@@ -66,12 +66,9 @@ class PayMongoService
                     'show_description'   => true,
                     'show_line_items'    => true,
                     'payment_method_types' => [
+                        'qrph',
                         'gcash',
                         'paymaya',
-                        'card',
-                        'qrph',
-                        'billease',
-                        'dobopay',
                     ],
                     'line_items'  => $lineItems,
                     'description' => 'Payment for Order #' . $order->order_number . ' at RAI MOTORCYCLE PARTS',

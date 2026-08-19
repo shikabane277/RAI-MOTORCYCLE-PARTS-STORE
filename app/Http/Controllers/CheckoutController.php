@@ -54,7 +54,7 @@ class CheckoutController extends Controller
             'province'       => 'required|string|max:100',
             'region'         => 'nullable|string|max:100',
             'zip_code'       => 'nullable|string|max:10',
-            'payment_method' => 'required|in:cod,gcash,maya,bank_transfer,google_pay',
+            'payment_method' => 'required|in:cod,google_pay,qrph',
             'notes'          => 'nullable|string|max:500',
         ]);
 
@@ -148,9 +148,9 @@ class CheckoutController extends Controller
             Payment::create([
                 'order_id'       => $order->id,
                 'gateway'        => $request->payment_method,
-                'transaction_id' => $gpayToken ?? null,
+                'gateway_ref'    => $gpayToken ?? null,
                 'amount'         => $grandTotal,
-                'status'         => $paymentStatus === 'paid' ? 'completed' : 'pending',
+                'status'         => $paymentStatus === 'paid' ? 'paid' : 'pending',
             ]);
 
             // Clear cart
@@ -162,8 +162,8 @@ class CheckoutController extends Controller
 
         $order = Order::find(session('last_order_id'));
 
-        // Handle PayMongo checkout session for GCash, Maya, Bank Transfer, or Online Payments
-        if (in_array($request->payment_method, ['gcash', 'maya', 'bank_transfer']) && $order) {
+        // Handle PayMongo checkout session for QR Ph payments (GCash, Maya, Banks)
+        if ($request->payment_method === 'qrph' && $order) {
             $payMongoService = app(\App\Services\PayMongoService::class);
             $payMongoResult  = $payMongoService->createCheckoutSession($order);
 
@@ -182,7 +182,7 @@ class CheckoutController extends Controller
                 'payment_status' => 'paid',
                 'status'         => 'confirmed',
             ]);
-            $order->payments()->update(['status' => 'completed']);
+            $order->payments()->update(['status' => 'paid']);
         }
 
         $order->load(['items', 'payments']);
@@ -205,9 +205,9 @@ class CheckoutController extends Controller
 
         $order->payments()->create([
             'gateway'        => 'google_pay',
-            'transaction_id' => $request->gpay_token,
+            'gateway_ref'    => $request->gpay_token,
             'amount'         => $order->grand_total,
-            'status'         => 'completed',
+            'status'         => 'paid',
         ]);
 
         return response()->json([
