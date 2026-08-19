@@ -157,14 +157,34 @@ class CheckoutController extends Controller
             $cart->items()->delete();
             $cart->delete();
 
-            session(['last_order_number' => $order->order_number]);
+            session(['last_order_id' => $order->id, 'last_order_number' => $order->order_number]);
         });
 
-        return redirect()->route('checkout.success', session('last_order_number'));
+        $order = Order::find(session('last_order_id'));
+
+        // Handle PayMongo checkout session for GCash, Maya, Bank Transfer, or Online Payments
+        if (in_array($request->payment_method, ['gcash', 'maya', 'bank_transfer']) && $order) {
+            $payMongoService = app(\App\Services\PayMongoService::class);
+            $payMongoResult  = $payMongoService->createCheckoutSession($order);
+
+            if (!empty($payMongoResult['success']) && !empty($payMongoResult['checkout_url'])) {
+                return redirect()->away($payMongoResult['checkout_url']);
+            }
+        }
+
+        return redirect()->route('checkout.success', $order ? $order->id : session('last_order_number'));
     }
 
-    public function success(Order $order)
+    public function success(Order $order, Request $request)
     {
+        if ($request->query('paymongo') === 'success') {
+            $order->update([
+                'payment_status' => 'paid',
+                'status'         => 'confirmed',
+            ]);
+            $order->payments()->update(['status' => 'completed']);
+        }
+
         $order->load(['items', 'payments']);
         return view('checkout.success', compact('order'));
     }
