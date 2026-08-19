@@ -11,26 +11,56 @@ class BrandController extends Controller
 {
     public function index()
     {
-        $brands = Brand::withCount('products')->get();
+        $brands = Brand::withCount('products')->orderBy('name')->get();
         return view('admin.brands.index', compact('brands'));
     }
 
     public function store(Request $request)
     {
-        $v = $request->validate(['name' => 'required|string|max:100', 'description' => 'nullable|string']);
-        Brand::create(array_merge($v, ['slug' => Str::slug($v['name']), 'is_active' => true]));
-        return back()->with('success', 'Brand created!');
+        $validated = $request->validate([
+            'name'        => 'required|string|max:100|unique:brands,name',
+            'logo_url'    => 'nullable|string|max:500',
+            'description' => 'nullable|string|max:1000',
+        ]);
+
+        $validated['slug'] = Str::slug($validated['name']);
+        $validated['is_active'] = true;
+
+        Brand::create($validated);
+
+        return redirect()->back()->with('success', 'Brand "' . $validated['name'] . '" created successfully!');
     }
 
     public function update(Request $request, Brand $brand)
     {
-        $brand->update($request->validate(['name' => 'required|string|max:100', 'description' => 'nullable|string', 'is_active' => 'boolean']));
-        return back()->with('success', 'Brand updated.');
+        $validated = $request->validate([
+            'name'        => 'required|string|max:100|unique:brands,name,' . $brand->id,
+            'logo_url'    => 'nullable|string|max:500',
+            'description' => 'nullable|string|max:1000',
+            'is_active'   => 'nullable|boolean',
+        ]);
+
+        $validated['slug'] = Str::slug($validated['name']);
+        $validated['is_active'] = $request->has('is_active') ? $request->boolean('is_active') : $brand->is_active;
+
+        $brand->update($validated);
+
+        return redirect()->back()->with('success', 'Brand updated successfully!');
+    }
+
+    public function toggle(Brand $brand)
+    {
+        $brand->update(['is_active' => !$brand->is_active]);
+
+        return redirect()->back()->with('success', 'Brand status updated!');
     }
 
     public function destroy(Brand $brand)
     {
-        $brand->update(['is_active' => false]);
-        return back()->with('success', 'Brand deactivated.');
+        // Reassign products to null if deleting brand
+        $brand->products()->update(['brand_id' => null]);
+        $brand->delete();
+
+        return redirect()->back()->with('success', 'Brand deleted successfully!');
     }
 }

@@ -109,6 +109,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
     // Brands
     Route::resource('brands', Admin\BrandController::class);
+    Route::patch('brands/{brand}/toggle', [App\Http\Controllers\Admin\BrandController::class, 'toggle'])->name('brands.toggle');
 
     // Filter Attributes (Materials, Colors, Thread Sizes)
     Route::resource('attributes', Admin\AttributeController::class)->only(['index', 'store', 'update', 'destroy']);
