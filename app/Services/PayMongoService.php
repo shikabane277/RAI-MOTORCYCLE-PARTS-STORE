@@ -66,6 +66,7 @@ class PayMongoService
                     'show_description'   => true,
                     'show_line_items'    => true,
                     'payment_method_types' => [
+                        'card',
                         'qrph',
                         'gcash',
                         'paymaya',

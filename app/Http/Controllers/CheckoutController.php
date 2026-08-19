@@ -80,13 +80,11 @@ class CheckoutController extends Controller
 
         $grandTotal = $subtotal + $shippingFee - $discount;
 
-        // Verify if Google Pay payment token was attached from frontend Google Pay API
-        $gpayToken = $request->input('gpay_token');
-        $isGpayPaid = ($request->payment_method === 'google_pay' && !empty($gpayToken));
-        $paymentStatus = $isGpayPaid ? 'paid' : 'pending';
-        $orderStatus = ($paymentStatus === 'paid' || $request->payment_method === 'cod') ? 'confirmed' : 'pending_payment';
+        // COD orders are confirmed immediately, online payments start as pending until PayMongo confirms
+        $paymentStatus = ($request->payment_method === 'cod') ? 'pending' : 'pending';
+        $orderStatus   = ($request->payment_method === 'cod') ? 'confirmed' : 'pending_payment';
 
-        DB::transaction(function () use ($request, $cart, $subtotal, $shippingFee, $discount, $grandTotal, $couponCode, $paymentStatus, $orderStatus, $gpayToken) {
+        DB::transaction(function () use ($request, $cart, $subtotal, $shippingFee, $discount, $grandTotal, $couponCode, $paymentStatus, $orderStatus) {
             // Create order
             $order = Order::create([
                 'order_number'    => Order::generateOrderNumber(),
@@ -147,10 +145,9 @@ class CheckoutController extends Controller
             // Create payment record
             Payment::create([
                 'order_id'       => $order->id,
-                'gateway'        => $request->payment_method,
-                'gateway_ref'    => $gpayToken ?? null,
+                'gateway'        => $request->payment_method === 'google_pay' ? 'paymongo_card' : ($request->payment_method === 'qrph' ? 'paymongo_qrph' : $request->payment_method),
                 'amount'         => $grandTotal,
-                'status'         => $paymentStatus === 'paid' ? 'paid' : 'pending',
+                'status'         => 'pending',
             ]);
 
             // Clear cart
@@ -162,8 +159,8 @@ class CheckoutController extends Controller
 
         $order = Order::find(session('last_order_id'));
 
-        // Handle PayMongo checkout session for QR Ph payments (GCash, Maya, Banks)
-        if ($request->payment_method === 'qrph' && $order) {
+        // Handle PayMongo checkout session for QR Ph and Google Pay payments
+        if (in_array($request->payment_method, ['qrph', 'google_pay']) && $order) {
             $payMongoService = app(\App\Services\PayMongoService::class);
             $payMongoResult  = $payMongoService->createCheckoutSession($order);
 
@@ -187,33 +184,5 @@ class CheckoutController extends Controller
 
         $order->load(['items', 'payments']);
         return view('checkout.success', compact('order'));
-    }
-
-    /**
-     * Complete Google Pay payment for an existing pending order
-     */
-    public function processGooglePay(Request $request, Order $order)
-    {
-        $request->validate([
-            'gpay_token' => 'required|string',
-        ]);
-
-        $order->update([
-            'payment_status' => 'paid',
-            'status'         => 'confirmed',
-        ]);
-
-        $order->payments()->create([
-            'gateway'        => 'google_pay',
-            'gateway_ref'    => $request->gpay_token,
-            'amount'         => $order->grand_total,
-            'status'         => 'paid',
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Google Pay payment authorized & confirmed!',
-            'redirect' => route('checkout.success', $order->order_number),
-        ]);
     }
 }
