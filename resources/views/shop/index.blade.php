@@ -29,38 +29,49 @@
                         </div>
                     </div>
                     {{-- Material --}}
+                    @if(isset($materials) && $materials->isNotEmpty())
                     <div class="mb-3">
                         <div class="form-label">Material</div>
-                        @foreach(['Titanium Gr5','Stainless A4','7075 Aluminum','Chromoly'] as $mat)
+                        @foreach($materials as $mat)
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="material" value="{{ $mat }}" id="mat_{{ $loop->index }}" {{ request('material') === $mat ? 'checked' : '' }}>
-                            <label class="form-check-label" for="mat_{{ $loop->index }}" style="color:var(--mb-muted);font-size:.88rem;">{{ $mat }}</label>
+                            <input class="form-check-input" type="radio" name="material" value="{{ $mat->name }}" id="mat_{{ $mat->id }}" {{ request('material') === $mat->name ? 'checked' : '' }}>
+                            <label class="form-check-label" for="mat_{{ $mat->id }}" style="color:var(--mb-muted);font-size:.88rem;">{{ $mat->name }}</label>
                         </div>
                         @endforeach
                     </div>
+                    @endif
+
                     {{-- Color --}}
+                    @if(isset($colors) && $colors->isNotEmpty())
                     <div class="mb-3">
                         <div class="form-label">Color</div>
                         <div class="d-flex flex-wrap gap-2">
-                            @foreach(['Black','Red','Blue','Gold','Silver','Rainbow'] as $c)
-                            <div class="color-swatch swatch-{{ strtolower($c) }} {{ request('color') === $c ? 'active' : '' }}"
-                                 title="{{ $c }}" onclick="document.getElementById('color-input').value='{{ $c }}';document.getElementById('filter-form').submit();"
-                                 style="cursor:pointer;"></div>
+                            @foreach($colors as $c)
+                            <div class="color-swatch {{ request('color') === $c->name ? 'active' : '' }}"
+                                 title="{{ $c->name }}" 
+                                 onclick="document.getElementById('color-input').value='{{ $c->name }}';document.getElementById('filter-form').submit();"
+                                 style="cursor:pointer;width:24px;height:24px;border-radius:50%;border:1px solid rgba(255,255,255,0.3);background:{{ $c->value ?? '#666' }};"></div>
                             @endforeach
                         </div>
                         <input type="hidden" id="color-input" name="color" value="{{ request('color') }}">
                     </div>
+                    @endif
+
                     {{-- Thread Size --}}
+                    @if(isset($threadSizes) && $threadSizes->isNotEmpty())
                     <div class="mb-3">
                         <div class="form-label">Thread Size</div>
-                        @foreach(['M5','M6','M8','M10','M12'] as $ts)
+                        @foreach($threadSizes as $ts)
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="thread_size" value="{{ $ts }}" id="ts_{{ $loop->index }}" {{ request('thread_size') === $ts ? 'checked' : '' }}>
-                            <label class="form-check-label" for="ts_{{ $loop->index }}" style="color:var(--mb-muted);font-size:.88rem;">{{ $ts }}</label>
+                            <input class="form-check-input" type="radio" name="thread_size" value="{{ $ts->name }}" id="ts_{{ $ts->id }}" {{ request('thread_size') === $ts->name ? 'checked' : '' }}>
+                            <label class="form-check-label" for="ts_{{ $ts->id }}" style="color:var(--mb-muted);font-size:.88rem;">{{ $ts->name }}</label>
                         </div>
                         @endforeach
                     </div>
+                    @endif
+
                     {{-- Brand --}}
+                    @if(isset($brands) && $brands->isNotEmpty())
                     <div class="mb-3">
                         <div class="form-label">Brand</div>
                         @foreach($brands as $brand)
@@ -70,6 +81,7 @@
                         </div>
                         @endforeach
                     </div>
+                    @endif
                     {{-- Fitment filter --}}
                     @if(session('fitment'))
                     <div class="mb-3">

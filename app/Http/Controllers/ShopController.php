@@ -6,6 +6,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\MotorcycleModel;
 use App\Models\Product;
+use App\Models\ProductAttribute;
 use Illuminate\Http\Request;
 
 class ShopController extends Controller
@@ -16,12 +17,15 @@ class ShopController extends Controller
 
         $this->applyFilters($query, $request);
 
-        $products = $query->paginate(20)->withQueryString();
-        $categories = Category::topLevel()->where('is_active', true)->with('children')->get();
-        $brands     = Brand::where('is_active', true)->get();
+        $products    = $query->paginate(20)->withQueryString();
+        $categories  = Category::topLevel()->where('is_active', true)->with('children')->get();
+        $brands      = Brand::where('is_active', true)->orderBy('name')->get();
+        $materials   = ProductAttribute::ofType('material')->active()->get();
+        $colors      = ProductAttribute::ofType('color')->active()->get();
+        $threadSizes = ProductAttribute::ofType('thread_size')->active()->get();
         $currentCategory = null;
 
-        return view('shop.index', compact('products', 'categories', 'brands', 'currentCategory'));
+        return view('shop.index', compact('products', 'categories', 'brands', 'materials', 'colors', 'threadSizes', 'currentCategory'));
     }
 
     public function category(Request $request, string $slug)
@@ -37,11 +41,14 @@ class ShopController extends Controller
 
         $this->applyFilters($query, $request);
 
-        $products   = $query->paginate(20)->withQueryString();
-        $categories = Category::topLevel()->where('is_active', true)->with('children')->get();
-        $brands     = Brand::where('is_active', true)->get();
+        $products    = $query->paginate(20)->withQueryString();
+        $categories  = Category::topLevel()->where('is_active', true)->with('children')->get();
+        $brands      = Brand::where('is_active', true)->orderBy('name')->get();
+        $materials   = ProductAttribute::ofType('material')->active()->get();
+        $colors      = ProductAttribute::ofType('color')->active()->get();
+        $threadSizes = ProductAttribute::ofType('thread_size')->active()->get();
 
-        return view('shop.index', compact('products', 'categories', 'brands', 'category'));
+        return view('shop.index', compact('products', 'categories', 'brands', 'materials', 'colors', 'threadSizes', 'category'));
     }
 
     private function applyFilters($query, Request $request): void

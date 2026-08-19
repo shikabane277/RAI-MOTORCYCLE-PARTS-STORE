@@ -60,9 +60,13 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $product->load('variants', 'motorcycleModels');
-        $brands     = Brand::where('is_active', true)->get();
-        $categories = Category::where('is_active', true)->get();
-        return view('admin.products.edit', compact('product', 'brands', 'categories'));
+        $brands      = Brand::where('is_active', true)->orderBy('name')->get();
+        $categories  = Category::where('is_active', true)->get();
+        $materials   = \App\Models\ProductAttribute::ofType('material')->active()->get();
+        $colors      = \App\Models\ProductAttribute::ofType('color')->active()->get();
+        $threadSizes = \App\Models\ProductAttribute::ofType('thread_size')->active()->get();
+
+        return view('admin.products.edit', compact('product', 'brands', 'categories', 'materials', 'colors', 'threadSizes'));
     }
 
     public function update(Request $request, Product $product)

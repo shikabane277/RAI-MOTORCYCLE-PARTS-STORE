@@ -110,6 +110,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     // Brands
     Route::resource('brands', Admin\BrandController::class);
 
+    // Filter Attributes (Materials, Colors, Thread Sizes)
+    Route::resource('attributes', Admin\AttributeController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::patch('attributes/{attribute}/toggle', [App\Http\Controllers\Admin\AttributeController::class, 'toggle'])->name('attributes.toggle');
+
     // Fitments
     Route::get('fitments', [Admin\FitmentController::class, 'index'])->name('fitments.index');
     Route::post('fitments/{product}/attach', [Admin\FitmentController::class, 'attach'])->name('fitments.attach');

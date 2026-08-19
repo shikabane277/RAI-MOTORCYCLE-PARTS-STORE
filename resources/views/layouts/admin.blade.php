@@ -37,6 +37,9 @@
         <a href="{{ route('admin.brands.index') }}" class="admin-nav-item {{ request()->routeIs('admin.brands*') ? 'active' : '' }}">
             <i class="bi bi-award"></i> Brands
         </a>
+        <a href="{{ route('admin.attributes.index') }}" class="admin-nav-item {{ request()->routeIs('admin.attributes*') ? 'active' : '' }}">
+            <i class="bi bi-sliders"></i> Filter Options
+        </a>
         <a href="{{ route('admin.fitments.index') }}" class="admin-nav-item {{ request()->routeIs('admin.fitments*') ? 'active' : '' }}">
             <i class="bi bi-motorcycle"></i> Fitments
         </a>

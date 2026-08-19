@@ -92,13 +92,30 @@
                     <form method="POST" action="{{ route('admin.products.variants.store', $product) }}">
                         @csrf
                         <div class="row g-2">
-                            <div class="col-md-3"><label class="form-label">Color *</label><input type="text" name="color" class="form-control" required></div>
-                            <div class="col-md-3"><label class="form-label">Material *</label>
-                                <select name="material" class="form-select">
-                                    <option>Titanium Gr5</option><option>Stainless A4</option><option>7075 Aluminum</option><option>Chromoly</option>
+                            <div class="col-md-3"><label class="form-label">Color *</label>
+                                <select name="color" class="form-select" required>
+                                    <option value="">— Select Color —</option>
+                                    @if(isset($colors))
+                                        @foreach($colors as $c)<option value="{{ $c->name }}">{{ $c->name }}</option>@endforeach
+                                    @endif
                                 </select>
                             </div>
-                            <div class="col-md-2"><label class="form-label">Thread Size</label><input type="text" name="thread_size" class="form-control" placeholder="M6"></div>
+                            <div class="col-md-3"><label class="form-label">Material *</label>
+                                <select name="material" class="form-select" required>
+                                    <option value="">— Select Material —</option>
+                                    @if(isset($materials))
+                                        @foreach($materials as $m)<option value="{{ $m->name }}">{{ $m->name }}</option>@endforeach
+                                    @endif
+                                </select>
+                            </div>
+                            <div class="col-md-2"><label class="form-label">Thread Size</label>
+                                <select name="thread_size" class="form-select">
+                                    <option value="">— N/A —</option>
+                                    @if(isset($threadSizes))
+                                        @foreach($threadSizes as $ts)<option value="{{ $ts->name }}">{{ $ts->name }}</option>@endforeach
+                                    @endif
+                                </select>
+                            </div>
                             <div class="col-md-2"><label class="form-label">Pack Qty *</label><input type="number" name="pack_qty" class="form-control" value="1" required></div>
                             <div class="col-md-2"><label class="form-label">Finish</label><input type="text" name="finish" class="form-control" placeholder="anodized"></div>
                             <div class="col-md-3"><label class="form-label">Price (₱) *</label><input type="number" name="price" step="0.01" class="form-control" required></div>
