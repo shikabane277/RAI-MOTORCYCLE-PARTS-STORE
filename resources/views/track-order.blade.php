@@ -120,8 +120,16 @@
                     </div>
                     @endif
 
-                    <div class="mt-3 text-end" style="font-size:.75rem;color:var(--mb-muted);">
-                        <i class="bi bi-clock-history me-1"></i>Last updated: {{ $lalamoveTracking['updated_at'] }}
+                    <div class="mt-3 d-flex justify-content-between align-items-center flex-wrap gap-2" style="font-size:.75rem;color:var(--mb-muted);">
+                        <div>
+                            <i class="bi bi-clock-history me-1"></i>Last updated: {{ $lalamoveTracking['updated_at'] }}
+                        </div>
+                        <form method="POST" action="{{ route('order.track.advance', $order->order_number) }}">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-outline-gold py-1 px-2" style="font-size:.75rem;">
+                                ⚡ Simulate Lalamove Delivery Progress (Step {{ ($lalamoveTracking['step'] % 4) + 1 }}/4)
+                            </button>
+                        </form>
                     </div>
                 </div>
                 @endif

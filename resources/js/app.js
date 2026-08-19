@@ -1,4 +1,5 @@
-import 'bootstrap';
+import * as bootstrap from 'bootstrap';
+window.bootstrap = bootstrap;
 import Swiper from 'swiper/bundle';
 
 // ── Scroll-aware header ───────────────────────────────────

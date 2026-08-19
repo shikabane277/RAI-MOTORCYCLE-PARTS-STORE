@@ -53,10 +53,10 @@ class LalamoveService
     /**
      * Fetch order status from Lalamove API (or mock tracking if API credentials are not set)
      */
-    public function getTrackingStatus(string $trackingNumber): array
+    public function getTrackingStatus(string $trackingNumber, ?int $forcedStep = null): array
     {
         if (empty($this->apiKey) || empty($this->apiSecret)) {
-            return $this->getMockLalamoveTracking($trackingNumber);
+            return $this->getMockLalamoveTracking($trackingNumber, $forcedStep);
         }
 
         try {
@@ -87,34 +87,38 @@ class LalamoveService
             // Fall back to mock response on error
         }
 
-        return $this->getMockLalamoveTracking($trackingNumber);
+        return $this->getMockLalamoveTracking($trackingNumber, $forcedStep);
     }
 
     /**
      * Realistic Lalamove tracking simulator for test environment
      */
-    protected function getMockLalamoveTracking(string $trackingNumber): array
+    protected function getMockLalamoveTracking(string $trackingNumber, ?int $forcedStep = null): array
     {
         $statuses = [
-            'ASSIGNING_DRIVER' => [
+            1 => [
+                'code' => 'ASSIGNING_DRIVER',
                 'step' => 1,
                 'title' => 'Finding Nearby Lalamove Rider 🛵',
-                'desc' => 'Searching for a Lalamove rider near our warehouse in Metro Manila...',
+                'desc' => 'Searching for a Lalamove rider near RAI warehouse in Metro Manila...',
                 'badge' => 'warning',
             ],
-            'ON_GO' => [
+            2 => [
+                'code' => 'ON_GO',
                 'step' => 2,
                 'title' => 'Rider On The Way to Pickup 📦',
                 'desc' => 'Lalamove rider Kuya Mark is heading to RAI Motorcycle Parts warehouse.',
                 'badge' => 'info',
             ],
-            'PICKED_UP' => [
+            3 => [
+                'code' => 'PICKED_UP',
                 'step' => 3,
                 'title' => 'Package Picked Up & In Transit 💨',
-                'desc' => 'Your motorcycle parts have been picked up and are en route to your address!',
+                'desc' => 'Your motorcycle parts have been picked up and are en route to your delivery address!',
                 'badge' => 'primary',
             ],
-            'COMPLETED' => [
+            4 => [
+                'code' => 'COMPLETED',
                 'step' => 4,
                 'title' => 'Delivered Successfully 🎉',
                 'desc' => 'Package delivered to recipient. Thank you for riding with RAI Motorcycle Parts!',
@@ -122,17 +126,18 @@ class LalamoveService
             ],
         ];
 
-        // Deterministic status based on tracking number
-        $keys = array_keys($statuses);
-        $index = abs(crc32($trackingNumber)) % count($keys);
-        $selectedKey = $keys[$index];
-        $selected = $statuses[$selectedKey];
+        if ($forcedStep && isset($statuses[$forcedStep])) {
+            $selected = $statuses[$forcedStep];
+        } else {
+            $stepIndex = (abs(crc32($trackingNumber)) % 4) + 1;
+            $selected = $statuses[$stepIndex];
+        }
 
         return [
             'success' => true,
             'is_mock' => true,
             'tracking_number' => $trackingNumber,
-            'status_code' => $selectedKey,
+            'status_code' => $selected['code'],
             'step' => $selected['step'],
             'title' => $selected['title'],
             'description' => $selected['desc'],
@@ -142,7 +147,7 @@ class LalamoveService
                 'phone' => '0917-889-2041',
                 'vehicle' => 'Yamaha NMAX (Plate: 882-XYZ)',
             ],
-            'eta' => now()->addMinutes(35)->format('g:i A'),
+            'eta' => ($selected['step'] === 4) ? 'Delivered' : now()->addMinutes(35)->format('g:i A'),
             'updated_at' => now()->format('M d, Y g:i A'),
         ];
     }

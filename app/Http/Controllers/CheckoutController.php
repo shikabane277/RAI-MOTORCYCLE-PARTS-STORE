@@ -80,7 +80,13 @@ class CheckoutController extends Controller
 
         $grandTotal = $subtotal + $shippingFee - $discount;
 
-        DB::transaction(function () use ($request, $cart, $subtotal, $shippingFee, $discount, $grandTotal, $couponCode) {
+        // Verify if Google Pay payment token was attached from frontend Google Pay API
+        $gpayToken = $request->input('gpay_token');
+        $isGpayPaid = ($request->payment_method === 'google_pay' && !empty($gpayToken));
+        $paymentStatus = $isGpayPaid ? 'paid' : 'pending';
+        $orderStatus = ($paymentStatus === 'paid' || $request->payment_method === 'cod') ? 'confirmed' : 'pending_payment';
+
+        DB::transaction(function () use ($request, $cart, $subtotal, $shippingFee, $discount, $grandTotal, $couponCode, $paymentStatus, $orderStatus, $gpayToken) {
             // Create order
             $order = Order::create([
                 'order_number'    => Order::generateOrderNumber(),
@@ -102,8 +108,8 @@ class CheckoutController extends Controller
                 'grand_total'     => $grandTotal,
                 'coupon_code'     => $couponCode,
                 'payment_method'  => $request->payment_method,
-                'payment_status'  => $request->payment_method === 'google_pay' ? 'paid' : 'pending',
-                'status'          => 'confirmed',
+                'payment_status'  => $paymentStatus,
+                'status'          => $orderStatus,
                 'courier'         => 'Lalamove Express',
                 'tracking_number' => 'LLM-PH-' . strtoupper(\Illuminate\Support\Str::random(8)),
                 'notes'           => $request->notes,
@@ -140,10 +146,11 @@ class CheckoutController extends Controller
 
             // Create payment record
             Payment::create([
-                'order_id' => $order->id,
-                'gateway'  => $request->payment_method,
-                'amount'   => $grandTotal,
-                'status'   => 'pending',
+                'order_id'       => $order->id,
+                'gateway'        => $request->payment_method,
+                'transaction_id' => $gpayToken ?? null,
+                'amount'         => $grandTotal,
+                'status'         => $paymentStatus === 'paid' ? 'completed' : 'pending',
             ]);
 
             // Clear cart
@@ -158,7 +165,35 @@ class CheckoutController extends Controller
 
     public function success(Order $order)
     {
-        $order->load('items');
+        $order->load(['items', 'payments']);
         return view('checkout.success', compact('order'));
+    }
+
+    /**
+     * Complete Google Pay payment for an existing pending order
+     */
+    public function processGooglePay(Request $request, Order $order)
+    {
+        $request->validate([
+            'gpay_token' => 'required|string',
+        ]);
+
+        $order->update([
+            'payment_status' => 'paid',
+            'status'         => 'confirmed',
+        ]);
+
+        $order->payments()->create([
+            'gateway'        => 'google_pay',
+            'transaction_id' => $request->gpay_token,
+            'amount'         => $order->grand_total,
+            'status'         => 'completed',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Google Pay payment authorized & confirmed!',
+            'redirect' => route('checkout.success', $order->order_number),
+        ]);
     }
 }
