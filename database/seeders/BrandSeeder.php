@@ -14,7 +14,7 @@ class BrandSeeder extends Seeder
             ['name' => 'CNC Racing',  'slug' => 'cnc-racing',  'description' => 'Italian-designed CNC machined motorcycle accessories and hardware.'],
             ['name' => 'BikeMaster',  'slug' => 'bikemaster',  'description' => 'Trusted OEM-quality replacement hardware for all motorcycle types.'],
             ['name' => 'LightSpeed',  'slug' => 'lightspeed',  'description' => 'Ultralight titanium fasteners for weight-conscious riders.'],
-            ['name' => 'MachBolt',    'slug' => 'machbolt',    'description' => 'Our in-house brand — precision CNC parts made for Filipino riders.'],
+            ['name' => 'RAI',         'slug' => 'rai',         'description' => 'Our in-house brand — precision motorcycle parts made for Filipino riders.'],
         ];
 
         foreach ($brands as $brand) {

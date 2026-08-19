@@ -33,6 +33,9 @@ class OrderController extends Controller
             return back()->withErrors(['order_number' => 'Order not found.']);
         }
 
-        return view('track-order', compact('order'));
+        $lalamoveService = app(\App\Services\LalamoveService::class);
+        $lalamoveTracking = $lalamoveService->getTrackingStatus($order->tracking_number ?? 'LLM-PH-DEMO123');
+
+        return view('track-order', compact('order', 'lalamoveTracking'));
     }
 }

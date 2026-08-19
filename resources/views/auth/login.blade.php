@@ -3,7 +3,7 @@
 @section('auth-content')
 
 <div class="auth-title">Welcome Back</div>
-<p class="auth-subtitle">Sign in to your MachBolt PH account</p>
+<p class="auth-subtitle">Sign in to your RAI MOTORCYCLE PARTS account</p>
 
 {{-- Session Status (e.g. password reset link sent) --}}
 @if (session('status'))

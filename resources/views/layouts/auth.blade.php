@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'MachBolt PH') — Login</title>
-    <meta name="description" content="Sign in to your MachBolt PH account to track orders, manage your wishlist, and access exclusive rider deals.">
+    <title>@yield('title', 'RAI MOTORCYCLE PARTS') — Login</title>
+    <meta name="description" content="Sign in to your RAI MOTORCYCLE PARTS account to track orders, manage your wishlist, and access exclusive rider deals.">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         .auth-page {

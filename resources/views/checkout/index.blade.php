@@ -1,11 +1,26 @@
 @extends('layouts.app')
-@section('title', 'Checkout — MachBolt PH')
+@section('title', 'Checkout — RAI MOTORCYCLE PARTS')
 
 @section('content')
 <div class="container-xl py-4">
-    <h1 style="font-family:'Rajdhani',sans-serif;font-size:1.8rem;font-weight:700;color:#fff;margin-bottom:1.5rem;">
+    <h1 style="font-family:'Rajdhani',sans-serif;font-size:1.8rem;font-weight:700;color:#fff;margin-bottom:1rem;">
         <i class="bi bi-bag-check text-gold me-2"></i>Checkout
     </h1>
+
+    {{-- Lalamove Dispatch Banner --}}
+    @if(isset($lalamoveWindow))
+    <div class="mb-4 p-3 d-flex align-items-center gap-3" style="background:{{ $lalamoveWindow['is_active'] ? 'rgba(0,200,83,0.1)' : 'rgba(245,166,35,0.1)' }};border:1px solid {{ $lalamoveWindow['is_active'] ? 'rgba(0,200,83,0.3)' : 'rgba(245,166,35,0.3)' }};border-radius:var(--mb-radius-sm);">
+        <div style="font-size:1.5rem;">🛵</div>
+        <div>
+            <div style="font-weight:700;color:{{ $lalamoveWindow['is_active'] ? 'var(--mb-green)' : 'var(--mb-gold)' }};font-size:.95rem;">
+                {{ $lalamoveWindow['message'] }}
+            </div>
+            <div style="font-size:.82rem;color:var(--mb-muted);">
+                {{ $lalamoveWindow['subtext'] }}
+            </div>
+        </div>
+    </div>
+    @endif
 
     <div class="row g-4">
         {{-- ── Left: Form ─────────────────────────────────── --}}

@@ -37,7 +37,10 @@ class CheckoutController extends Controller
         $shippingFee = $cart->subtotal >= 1500 ? 0 : 89;
         $defaultAddress = auth()->check() ? auth()->user()->addresses()->where('is_default', true)->first() : null;
 
-        return view('checkout.index', compact('cart', 'coupon', 'discount', 'shippingFee', 'defaultAddress'));
+        $lalamoveService = app(\App\Services\LalamoveService::class);
+        $lalamoveWindow = $lalamoveService->isSameDayWindowActive();
+
+        return view('checkout.index', compact('cart', 'coupon', 'discount', 'shippingFee', 'defaultAddress', 'lalamoveWindow'));
     }
 
     public function store(Request $request)
@@ -80,29 +83,31 @@ class CheckoutController extends Controller
         DB::transaction(function () use ($request, $cart, $subtotal, $shippingFee, $discount, $grandTotal, $couponCode) {
             // Create order
             $order = Order::create([
-                'order_number'   => Order::generateOrderNumber(),
-                'user_id'        => auth()->id(),
-                'guest_name'     => auth()->check() ? null : $request->recipient_name,
-                'guest_email'    => auth()->check() ? null : $request->guest_email,
-                'guest_phone'    => auth()->check() ? null : $request->phone,
-                'ship_recipient' => $request->recipient_name,
-                'ship_phone'     => $request->phone,
-                'ship_line1'     => $request->line1,
-                'ship_barangay'  => $request->barangay,
-                'ship_city'      => $request->city,
-                'ship_province'  => $request->province,
-                'ship_region'    => $request->region,
-                'ship_zip'       => $request->zip_code,
-                'subtotal'       => $subtotal,
-                'shipping_fee'   => $shippingFee,
-                'discount_total' => $discount,
-                'grand_total'    => $grandTotal,
-                'coupon_code'    => $couponCode,
-                'payment_method' => $request->payment_method,
-                'payment_status' => $request->payment_method === 'google_pay' ? 'paid' : 'pending',
-                'status'         => 'confirmed',
-                'notes'          => $request->notes,
-                'placed_at'      => now(),
+                'order_number'    => Order::generateOrderNumber(),
+                'user_id'         => auth()->id(),
+                'guest_name'      => auth()->check() ? null : $request->recipient_name,
+                'guest_email'     => auth()->check() ? null : $request->guest_email,
+                'guest_phone'     => auth()->check() ? null : $request->phone,
+                'ship_recipient'  => $request->recipient_name,
+                'ship_phone'      => $request->phone,
+                'ship_line1'      => $request->line1,
+                'ship_barangay'   => $request->barangay,
+                'ship_city'       => $request->city,
+                'ship_province'   => $request->province,
+                'ship_region'     => $request->region,
+                'ship_zip'        => $request->zip_code,
+                'subtotal'        => $subtotal,
+                'shipping_fee'    => $shippingFee,
+                'discount_total'  => $discount,
+                'grand_total'     => $grandTotal,
+                'coupon_code'     => $couponCode,
+                'payment_method'  => $request->payment_method,
+                'payment_status'  => $request->payment_method === 'google_pay' ? 'paid' : 'pending',
+                'status'          => 'confirmed',
+                'courier'         => 'Lalamove Express',
+                'tracking_number' => 'LLM-PH-' . strtoupper(\Illuminate\Support\Str::random(8)),
+                'notes'           => $request->notes,
+                'placed_at'       => now(),
             ]);
 
             // Create order items and decrement stock

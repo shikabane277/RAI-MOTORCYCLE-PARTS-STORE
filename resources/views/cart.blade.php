@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Your Cart — MachBolt PH')
+@section('title', 'Your Cart — RAI MOTORCYCLE PARTS')
 
 @section('content')
 <div class="container-xl py-4">
@@ -32,7 +32,7 @@
                     </a>
                     {{-- Info --}}
                     <div class="flex-grow-1">
-                        <div class="product-brand">{{ $product->brand?->name ?? 'MachBolt' }}</div>
+                        <div class="product-brand">{{ $product->brand?->name ?? 'RAI' }}</div>
                         <a href="{{ route('product.show', $product->slug) }}" class="text-decoration-none">
                             <div style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:600;color:var(--mb-text);">{{ $product->name }}</div>
                         </a>

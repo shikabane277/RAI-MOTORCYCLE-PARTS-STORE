@@ -20,7 +20,7 @@ th { background: #f0f0f0; font-weight: 700; }
             <img src="/images/logo.png" alt="RAI Logo" style="height:40px;width:40px;border-radius:50%;">
             <div>
                 <h1 style="margin:0;font-size:1.4rem;">RAI MOTORCYCLE PARTS</h1>
-                <div style="color:#666;font-size:11px;">Precision CNC Parts for Filipino Riders</div>
+                <div style="color:#666;font-size:11px;">Your Trusted Motorcycle Parts Store</div>
             </div>
         </div>
     <div style="text-align:right;">

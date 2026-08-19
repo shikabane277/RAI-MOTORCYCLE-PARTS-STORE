@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'RAI MOTORCYCLE PARTS') — Precision CNC Parts for Filipino Riders</title>
+    <title>@yield('title', 'RAI MOTORCYCLE PARTS') — Your Trusted Motorcycle Parts Store</title>
     <meta name="description" content="@yield('meta_description', 'RAI MOTORCYCLE PARTS — Premium CNC-machined bolts, fasteners, and motorcycle accessories for Filipino riders. Titanium, stainless, anodized aluminum. Fast shipping via J&T and Ninja Van.')">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -16,7 +16,7 @@
     <div class="container-fluid px-3">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
             <span class="text-gold fw-semibold">&#x1F3CD;&#xFE0F; FREE SHIPPING on orders &#x20B1;1,500+</span>
-            <span class="text-muted-custom">&#x1F4E6; Metro Manila same-day dispatch before 12NN</span>
+            <span class="text-muted-custom">🛵 Lalamove Express Same-Day Delivery (Orders 8:00 AM – 4:00 PM)</span>
             <div class="d-flex gap-3">
                 <a href="{{ route('order.track') }}" class="text-muted-custom text-decoration-none" style="font-size:.8rem"><i class="bi bi-geo-alt me-1"></i>Track Order</a>
                 @auth

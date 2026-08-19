@@ -58,7 +58,7 @@ class SocialAuthController extends Controller
                 } else {
                     $user = User::create([
                         'name' => $socialUser->getName() ?? $socialUser->getNickname() ?? ucfirst($provider) . ' User',
-                        'email' => $socialUser->getEmail() ?? ($socialUser->getId() . "@{$provider}.machbolt.ph"),
+                        'email' => $socialUser->getEmail() ?? ($socialUser->getId() . "@{$provider}.raimotorcycleparts.ph"),
                         'password' => Hash::make(Str::random(24)),
                         'provider' => $provider,
                         'provider_id' => $socialUser->getId(),
@@ -81,7 +81,7 @@ class SocialAuthController extends Controller
      */
     protected function handleDemoSocialLogin(string $provider)
     {
-        $demoEmail = "demo.{$provider}@machbolt.ph";
+        $demoEmail = "demo.{$provider}@raimotorcycleparts.ph";
         $providerName = ucfirst($provider);
 
         $user = User::where('email', $demoEmail)->first();

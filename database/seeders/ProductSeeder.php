@@ -13,7 +13,7 @@ class ProductSeeder extends Seeder
 {
     public function run(): void
     {
-        $machbolt  = Brand::where('slug', 'machbolt')->first();
+        $rai  = Brand::where('slug', 'rai')->first();
         $probolt   = Brand::where('slug', 'probolt')->first();
         $cncRacing = Brand::where('slug', 'cnc-racing')->first();
 
@@ -49,7 +49,7 @@ class ProductSeeder extends Seeder
             [
                 'name'              => 'CNC Anodized Fairing Bolt Kit',
                 'slug'              => 'cnc-anodized-fairing-bolt-kit',
-                'brand_id'          => $machbolt->id,
+                'brand_id'          => $rai->id,
                 'category_id'       => $fairingCat->id,
                 'description'       => 'Upgrade your fairing hardware with our precision CNC-machined anodized bolt kits. Each kit is hand-counted and individually packaged. Available in 6 colors to match your build.',
                 'short_description' => 'Full fairing bolt set, 8 pcs, CNC anodized. Available in 6 colors.',
@@ -88,7 +88,7 @@ class ProductSeeder extends Seeder
             [
                 'name'              => 'Engine Cover Bolt Kit — M6 CNC',
                 'slug'              => 'engine-cover-bolt-kit-m6-cnc',
-                'brand_id'          => $machbolt->id,
+                'brand_id'          => $rai->id,
                 'category_id'       => $engineCat->id,
                 'description'       => 'CNC-machined engine cover bolts with hex flange heads. Perfect for riders who want a clean, uniform engine bay. Stainless A4 for long-term corrosion resistance.',
                 'short_description' => 'Engine cover bolt kit, M6 flange hex, 12 pcs.',
@@ -107,7 +107,7 @@ class ProductSeeder extends Seeder
             [
                 'name'              => 'CNC Disc Rotor Bolt Set',
                 'slug'              => 'cnc-disc-rotor-bolt-set',
-                'brand_id'          => $machbolt->id,
+                'brand_id'          => $rai->id,
                 'category_id'       => $discCat->id,
                 'description'       => 'High-torque disc rotor bolts with locking compound. Precision CNC machined, available in anodized finishes. Sold in sets of 6.',
                 'short_description' => 'Disc rotor bolt set, 6 pcs. CNC anodized.',
@@ -148,7 +148,7 @@ class ProductSeeder extends Seeder
             [
                 'name'              => 'CNC Billet Foot Pegs — Universal',
                 'slug'              => 'cnc-billet-foot-pegs-universal',
-                'brand_id'          => $machbolt->id,
+                'brand_id'          => $rai->id,
                 'category_id'       => $footpegCat->id,
                 'description'       => 'Lightweight CNC billet aluminum foot pegs with non-slip knurling. Wide platform for comfortable cornering. Universal 10mm pin mount.',
                 'short_description' => 'CNC billet foot pegs, pair, 10mm pin.',
@@ -186,7 +186,7 @@ class ProductSeeder extends Seeder
             [
                 'name'              => 'CNC Swingarm Spools — M8 x 1.25',
                 'slug'              => 'cnc-swingarm-spools-m8',
-                'brand_id'          => $machbolt->id,
+                'brand_id'          => $rai->id,
                 'category_id'       => $spoolCat->id,
                 'description'       => 'CNC-machined swingarm spools for paddock stand use. M8 x 1.25 thread. Pair.',
                 'short_description' => 'Swingarm spools, M8, pair, CNC anodized.',
@@ -207,7 +207,7 @@ class ProductSeeder extends Seeder
             [
                 'name'              => 'CNC Oil Filler Cap — Universal Anodized',
                 'slug'              => 'cnc-oil-filler-cap-universal',
-                'brand_id'          => $machbolt->id,
+                'brand_id'          => $rai->id,
                 'category_id'       => $capCat->id,
                 'description'       => 'CNC-machined anodized oil filler cap. Fits most 30mm and 35mm oil filler ports. O-ring sealed, no leaks.',
                 'short_description' => 'CNC oil filler cap, anodized. Universal fit.',
@@ -228,7 +228,7 @@ class ProductSeeder extends Seeder
             [
                 'name'              => 'Handlebar Clamp Bolt Set — M5 CNC',
                 'slug'              => 'handlebar-clamp-bolt-set-m5-cnc',
-                'brand_id'          => $machbolt->id,
+                'brand_id'          => $rai->id,
                 'category_id'       => $handlebarCat->id,
                 'description'       => 'CNC machined M5 handlebar clamp bolts. Button head for sleek look. 4-piece set covers standard clamp.',
                 'short_description' => 'Handlebar clamp bolt set, M5 button head, 4 pcs.',

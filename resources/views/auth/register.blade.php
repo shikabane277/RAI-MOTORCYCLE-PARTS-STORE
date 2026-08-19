@@ -3,7 +3,7 @@
 @section('auth-content')
 
 <div class="auth-title">Create Account</div>
-<p class="auth-subtitle">Join MachBolt PH — free, fast, and built for riders</p>
+<p class="auth-subtitle">Join RAI MOTORCYCLE PARTS — free, fast, and built for riders</p>
 
 {{-- Validation Errors --}}
 @if ($errors->any())

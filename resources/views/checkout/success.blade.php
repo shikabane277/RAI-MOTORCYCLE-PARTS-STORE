@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Order Confirmed — MachBolt PH')
+@section('title', 'Order Confirmed — RAI MOTORCYCLE PARTS')
 
 @section('content')
 <div class="container-xl py-5">
@@ -57,7 +57,7 @@
                 @elseif($order->payment_method === 'gcash')
                 <p style="color:var(--mb-text);">Send <strong>&#x20B1;{{ number_format($order->grand_total, 2) }}</strong> to our GCash number:</p>
                 <div style="font-family:'Rajdhani',sans-serif;font-size:1.5rem;color:var(--mb-gold);font-weight:700;">09XX-XXX-XXXX</div>
-                <p style="color:var(--mb-muted);font-size:.85rem;margin-top:.5rem;">Account name: MachBolt PH. Use your order number <strong>{{ $order->order_number }}</strong> as reference. Screenshot proof and send to our FB/Viber.</p>
+                <p style="color:var(--mb-muted);font-size:.85rem;margin-top:.5rem;">Account name: RAI MOTORCYCLE PARTS. Use your order number <strong>{{ $order->order_number }}</strong> as reference. Screenshot proof and send to our FB/Viber.</p>
                 @elseif($order->payment_method === 'maya')
                 <p style="color:var(--mb-text);">Send <strong>&#x20B1;{{ number_format($order->grand_total, 2) }}</strong> to our Maya number:</p>
                 <div style="font-family:'Rajdhani',sans-serif;font-size:1.5rem;color:var(--mb-gold);font-weight:700;">09XX-XXX-XXXX</div>
@@ -67,7 +67,7 @@
                 <div style="font-size:.9rem;line-height:2;color:var(--mb-text);">
                     <div><span style="color:var(--mb-muted);">BDO:</span> <strong>1234 5678 9012</strong></div>
                     <div><span style="color:var(--mb-muted);">BPI:</span> <strong>0123 4567 89</strong></div>
-                    <div><span style="color:var(--mb-muted);">Account Name:</span> <strong>MachBolt PH</strong></div>
+                    <div><span style="color:var(--mb-muted);">Account Name:</span> <strong>RAI MOTORCYCLE PARTS</strong></div>
                 </div>
                 <p style="color:var(--mb-muted);font-size:.85rem;margin-top:.5rem;">Reference: <strong>{{ $order->order_number }}</strong>. Send transfer receipt to our FB or Viber.</p>
                 @endif

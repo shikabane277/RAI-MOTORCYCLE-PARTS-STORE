@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'RAI MOTORCYCLE PARTS — Precision CNC Parts for Filipino Riders')
+@section('title', 'RAI MOTORCYCLE PARTS — Your Trusted Motorcycle Parts Store')
 @section('meta_description', 'Shop CNC-machined motorcycle bolts, fasteners, levers, foot pegs, and accessories. Premium titanium and anodized aluminum hardware. Fast PH shipping.')
 
 @section('content')

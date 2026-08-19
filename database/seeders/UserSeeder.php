@@ -12,8 +12,8 @@ class UserSeeder extends Seeder
     {
         // Admin
         User::create([
-            'name'     => 'MachBolt Admin',
-            'email'    => 'admin@machbolt.ph',
+            'name'     => 'RAI Admin',
+            'email'    => 'admin@raimotorcycleparts.ph',
             'phone'    => '09171234567',
             'password' => Hash::make('password'),
             'role'     => 'admin',
@@ -22,7 +22,7 @@ class UserSeeder extends Seeder
         // Staff
         User::create([
             'name'     => 'Juan Catalog',
-            'email'    => 'catalog@machbolt.ph',
+            'email'    => 'catalog@raimotorcycleparts.ph',
             'phone'    => '09179876543',
             'password' => Hash::make('password'),
             'role'     => 'catalog_manager',
@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
 
         User::create([
             'name'     => 'Pedro Packer',
-            'email'    => 'packer@machbolt.ph',
+            'email'    => 'packer@raimotorcycleparts.ph',
             'phone'    => '09185551234',
             'password' => Hash::make('password'),
             'role'     => 'packer',

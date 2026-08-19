@@ -41,5 +41,11 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI', '/auth/google/callback'),
     ],
 
+    'lalamove' => [
+        'key' => env('LALAMOVE_API_KEY'),
+        'secret' => env('LALAMOVE_API_SECRET'),
+        'env' => env('LALAMOVE_ENV', 'sandbox'),
+    ],
+
 ];
 

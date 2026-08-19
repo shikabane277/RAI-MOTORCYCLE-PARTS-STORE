@@ -23,7 +23,7 @@ class ReviewSeeder extends Seeder
             'Okay naman pero yung packing pwede pa i-improve. Lahat naman naka-receive in good condition.',
             'Exactly as described. My Sniper 155 looks race-ready now. Will order more colors!',
             'Sulit na sulit! Nakuha ko pa discount sa WELCOME10 code. Maganda ang color, hindi mabilis mag-fade.',
-            'I\'ve tried other brands but MachBolt is the best quality for the price in PH. Lagi na ko mag o-order dito.',
+            'I\'ve tried other brands but RAI is the best quality for the price in PH. Lagi na ko mag o-order dito.',
             'Fit and finish is excellent. You can tell these were precision machined. The anodized finish is consistent.',
             'Nag-order ako ng black at blue — both look awesome. Pinaka-magandang upgrade sa aking Click 160.',
             'Delivered in 2 days! Ang bilis. Quality is consistent with my previous order. Will definitely reorder.',

@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', $product->name . ' — MachBolt PH')
+@section('title', $product->name . ' — RAI MOTORCYCLE PARTS')
 @section('meta_description', $product->short_description ?? Str::limit($product->description, 160))
 
 @section('content')
@@ -257,7 +257,7 @@
                     <p style="color:var(--mb-text);font-size:.9rem;line-height:1.6;margin:0;">{{ $review->comment }}</p>
                     @if($review->admin_reply)
                     <div class="mt-2 p-2" style="background:var(--mb-gold-dim);border-radius:var(--mb-radius-sm);font-size:.82rem;color:var(--mb-gold);">
-                        <i class="bi bi-reply me-1"></i><strong>MachBolt:</strong> {{ $review->admin_reply }}
+                        <i class="bi bi-reply me-1"></i><strong>RAI MOTORCYCLE PARTS:</strong> {{ $review->admin_reply }}
                     </div>
                     @endif
                 </div>

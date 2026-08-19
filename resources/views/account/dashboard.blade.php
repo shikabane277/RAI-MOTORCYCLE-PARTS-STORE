@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'My Account — MachBolt PH')
+@section('title', 'My Account — RAI MOTORCYCLE PARTS')
 
 @section('content')
 <div class="container-xl py-5">

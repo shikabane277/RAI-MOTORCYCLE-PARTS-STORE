@@ -39,7 +39,7 @@
 
     {{-- Body --}}
     <div class="product-card-body d-flex flex-column flex-grow-1">
-        <div class="product-brand">{{ $product->brand?->name ?? 'MachBolt' }}</div>
+        <div class="product-brand">{{ $product->brand?->name ?? 'RAI' }}</div>
         <a href="{{ route('product.show', $product->slug) }}" class="text-decoration-none">
             <div class="product-name">{{ $product->name }}</div>
         </a>
