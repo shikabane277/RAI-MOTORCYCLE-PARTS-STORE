@@ -35,27 +35,8 @@ class OrderController extends Controller
         }
 
         $lalamoveService = app(LalamoveService::class);
-        $forcedStep = session("lalamove_step_{$order->id}", null);
-        $lalamoveTracking = $lalamoveService->getTrackingStatus($order->tracking_number ?? 'LLM-PH-DEMO123', $forcedStep);
+        $lalamoveTracking = $lalamoveService->getTrackingStatus($order->tracking_number ?? 'LLM-PH-ORDER');
 
         return view('track-order', compact('order', 'lalamoveTracking'));
-    }
-
-    /**
-     * Advance simulated Lalamove delivery stage (for testing/demo)
-     */
-    public function advanceLalamoveStep(Request $request, Order $order)
-    {
-        $currentStep = session("lalamove_step_{$order->id}", 2);
-        $nextStep = ($currentStep >= 4) ? 1 : $currentStep + 1;
-        session(["lalamove_step_{$order->id}" => $nextStep]);
-
-        if ($nextStep === 4) {
-            $order->update(['status' => 'delivered']);
-        } elseif ($nextStep === 3) {
-            $order->update(['status' => 'shipped']);
-        }
-
-        return redirect()->back()->with('success', "Lalamove delivery status updated to Step {$nextStep}!");
     }
 }

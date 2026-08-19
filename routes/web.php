@@ -54,7 +54,6 @@ Route::prefix('checkout')->name('checkout.')->group(function () {
 // Order tracking (public)
 Route::get('/track-order', [OrderController::class, 'trackForm'])->name('order.track');
 Route::post('/track-order', [OrderController::class, 'track'])->name('order.track.search');
-Route::post('/track-order/{order:order_number}/advance', [OrderController::class, 'advanceLalamoveStep'])->name('order.track.advance');
 
 // Social Auth (Google & Facebook)
 Route::get('/auth/{provider}/redirect', [App\Http\Controllers\Auth\SocialAuthController::class, 'redirectToProvider'])->name('auth.social.redirect');
