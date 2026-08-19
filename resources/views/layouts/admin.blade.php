@@ -40,9 +40,6 @@
         <a href="{{ route('admin.attributes.index') }}" class="admin-nav-item {{ request()->routeIs('admin.attributes*') ? 'active' : '' }}">
             <i class="bi bi-sliders"></i> Filter Options
         </a>
-        <a href="{{ route('admin.fitments.index') }}" class="admin-nav-item {{ request()->routeIs('admin.fitments*') ? 'active' : '' }}">
-            <i class="bi bi-motorcycle"></i> Fitments
-        </a>
         <a href="{{ route('admin.inventory.index') }}" class="admin-nav-item {{ request()->routeIs('admin.inventory*') ? 'active' : '' }}">
             <i class="bi bi-clipboard-data"></i> Inventory
         </a>

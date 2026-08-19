@@ -52,16 +52,6 @@
             <button class="navbar-toggler border-0 ms-auto me-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
                 <i class="bi bi-list text-gold fs-4"></i>
             </button>
-            {{-- Fitment chip --}}
-            <div class="fitment-chip-wrap {{ session('fitment') ? '' : 'd-none' }} d-lg-flex me-3">
-                <div class="fitment-chip d-flex align-items-center gap-2">
-                    <i class="bi bi-motorcycle"></i>
-                    <span class="fitment-chip-label">{{ session('fitment.label', '') }}</span>
-                    <button class="fitment-clear-btn btn btn-sm p-0 border-0 bg-transparent" style="color:var(--mb-muted);" title="Clear">
-                        <i class="bi bi-x"></i>
-                    </button>
-                </div>
-            </div>
             <div class="d-flex align-items-center gap-2">
                 @auth
                     <a href="{{ route('account.wishlist') }}" class="btn btn-dark-surface btn-sm d-none d-lg-flex align-items-center" style="border-radius:50px;"><i class="bi bi-heart"></i></a>
@@ -90,7 +80,6 @@
                             <li><a class="dropdown-item py-2" href="{{ route('shop.category','fluid-caps') }}" style="color:var(--mb-text);">&#x1F4A7; Fluid Caps</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('fitment.index') }}"><i class="bi bi-motorcycle me-1"></i>Fitment Finder</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ route('shop.index') }}?sort=sale">&#x1F525; Deals</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ route('shop.index') }}?new=1">&#x2728; New Arrivals</a></li>
                     @auth @if(auth()->user()->isStaff())
@@ -148,7 +137,6 @@
                 <a href="{{ route('shop.category','bolts-fasteners') }}" class="footer-link">Bolts &amp; Fasteners</a>
                 <a href="{{ route('shop.category','levers-grips') }}" class="footer-link">Levers &amp; Grips</a>
                 <a href="{{ route('shop.category','frame-sliders') }}" class="footer-link">Frame Sliders</a>
-                <a href="{{ route('fitment.index') }}" class="footer-link">Fitment Finder</a>
             </div>
             <div class="col-lg-2 col-md-6">
                 <div class="footer-heading">Support</div>

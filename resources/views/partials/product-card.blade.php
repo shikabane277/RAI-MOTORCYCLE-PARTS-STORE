@@ -5,8 +5,6 @@
     $isSale = $displayVariant && $displayVariant->is_on_sale;
     $price  = $displayVariant?->price ?? $product->base_price;
     $salePrice = $displayVariant?->sale_price;
-    $fitsCount = $product->relationLoaded('motorcycleModels') ? $product->motorcycleModels->count() : 0;
-    $fitSession = session('fitment');
 @endphp
 <div class="product-card h-100 d-flex flex-column">
     {{-- Badges --}}
@@ -54,13 +52,6 @@
                 @endfor
             </div>
             <span style="font-size:.72rem;color:var(--mb-muted);">({{ $count }})</span>
-        </div>
-        @endif
-
-        {{-- Fitment chip --}}
-        @if($fitsCount > 0)
-        <div class="mb-2">
-            <span class="fits-chip"><i class="bi bi-motorcycle"></i>Fits {{ $fitsCount }} model{{ $fitsCount > 1 ? 's' : '' }}</span>
         </div>
         @endif
 

@@ -150,23 +150,6 @@
             <a href="{{ route('cart.index') }}" class="btn btn-outline-gold w-100 mb-3">Buy Now — Checkout</a>
             @endif
 
-            {{-- Fitment mini-widget --}}
-            @if($product->motorcycleModels->count() > 0)
-            <div style="background:rgba(0,200,83,0.07);border:1px solid rgba(0,200,83,0.2);border-radius:var(--mb-radius-sm);padding:1rem;margin-bottom:1rem;">
-                <div style="color:var(--mb-green);font-size:.88rem;font-weight:600;margin-bottom:.5rem;">
-                    <i class="bi bi-motorcycle me-1"></i>Compatible Motorcycles ({{ $product->motorcycleModels->count() }})
-                </div>
-                <div class="d-flex flex-wrap gap-1">
-                    @foreach($product->motorcycleModels->take(6) as $moto)
-                    <span style="background:rgba(0,200,83,0.12);color:var(--mb-green);font-size:.72rem;padding:.2rem .5rem;border-radius:20px;">{{ $moto->display_name }}</span>
-                    @endforeach
-                    @if($product->motorcycleModels->count() > 6)
-                    <span style="color:var(--mb-muted);font-size:.72rem;">+{{ $product->motorcycleModels->count() - 6 }} more</span>
-                    @endif
-                </div>
-            </div>
-            @endif
-
             {{-- Meta (SKU, brand) --}}
             <div style="font-size:.8rem;color:var(--mb-muted);">
                 @if($firstVariant) SKU: <span class="text-gold">{{ $firstVariant->variant_sku }}</span> &bull; @endif
@@ -178,7 +161,7 @@
     {{-- ── Tabs ─────────────────────────────────────────── --}}
     <div class="mt-5">
         <ul class="nav nav-tabs gap-1" style="border-bottom:1px solid var(--mb-border);">
-            @foreach(['Description','Specifications','Fitment','Shipping & Returns','Reviews'] as $tab)
+            @foreach(['Description','Specifications','Shipping & Returns','Reviews'] as $tab)
             <li class="nav-item">
                 <button class="nav-link {{ $loop->first ? 'active' : '' }}" data-bs-toggle="tab" data-bs-target="#tab-{{ $loop->index }}"
                         style="{{ $loop->first ? 'color:var(--mb-gold);border-bottom-color:var(--mb-gold)!important;' : 'color:var(--mb-muted);' }}background:none;border:none;border-bottom:2px solid transparent;padding:.75rem 1.25rem;font-weight:600;">
@@ -212,25 +195,8 @@
                     </table>
                 </div>
             </div>
-            {{-- Fitment --}}
-            <div class="tab-pane fade" id="tab-2">
-                @if($product->motorcycleModels->count() > 0)
-                <div class="row g-2" style="max-width:700px;">
-                    @foreach($product->motorcycleModels as $moto)
-                    <div class="col-md-6">
-                        <div style="background:var(--mb-surface);border:1px solid var(--mb-border);border-radius:var(--mb-radius-sm);padding:.65rem 1rem;font-size:.88rem;">
-                            <i class="bi bi-motorcycle text-gold me-2"></i>{{ $moto->display_name }}
-                            @if($moto->pivot->notes)<div style="font-size:.75rem;color:var(--mb-muted);">{{ $moto->pivot->notes }}</div>@endif
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-                @else
-                <p style="color:var(--mb-muted);">Fitment data not yet available. Contact us to confirm compatibility.</p>
-                @endif
-            </div>
             {{-- Shipping --}}
-            <div class="tab-pane fade" id="tab-3">
+            <div class="tab-pane fade" id="tab-2">
                 <div style="color:var(--mb-text);line-height:1.8;max-width:700px;">
                     <h3 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;color:var(--mb-gold);">Shipping</h3>
                     <p>Metro Manila orders placed before 12NN ship same day. Provincial orders are processed and handed to J&amp;T Express or Ninja Van within 1 business day.</p>
@@ -241,7 +207,7 @@
                 </div>
             </div>
             {{-- Reviews --}}
-            <div class="tab-pane fade" id="tab-4">
+            <div class="tab-pane fade" id="tab-3">
                 @forelse($product->approvedReviews as $review)
                 <div class="review-card mb-3" style="max-width:700px;">
                     <div class="d-flex align-items-center gap-3 mb-2">

@@ -26,9 +26,6 @@
                                 {{ $banner->button_text ?? 'Shop Now' }} <i class="bi bi-arrow-right ms-1"></i>
                             </a>
                         @endif
-                        <a href="{{ route('fitment.index') }}" class="btn btn-outline-gold px-4 py-2">
-                            <i class="bi bi-motorcycle me-1"></i>Find Parts for My Bike
-                        </a>
                     </div>
                 </div>
             </div>
@@ -45,7 +42,6 @@
                             Titanium &amp; anodized aluminum hardware — built for the streets and the track.
                         </p>
                         <a href="{{ route('shop.index') }}" class="btn btn-gold px-4 py-2 me-3">Shop Now <i class="bi bi-arrow-right ms-1"></i></a>
-                        <a href="{{ route('fitment.index') }}" class="btn btn-outline-gold px-4 py-2"><i class="bi bi-motorcycle me-1"></i>Fitment Finder</a>
                     </div>
                 </div>
             </div>
@@ -56,51 +52,6 @@
     <div class="swiper-button-next" style="color:var(--mb-gold)!important;"></div>
     <div class="swiper-button-prev" style="color:var(--mb-gold)!important;"></div>
 </div>
-
-{{-- ═══════════════════════════════════════════════════════════
-     SHOP BY MOTORCYCLE — Fitment Finder Widget
-═══════════════════════════════════════════════════════════ --}}
-<section class="py-4" style="background:var(--mb-surface);border-bottom:1px solid var(--mb-border);">
-    <div class="container-xl">
-        <div class="fitment-widget">
-            <div class="row align-items-center g-3">
-                <div class="col-lg-3">
-                    <div class="section-label">Find Your Fit</div>
-                    <h2 class="section-title mb-0" style="font-size:1.4rem;">Shop by Motorcycle</h2>
-                    <p style="color:var(--mb-muted);font-size:.85rem;margin-top:.3rem;">Select your bike to see compatible parts</p>
-                </div>
-                <div class="col-lg-7">
-                    <div class="row g-2">
-                        <div class="col-md-4">
-                            <select id="fitment-make" class="fitment-select">
-                                <option value="">— Select Make —</option>
-                                @php $makes = \App\Models\MotorcycleModel::where('is_active',true)->distinct()->orderBy('make')->pluck('make'); @endphp
-                                @foreach($makes as $make)
-                                    <option value="{{ $make }}" {{ session('fitment.make') === $make ? 'selected' : '' }}>{{ $make }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <select id="fitment-model" class="fitment-select" {{ session('fitment') ? '' : 'disabled' }}>
-                                <option value="">— Select Model —</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <select id="fitment-year" class="fitment-select" {{ session('fitment') ? '' : 'disabled' }}>
-                                <option value="">— Select Year —</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-2">
-                    <button id="fitment-submit" class="btn btn-gold w-100" disabled>
-                        <i class="bi bi-search me-1"></i>Find Parts
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 
 {{-- ═══════════════════════════════════════════════════════════
      CATEGORY ICON GRID

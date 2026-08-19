@@ -3,7 +3,6 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\FitmentController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
@@ -23,14 +22,6 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/shop/{slug}', [ShopController::class, 'category'])->name('shop.category');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('product.show');
-
-// Fitment Finder (AJAX + full page)
-Route::get('/fitment', [FitmentController::class, 'index'])->name('fitment.index');
-Route::get('/api/fitment/makes', [FitmentController::class, 'makes'])->name('fitment.makes');
-Route::get('/api/fitment/models', [FitmentController::class, 'models'])->name('fitment.models');
-Route::get('/api/fitment/years', [FitmentController::class, 'years'])->name('fitment.years');
-Route::get('/api/fitment/set', [FitmentController::class, 'setSession'])->name('fitment.set');
-Route::get('/api/fitment/clear', [FitmentController::class, 'clearSession'])->name('fitment.clear');
 
 // Cart
 Route::prefix('cart')->name('cart.')->group(function () {
@@ -114,11 +105,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     // Filter Attributes (Materials, Colors, Thread Sizes)
     Route::resource('attributes', Admin\AttributeController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::patch('attributes/{attribute}/toggle', [App\Http\Controllers\Admin\AttributeController::class, 'toggle'])->name('attributes.toggle');
-
-    // Fitments
-    Route::get('fitments', [Admin\FitmentController::class, 'index'])->name('fitments.index');
-    Route::post('fitments/{product}/attach', [Admin\FitmentController::class, 'attach'])->name('fitments.attach');
-    Route::delete('fitments/{product}/detach/{model}', [Admin\FitmentController::class, 'detach'])->name('fitments.detach');
 
     // Orders
     Route::resource('orders', Admin\OrderController::class)->only(['index', 'show', 'update']);

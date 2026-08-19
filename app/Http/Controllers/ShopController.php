@@ -81,12 +81,6 @@ class ShopController extends Controller
             $query->where('brand_id', $request->brand);
         }
 
-        // Fitment (session bike)
-        $fitment = session('fitment');
-        if ($request->fitment_filter && $fitment) {
-            $query->whereHas('motorcycleModels', fn($q) => $q->where('motorcycle_models.id', $fitment['id']));
-        }
-
         // Search
         if ($request->search) {
             $search = $request->search;

@@ -170,13 +170,11 @@
             <div class="d-flex justify-content-between mb-2" style="font-size:.88rem;"><span style="color:var(--mb-muted);">Total Stock</span><span style="font-weight:700;">{{ $product->total_stock }} units</span></div>
             <div class="d-flex justify-content-between mb-2" style="font-size:.88rem;"><span style="color:var(--mb-muted);">Views</span><span>{{ number_format($product->views) }}</span></div>
             <div class="d-flex justify-content-between mb-2" style="font-size:.88rem;"><span style="color:var(--mb-muted);">Avg. Rating</span><span>{{ $product->average_rating ? $product->average_rating . ' / 5' : 'No reviews' }}</span></div>
-            <div class="d-flex justify-content-between" style="font-size:.88rem;"><span style="color:var(--mb-muted);">Fitment Links</span><span>{{ $product->motorcycleModels->count() }} models</span></div>
         </div>
         <div class="dark-card p-4">
             <h3 style="font-family:'Rajdhani',sans-serif;font-size:.95rem;color:var(--mb-muted);margin-bottom:.75rem;">Quick Actions</h3>
             <div class="d-grid gap-2">
                 <a href="{{ route('product.show', $product->slug) }}" class="btn btn-dark-surface btn-sm" target="_blank"><i class="bi bi-eye me-1"></i>View Storefront</a>
-                <a href="{{ route('admin.fitments.index') }}?product={{ $product->id }}" class="btn btn-dark-surface btn-sm"><i class="bi bi-motorcycle me-1"></i>Manage Fitments</a>
                 <a href="{{ route('admin.inventory.index') }}?search={{ $product->slug }}" class="btn btn-dark-surface btn-sm"><i class="bi bi-clipboard-data me-1"></i>Inventory Logs</a>
             </div>
         </div>

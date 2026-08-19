@@ -82,17 +82,6 @@
                         @endforeach
                     </div>
                     @endif
-                    {{-- Fitment filter --}}
-                    @if(session('fitment'))
-                    <div class="mb-3">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" name="fitment_filter" value="1" id="fitment_filter" {{ request('fitment_filter') ? 'checked' : '' }}>
-                            <label class="form-check-label" for="fitment_filter" style="color:var(--mb-text);font-size:.88rem;">
-                                <i class="bi bi-motorcycle text-gold me-1"></i>Fits my {{ session('fitment.make') }} {{ session('fitment.model') }}
-                            </label>
-                        </div>
-                    </div>
-                    @endif
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-gold btn-sm flex-grow-1">Apply</button>
                         <a href="{{ isset($category) ? route('shop.category',$category->slug) : route('shop.index') }}" class="btn btn-dark-surface btn-sm">Clear</a>
