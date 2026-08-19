@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'MachBolt PH — Precision CNC Parts for Filipino Riders')
+@section('title', 'RAI MOTORCYCLE PARTS — Precision CNC Parts for Filipino Riders')
 @section('meta_description', 'Shop CNC-machined motorcycle bolts, fasteners, levers, foot pegs, and accessories. Premium titanium and anodized aluminum hardware. Fast PH shipping.')
 
 @section('content')
@@ -16,7 +16,7 @@
                 <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(13,13,15,.92) 0%,rgba(13,13,15,.5) 60%,transparent 100%);"></div>
                 <div class="container-xl hero-slide-content">
                     <div class="col-lg-6">
-                        <div class="hero-eyebrow mb-2">MachBolt PH</div>
+                        <div class="hero-eyebrow mb-2">RAI MOTORCYCLE PARTS</div>
                         <h1 class="hero-title mb-3">{!! nl2br(e($banner->title)) !!}</h1>
                         @if($banner->subtitle)
                             <p style="color:rgba(232,232,240,.75);font-size:1.05rem;max-width:480px;margin-bottom:2rem;">{{ $banner->subtitle }}</p>
@@ -39,7 +39,7 @@
             <div class="hero-slide">
                 <div class="container-xl hero-slide-content">
                     <div class="col-lg-6">
-                        <div class="hero-eyebrow mb-2">MachBolt PH</div>
+                        <div class="hero-eyebrow mb-2">RAI MOTORCYCLE PARTS</div>
                         <h1 class="hero-title mb-3">Precision CNC Parts for <span>Filipino Riders</span></h1>
                         <p style="color:rgba(232,232,240,.75);font-size:1.05rem;max-width:480px;margin-bottom:2rem;">
                             Titanium &amp; anodized aluminum hardware — built for the streets and the track.
@@ -276,7 +276,7 @@
     <div class="container-xl">
         <div class="row g-4">
             <div class="col-md-6 col-lg-3">
-                <h3 style="font-family:'Rajdhani',sans-serif;font-size:1rem;color:var(--mb-gold);margin-bottom:.75rem;">About MachBolt PH</h3>
+                <h3 style="font-family:'Rajdhani',sans-serif;font-size:1rem;color:var(--mb-gold);margin-bottom:.75rem;">About RAI MOTORCYCLE PARTS</h3>
                 <p style="color:var(--mb-muted);font-size:.85rem;line-height:1.7;">
                     We're a Filipino-owned store specializing in CNC-machined motorcycle fasteners and accessories. Every bolt is precision-machined and individually inspected before shipping.
                 </p>

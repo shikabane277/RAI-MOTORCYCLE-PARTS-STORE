@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Admin') — MachBolt PH</title>
+    <title>@yield('title', 'Admin') — RAI MOTORCYCLE PARTS</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body style="background:var(--mb-darker);">
@@ -12,10 +12,13 @@
 {{-- Sidebar --}}
 <aside class="admin-sidebar d-flex flex-column">
     <div class="p-4 border-bottom" style="border-color:var(--mb-border)!important;">
-        <a href="{{ route('home') }}" class="text-decoration-none" style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;">
-            <span class="text-gold">MACH</span>BOLT<span style="color:var(--mb-muted);font-size:.65em;"> PH</span>
+        <a href="{{ route('home') }}" class="text-decoration-none d-flex align-items-center gap-2">
+            <img src="/images/logo.png" alt="RAI Logo" style="height:34px;width:34px;object-fit:cover;border-radius:50%;border:1px solid var(--mb-gold);">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700;line-height:1.2;">
+                <span class="text-gold">RAI</span> <span style="color:#fff;">MOTORCYCLE</span>
+            </div>
         </a>
-        <div style="color:var(--mb-muted);font-size:.7rem;margin-top:.2rem;letter-spacing:.12em;text-transform:uppercase;">Admin Panel</div>
+        <div style="color:var(--mb-muted);font-size:.68rem;margin-top:.3rem;letter-spacing:.12em;text-transform:uppercase;">Admin Panel</div>
     </div>
 
     <nav class="flex-grow-1 py-3 overflow-auto">

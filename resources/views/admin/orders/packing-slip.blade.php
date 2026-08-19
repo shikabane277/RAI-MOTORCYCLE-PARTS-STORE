@@ -16,10 +16,13 @@ th { background: #f0f0f0; font-weight: 700; }
 </head>
 <body>
 <div class="header">
-    <div>
-        <h1>MachBolt PH</h1>
-        <div style="color:#666;">Precision CNC Parts for Filipino Riders</div>
-    </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+            <img src="/images/logo.png" alt="RAI Logo" style="height:40px;width:40px;border-radius:50%;">
+            <div>
+                <h1 style="margin:0;font-size:1.4rem;">RAI MOTORCYCLE PARTS</h1>
+                <div style="color:#666;font-size:11px;">Precision CNC Parts for Filipino Riders</div>
+            </div>
+        </div>
     <div style="text-align:right;">
         <div style="font-size:1.2rem;font-weight:700;">PACKING SLIP</div>
         <div>Order: <strong>{{ $order->order_number }}</strong></div>
@@ -74,7 +77,7 @@ th { background: #f0f0f0; font-weight: 700; }
 @endif
 
 <div style="margin-top:24px;font-size:11px;color:#666;text-align:center;">
-    Thank you for your order! — MachBolt PH | machbolt.ph
+    Thank you for your order! — RAI MOTORCYCLE PARTS
 </div>
 
 <div class="no-print" style="margin-top:24px;">

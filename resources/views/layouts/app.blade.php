@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'MachBolt PH') — Precision CNC Parts for Filipino Riders</title>
-    <meta name="description" content="@yield('meta_description', 'MachBolt PH — Premium CNC-machined bolts, fasteners, and motorcycle accessories for Filipino riders. Titanium, stainless, anodized aluminum. Fast shipping via J&T and Ninja Van.')">
+    <title>@yield('title', 'RAI MOTORCYCLE PARTS') — Precision CNC Parts for Filipino Riders</title>
+    <meta name="description" content="@yield('meta_description', 'RAI MOTORCYCLE PARTS — Premium CNC-machined bolts, fasteners, and motorcycle accessories for Filipino riders. Titanium, stainless, anodized aluminum. Fast shipping via J&T and Ninja Van.')">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -33,8 +33,11 @@
 <header class="site-header" id="site-header">
     <nav class="navbar navbar-expand-lg py-2">
         <div class="container-xl">
-            <a class="navbar-brand me-4" href="{{ route('home') }}">
-                <span>MACH</span>BOLT<span style="color:var(--mb-muted);font-size:.7em;font-weight:400"> PH</span>
+            <a class="navbar-brand me-4 d-flex align-items-center gap-2" href="{{ route('home') }}">
+                <img src="/images/logo.png" alt="RAI MOTORCYCLE PARTS Logo" style="height:42px;width:42px;object-fit:cover;border-radius:50%;border:1px solid var(--mb-gold);">
+                <span style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.2rem;letter-spacing:.03em;">
+                    <span class="text-gold">RAI</span> <span style="color:#fff;">MOTORCYCLE</span> <span style="color:var(--mb-muted);font-size:.7em;">PARTS</span>
+                </span>
             </a>
             <form class="d-none d-lg-flex flex-grow-1 me-4" action="{{ route('shop.index') }}" method="GET">
                 <div class="input-group">
@@ -127,7 +130,10 @@
     <div class="container-xl">
         <div class="row g-4 mb-5">
             <div class="col-lg-3 col-md-6">
-                <div class="footer-heading mb-3" style="font-size:1.3rem;"><span class="text-gold">MACH</span>BOLT<span class="text-muted-custom" style="font-size:.7em;"> PH</span></div>
+                <div class="footer-heading mb-3 d-flex align-items-center gap-2" style="font-size:1.2rem;">
+                    <img src="/images/logo.png" alt="RAI Logo" style="height:36px;width:36px;object-fit:cover;border-radius:50%;border:1px solid var(--mb-gold);">
+                    <span class="text-gold">RAI</span> MOTORCYCLE <span class="text-muted-custom" style="font-size:.7em;">PARTS</span>
+                </div>
                 <p style="color:var(--mb-muted);font-size:.87rem;line-height:1.7;">Precision CNC-machined parts for Filipino riders. Built tough, finished premium, delivered fast.</p>
                 <div class="d-flex gap-2 mt-3">
                     <a href="#" class="social-icon"><i class="bi bi-facebook"></i></a>
@@ -154,7 +160,7 @@
             </div>
             <div class="col-lg-2 col-md-6">
                 <div class="footer-heading">Company</div>
-                <a href="{{ route('about') }}" class="footer-link">About MachBolt</a>
+                <a href="{{ route('about') }}" class="footer-link">About RAI</a>
                 <a href="{{ route('terms') }}" class="footer-link">Terms of Service</a>
                 <a href="{{ route('privacy') }}" class="footer-link">Privacy Policy</a>
             </div>
@@ -173,7 +179,7 @@
         </div>
         <hr class="divider-gold">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 pt-3">
-            <p class="mb-0" style="color:var(--mb-muted);font-size:.8rem;">&copy; {{ date('Y') }} MachBolt PH. All rights reserved.</p>
+            <p class="mb-0" style="color:var(--mb-muted);font-size:.8rem;">&copy; {{ date('Y') }} RAI MOTORCYCLE PARTS. All rights reserved.</p>
             <p class="mb-0" style="color:var(--mb-muted);font-size:.8rem;">&#x1F1F5;&#x1F1ED; Made with passion for Filipino riders</p>
         </div>
     </div>
