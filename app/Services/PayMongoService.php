@@ -21,7 +21,7 @@ class PayMongoService
     /**
      * Create a PayMongo Checkout Session for an Order
      */
-    public function createCheckoutSession(Order $order): array
+    public function createCheckoutSession(Order $order, string $paymentType = 'qrph'): array
     {
         // Convert items into PayMongo line_items format (amounts in centavos e.g. 100 PHP = 10000)
         $lineItems = [];
@@ -65,12 +65,11 @@ class PayMongoService
                     'send_email_receipt' => true,
                     'show_description'   => true,
                     'show_line_items'    => true,
-                    'payment_method_types' => [
-                        'card',
-                        'qrph',
-                        'gcash',
-                        'paymaya',
-                    ],
+                    'payment_method_types' => match($paymentType) {
+                        'card' => ['card'],
+                        'qrph' => ['qrph', 'gcash', 'paymaya'],
+                        default => ['card', 'qrph', 'gcash', 'paymaya'],
+                    },
                     'line_items'  => $lineItems,
                     'description' => 'Payment for Order #' . $order->order_number . ' at RAI MOTORCYCLE PARTS',
                     'success_url' => route('checkout.success', ['order' => $order->id]) . '?paymongo=success',

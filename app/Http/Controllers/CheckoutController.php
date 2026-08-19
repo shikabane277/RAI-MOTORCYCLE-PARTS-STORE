@@ -79,12 +79,12 @@ class CheckoutController extends Controller
         }
 
         $grandTotal = $subtotal + $shippingFee - $discount;
+        $isOnlinePayment = in_array($request->payment_method, ['google_pay', 'qrph']);
+        $orderStatus = $isOnlinePayment ? 'pending_payment' : 'confirmed';
 
-        // COD orders are confirmed immediately, online payments start as pending until PayMongo confirms
-        $paymentStatus = ($request->payment_method === 'cod') ? 'pending' : 'pending';
-        $orderStatus   = ($request->payment_method === 'cod') ? 'confirmed' : 'pending_payment';
+        $orderId = null;
 
-        DB::transaction(function () use ($request, $cart, $subtotal, $shippingFee, $discount, $grandTotal, $couponCode, $paymentStatus, $orderStatus) {
+        DB::transaction(function () use ($request, $cart, $subtotal, $shippingFee, $discount, $grandTotal, $couponCode, $orderStatus, $isOnlinePayment, &$orderId) {
             // Create order
             $order = Order::create([
                 'order_number'    => Order::generateOrderNumber(),
@@ -106,7 +106,7 @@ class CheckoutController extends Controller
                 'grand_total'     => $grandTotal,
                 'coupon_code'     => $couponCode,
                 'payment_method'  => $request->payment_method,
-                'payment_status'  => $paymentStatus,
+                'payment_status'  => 'pending',
                 'status'          => $orderStatus,
                 'courier'         => 'Lalamove Express',
                 'tracking_number' => 'LLM-PH-' . strtoupper(\Illuminate\Support\Str::random(8)),
@@ -143,30 +143,47 @@ class CheckoutController extends Controller
             }
 
             // Create payment record
+            $gateway = match($request->payment_method) {
+                'google_pay' => 'paymongo_card',
+                'qrph'       => 'paymongo_qrph',
+                default      => $request->payment_method,
+            };
+
             Payment::create([
-                'order_id'       => $order->id,
-                'gateway'        => $request->payment_method === 'google_pay' ? 'paymongo_card' : ($request->payment_method === 'qrph' ? 'paymongo_qrph' : $request->payment_method),
-                'amount'         => $grandTotal,
-                'status'         => 'pending',
+                'order_id' => $order->id,
+                'gateway'  => $gateway,
+                'amount'   => $grandTotal,
+                'status'   => 'pending',
             ]);
 
-            // Clear cart
-            $cart->items()->delete();
-            $cart->delete();
+            // Only clear cart for COD (immediate confirmation)
+            // For online payments, cart is cleared after payment succeeds
+            if (!$isOnlinePayment) {
+                $cart->items()->delete();
+                $cart->delete();
+            }
 
+            $orderId = $order->id;
             session(['last_order_id' => $order->id, 'last_order_number' => $order->order_number]);
         });
 
-        $order = Order::find(session('last_order_id'));
+        $order = Order::find($orderId);
 
-        // Handle PayMongo checkout session for QR Ph and Google Pay payments
-        if (in_array($request->payment_method, ['qrph', 'google_pay']) && $order) {
+        // Handle PayMongo checkout for online payments
+        if ($isOnlinePayment && $order) {
             $payMongoService = app(\App\Services\PayMongoService::class);
-            $payMongoResult  = $payMongoService->createCheckoutSession($order);
+
+            // Card-only session for Google Pay, QR Ph session for qrph
+            $paymentType = ($request->payment_method === 'google_pay') ? 'card' : 'qrph';
+            $payMongoResult = $payMongoService->createCheckoutSession($order, $paymentType);
 
             if (!empty($payMongoResult['success']) && !empty($payMongoResult['checkout_url'])) {
                 return redirect()->away($payMongoResult['checkout_url']);
             }
+
+            // If PayMongo fails, restore the cart — cancel the order
+            $this->cancelFailedOrder($order);
+            return redirect()->route('checkout.index')->with('error', 'Payment gateway is currently unavailable. Please try again or choose a different payment method.');
         }
 
         return redirect()->route('checkout.success', $order ? $order->id : session('last_order_number'));
@@ -174,15 +191,41 @@ class CheckoutController extends Controller
 
     public function success(Order $order, Request $request)
     {
-        if ($request->query('paymongo') === 'success') {
+        // PayMongo success callback — mark order as paid and clear cart
+        if ($request->query('paymongo') === 'success' && $order->payment_status !== 'paid') {
             $order->update([
                 'payment_status' => 'paid',
                 'status'         => 'confirmed',
             ]);
             $order->payments()->update(['status' => 'paid']);
+
+            // Now clear the cart since payment succeeded
+            $cart = $this->getCart();
+            if ($cart) {
+                $cart->items()->delete();
+                $cart->delete();
+            }
         }
 
         $order->load(['items', 'payments']);
         return view('checkout.success', compact('order'));
+    }
+
+    /**
+     * Cancel a failed order — restore stock and remove the order
+     */
+    private function cancelFailedOrder(Order $order): void
+    {
+        foreach ($order->items as $item) {
+            if ($item->product_variant_id) {
+                $variant = $item->variant;
+                if ($variant) {
+                    $variant->increment('stock_qty', $item->qty);
+                }
+            }
+        }
+        $order->payments()->delete();
+        $order->items()->delete();
+        $order->delete();
     }
 }
