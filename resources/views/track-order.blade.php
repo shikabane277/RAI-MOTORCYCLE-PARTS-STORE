@@ -1,0 +1,3 @@
+﻿@extends('layouts.app')
+@section('title','Track Order')
+@section('content')<div class='container py-5'><div style='max-width:500px;'><h1 style='font-family:Rajdhani,sans-serif;color:#fff;'>Track Your Order</h1><form method='POST' action='{{ route(chr(34)order.track.search chr(34)) }}' class='dark-card p-4 mt-4'>@csrf<div class='mb-3'><label class='form-label'>Order Number</label><input type='text' name='order_number' class='form-control' required></div><div class='mb-3'><label class='form-label'>Email Address</label><input type='email' name='email' class='form-control' required></div><button class='btn btn-gold w-100'>Track Order</button></form></div></div>@endsection

@@ -1,0 +1,3 @@
+﻿@extends('layouts.app')
+@section('title','Profile')
+@section('content')<div class='container-xl py-4'><h1 style='font-family:Rajdhani,sans-serif;color:#fff;'>Profile</h1><div class='dark-card p-4 mt-3' style='max-width:500px;'><form method='POST' action='{{ route(chr(34)account.profile.update chr(34)) }}'>@csrf @method(chr(34)PUT chr(34))<div class='mb-3'><label class='form-label'>Name</label><input type='text' name='name' class='form-control' value='{{ auth()->user()->name }}'></div><div class='mb-3'><label class='form-label'>Phone</label><input type='text' name='phone' class='form-control' value='{{ auth()->user()->phone }}'></div><button class='btn btn-gold'>Save</button></form></div></div>@endsection
