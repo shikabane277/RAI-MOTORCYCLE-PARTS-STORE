@@ -55,5 +55,20 @@ class AppServiceProvider extends ServiceProvider
         } catch (\Throwable $e) {
             // Ignore during initial migration bootstrap
         }
+
+        // Share active categories dynamically across all views
+        try {
+            if (Schema::hasTable('categories')) {
+                \Illuminate\Support\Facades\View::composer('*', function ($view) {
+                    $navCategories = \App\Models\Category::where('is_active', true)
+                        ->orderBy('sort_order')
+                        ->orderBy('name')
+                        ->get();
+                    $view->with('navCategories', $navCategories);
+                });
+            }
+        } catch (\Throwable $e) {
+            // Ignore during initial migration
+        }
     }
 }

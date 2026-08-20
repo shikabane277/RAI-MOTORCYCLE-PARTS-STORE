@@ -13,13 +13,13 @@
         @forelse($banners as $banner)
         <div class="swiper-slide">
             <div class="hero-slide" style="{{ $banner->image_url && file_exists(public_path(ltrim($banner->image_url,'/'))) ? 'background-image:url('.$banner->image_url.');background-size:cover;background-position:center;' : '' }}">
-                <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(13,13,15,.92) 0%,rgba(13,13,15,.5) 60%,transparent 100%);"></div>
+                <div class="hero-overlay" style="position:absolute;inset:0;pointer-events:none;"></div>
                 <div class="container-xl hero-slide-content">
                     <div class="col-lg-6">
                         <div class="hero-eyebrow mb-2">RAI MOTORCYCLE PARTS</div>
                         <h1 class="hero-title mb-3">{!! nl2br(e($banner->title)) !!}</h1>
                         @if($banner->subtitle)
-                            <p style="color:rgba(232,232,240,.75);font-size:1.05rem;max-width:480px;margin-bottom:2rem;">{{ $banner->subtitle }}</p>
+                            <p style="color:var(--mb-muted);font-size:1.05rem;max-width:480px;margin-bottom:2rem;">{{ $banner->subtitle }}</p>
                         @endif
                         @if($banner->link_url)
                             <a href="{{ $banner->link_url }}" class="btn btn-gold px-4 py-2 me-3">
@@ -34,11 +34,12 @@
         {{-- Fallback hero --}}
         <div class="swiper-slide">
             <div class="hero-slide">
+                <div class="hero-overlay" style="position:absolute;inset:0;pointer-events:none;"></div>
                 <div class="container-xl hero-slide-content">
                     <div class="col-lg-6">
                         <div class="hero-eyebrow mb-2">RAI MOTORCYCLE PARTS</div>
                         <h1 class="hero-title mb-3">Precision CNC Parts for <span>Filipino Riders</span></h1>
-                        <p style="color:rgba(232,232,240,.75);font-size:1.05rem;max-width:480px;margin-bottom:2rem;">
+                        <p style="color:var(--mb-muted);font-size:1.05rem;max-width:480px;margin-bottom:2rem;">
                             Titanium &amp; anodized aluminum hardware — built for the streets and the track.
                         </p>
                         <a href="{{ route('shop.index') }}" class="btn btn-gold px-4 py-2 me-3">Shop Now <i class="bi bi-arrow-right ms-1"></i></a>

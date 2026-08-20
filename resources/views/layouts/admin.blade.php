@@ -5,9 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Admin') — RAI MOTORCYCLE PARTS</title>
+    <script>
+        (function() {
+            var theme = localStorage.getItem('rai_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body style="background:var(--mb-darker);">
+<body style="background:var(--mb-dark);">
 
 {{-- Sidebar --}}
 <aside class="admin-sidebar d-flex flex-column">
@@ -15,7 +21,7 @@
         <a href="{{ route('home') }}" class="text-decoration-none d-flex align-items-center gap-2">
             <img src="/images/logo.png" alt="RAI Logo" style="height:34px;width:34px;object-fit:cover;border-radius:50%;border:1px solid var(--mb-gold);">
             <div style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700;line-height:1.2;">
-                <span class="text-gold">RAI</span> <span style="color:#fff;">MOTORCYCLE</span>
+                <span class="text-gold">RAI</span> <span class="brand-text-main">MOTORCYCLE</span>
             </div>
         </a>
         <div style="color:var(--mb-muted);font-size:.68rem;margin-top:.3rem;letter-spacing:.12em;text-transform:uppercase;">Admin Panel</div>
@@ -90,14 +96,18 @@
 {{-- Main Content --}}
 <div class="admin-content">
     {{-- Top bar --}}
-    <div class="px-4 py-3 d-flex align-items-center justify-content-between border-bottom" style="border-color:var(--mb-border)!important;background:var(--mb-dark);">
+    <div class="px-4 py-3 d-flex align-items-center justify-content-between border-bottom" style="border-color:var(--mb-border)!important;background:var(--mb-header-bg);">
         <div class="d-flex align-items-center gap-3">
             <button class="btn btn-dark-surface btn-sm d-lg-none" id="admin-sidebar-toggle">
                 <i class="bi bi-list"></i>
             </button>
-            <h1 class="mb-0" style="font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;color:#fff;">@yield('page-title', 'Dashboard')</h1>
+            <h1 class="mb-0" style="font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;color:var(--mb-heading);">@yield('page-title', 'Dashboard')</h1>
         </div>
         <div class="d-flex gap-2 align-items-center">
+            <button type="button" class="btn btn-dark-surface btn-sm d-flex align-items-center justify-content-center" id="theme-toggle-btn" style="border-radius:50px;width:36px;height:36px;" title="Toggle Light / Dark Mode">
+                <i class="bi bi-moon-stars-fill text-gold fs-6" id="theme-icon-dark"></i>
+                <i class="bi bi-sun-fill text-gold fs-6 d-none" id="theme-icon-light"></i>
+            </button>
             @if($unprocessedCount > 0)
             <a href="{{ route('admin.orders.index', ['status' => 'confirmed']) }}" class="btn btn-warning btn-sm fw-bold d-flex align-items-center gap-2 px-3 py-1" style="font-size:.82rem;border-radius:20px;box-shadow:0 0 12px rgba(255,193,7,0.35);">
                 <i class="bi bi-bell-fill"></i>
@@ -131,6 +141,36 @@
     </div>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const darkIcon = document.getElementById('theme-icon-dark');
+    const lightIcon = document.getElementById('theme-icon-light');
+
+    function updateIcons(theme) {
+        if (!darkIcon || !lightIcon) return;
+        if (theme === 'dark') {
+            darkIcon.classList.add('d-none');
+            lightIcon.classList.remove('d-none');
+        } else {
+            darkIcon.classList.remove('d-none');
+            lightIcon.classList.add('d-none');
+        }
+    }
+
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    updateIcons(currentTheme);
+
+    if (themeBtn) {
+        themeBtn.addEventListener('click', () => {
+            const active = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', active);
+            localStorage.setItem('rai_theme', active);
+            updateIcons(active);
+        });
+    }
+});
+</script>
 @stack('scripts')
 </body>
 </html>

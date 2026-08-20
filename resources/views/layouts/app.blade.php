@@ -79,14 +79,18 @@
                 <ul class="navbar-nav me-auto gap-1 py-2 py-lg-0">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="{{ route('shop.index') }}" data-bs-toggle="dropdown">Shop All</a>
-                        <ul class="dropdown-menu" style="background:var(--mb-card);border:1px solid var(--mb-border);border-radius:var(--mb-radius);min-width:220px;">
-                            <li><a class="dropdown-item py-2" href="{{ route('shop.category','bolts-fasteners') }}" style="color:var(--mb-text);">&#x1F529; Bolts &amp; Fasteners</a></li>
-                            <li><a class="dropdown-item py-2" href="{{ route('shop.category','nuts-washers') }}" style="color:var(--mb-text);">&#x2699;&#xFE0F; Nuts &amp; Washers</a></li>
-                            <li><a class="dropdown-item py-2" href="{{ route('shop.category','levers-grips') }}" style="color:var(--mb-text);">&#x1F3CD;&#xFE0F; Levers &amp; Grips</a></li>
-                            <li><a class="dropdown-item py-2" href="{{ route('shop.category','foot-pegs-rearsets') }}" style="color:var(--mb-text);">&#x1F9B6; Foot Pegs</a></li>
-                            <li><a class="dropdown-item py-2" href="{{ route('shop.category','frame-sliders') }}" style="color:var(--mb-text);">&#x1F6E1;&#xFE0F; Frame Sliders</a></li>
-                            <li><a class="dropdown-item py-2" href="{{ route('shop.category','swingarm-spools') }}" style="color:var(--mb-text);">&#x1F3AF; Swingarm Spools</a></li>
-                            <li><a class="dropdown-item py-2" href="{{ route('shop.category','fluid-caps') }}" style="color:var(--mb-text);">&#x1F4A7; Fluid Caps</a></li>
+                        <ul class="dropdown-menu" style="background:var(--mb-card);border:1px solid var(--mb-border);border-radius:var(--mb-radius);min-width:220px;box-shadow:var(--mb-shadow);">
+                            <li><a class="dropdown-item py-2 fw-bold text-gold border-bottom" style="border-color:var(--mb-border)!important;" href="{{ route('shop.index') }}">🔍 All Products</a></li>
+                            @forelse($navCategories ?? [] as $cat)
+                                <li>
+                                    <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{{ route('shop.category', $cat->slug) }}" style="color:var(--mb-text);">
+                                        <span>{{ $cat->icon ?? '🔩' }}</span>
+                                        <span>{{ $cat->name }}</span>
+                                    </a>
+                                </li>
+                            @empty
+                                <li><span class="dropdown-item py-2 text-muted">No categories configured</span></li>
+                            @endforelse
                         </ul>
                     </li>
                     <li class="nav-item"><a class="nav-link" href="{{ route('shop.index') }}?sort=sale">&#x1F525; Deals</a></li>
