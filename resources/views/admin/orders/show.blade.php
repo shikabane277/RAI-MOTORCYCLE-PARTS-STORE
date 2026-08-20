@@ -54,6 +54,52 @@
 
     {{-- Right: Status + Tracking --}}
     <div class="col-lg-4">
+        {{-- Quick Process Order Actions --}}
+        <div class="dark-card p-4 mb-3" style="border:1px solid var(--mb-gold-border);">
+            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:#fff;margin-bottom:1rem;">
+                <i class="bi bi-play-circle text-gold me-2"></i>Quick Process Order
+            </h2>
+            <div class="d-grid gap-2">
+                @if($order->status === 'pending_payment')
+                    <form method="POST" action="{{ route('admin.orders.status', $order) }}">
+                        @csrf
+                        <input type="hidden" name="status" value="confirmed">
+                        <button type="submit" class="btn btn-gold w-100 py-2 font-bold">
+                            <i class="bi bi-check-circle me-1"></i>Approve &amp; Confirm Order
+                        </button>
+                    </form>
+                @elseif($order->status === 'confirmed')
+                    <form method="POST" action="{{ route('admin.orders.status', $order) }}">
+                        @csrf
+                        <input type="hidden" name="status" value="processing">
+                        <button type="submit" class="btn btn-gold w-100 py-2 font-bold">
+                            <i class="bi bi-box-seam me-1"></i>Move to "To Ship" (Start Packing)
+                        </button>
+                    </form>
+                @elseif($order->status === 'processing')
+                    <form method="POST" action="{{ route('admin.orders.status', $order) }}">
+                        @csrf
+                        <input type="hidden" name="status" value="shipped">
+                        <button type="submit" class="btn btn-primary w-100 py-2 font-bold">
+                            <i class="bi bi-truck me-1"></i>Dispatch Order (Mark as Shipped)
+                        </button>
+                    </form>
+                @elseif($order->status === 'shipped')
+                    <form method="POST" action="{{ route('admin.orders.status', $order) }}">
+                        @csrf
+                        <input type="hidden" name="status" value="delivered">
+                        <button type="submit" class="btn btn-success w-100 py-2 font-bold">
+                            <i class="bi bi-house-check me-1"></i>Mark as Delivered
+                        </button>
+                    </form>
+                @else
+                    <div style="font-size:.85rem;color:var(--mb-muted);" class="text-center">
+                        Current Status: <strong class="text-gold">{{ ucfirst(str_replace('_',' ',$order->status)) }}</strong>
+                    </div>
+                @endif
+            </div>
+        </div>
+
         <div class="dark-card p-4 mb-3">
             <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:#fff;margin-bottom:1rem;">Order Info</h2>
             <div class="d-flex flex-column gap-2" style="font-size:.88rem;">
