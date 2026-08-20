@@ -53,6 +53,7 @@
                     <td style="font-family:'Rajdhani',sans-serif;font-weight:700;">&#x20B1;{{ number_format($order->grand_total, 0) }}</td>
                     <td>
                         <div style="font-size:.82rem;color:var(--mb-text);">{{ strtoupper(str_replace('_',' ',$order->payment_method)) }}</div>
+                        @if($order->gcash_number)<div style="font-size:.72rem;color:#007dfe;">{{ $order->gcash_number }}</div>@endif
                         <span style="font-size:.7rem;color:{{ $order->payment_status === 'paid' ? 'var(--mb-green)' : 'var(--mb-gold)' }};">
                             {{ ucfirst($order->payment_status) }}
                         </span>

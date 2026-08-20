@@ -98,6 +98,78 @@
                     </div>
                 </div>
 
+                {{-- Delivery Service / Shipping Method --}}
+                <div class="dark-card p-4 mb-4">
+                    <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1.25rem;">
+                        <i class="bi bi-truck text-gold me-2"></i>Delivery Courier &amp; Service
+                    </h2>
+
+                    @error('shipping_method')
+                        <div class="alert alert-danger p-2 mb-3" style="font-size:.85rem;">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i>{{ $message }}
+                        </div>
+                    @enderror
+
+                    <div class="d-flex flex-column gap-3">
+                        @php
+                            $isLalamoveActive = $lalamoveWindow['is_active'] ?? false;
+                            $defaultShipping = $isLalamoveActive ? 'same_day' : 'standard';
+                            $selectedShipping = old('shipping_method', $defaultShipping);
+                        @endphp
+
+                        {{-- 🛵 Same-Day Shipping (Lalamove) --}}
+                        <div class="d-flex flex-column">
+                            <label class="d-flex align-items-start gap-3 p-3 dark-card-hover {{ !$isLalamoveActive ? 'opacity-50' : '' }}" 
+                                   style="cursor:{{ $isLalamoveActive ? 'pointer' : 'not-allowed' }};border-radius:var(--mb-radius-sm);border:1px solid {{ $selectedShipping === 'same_day' && $isLalamoveActive ? 'var(--mb-gold)' : 'var(--mb-border)' }};background:{{ $selectedShipping === 'same_day' && $isLalamoveActive ? 'rgba(245,166,35,0.05)' : 'transparent' }};">
+                                <input type="radio" name="shipping_method" value="same_day" class="form-check-input mt-1" 
+                                       {{ $selectedShipping === 'same_day' && $isLalamoveActive ? 'checked' : '' }} 
+                                       {{ !$isLalamoveActive ? 'disabled' : '' }} required>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                        <div style="font-weight:700;color:#fff;font-size:.95rem;">
+                                            🛵 Lalamove Express (Same-Day Delivery)
+                                        </div>
+                                        @if($isLalamoveActive)
+                                            <span class="badge bg-success text-white" style="font-size:.7rem;">Active (Cutoff 4:00 PM)</span>
+                                        @else
+                                            <span class="badge bg-secondary text-white" style="font-size:.7rem;">Closed (Outside 8 AM–4 PM)</span>
+                                        @endif
+                                    </div>
+                                    <div style="font-size:.82rem;color:var(--mb-muted);" class="mt-1">
+                                        Order now for fast same-day motorcycle dispatch within Metro Manila &amp; nearby areas.
+                                    </div>
+                                    @if(!$isLalamoveActive)
+                                        <div class="mt-1 text-warning fw-bold" style="font-size:.78rem;">
+                                            <i class="bi bi-clock-history me-1"></i>Same-day shipping automatically turns off outside 8:00 AM – 4:00 PM operational window.
+                                        </div>
+                                    @endif
+                                </div>
+                            </label>
+                        </div>
+
+                        {{-- 📦 Standard Shipping (J&T Express) --}}
+                        <div class="d-flex flex-column">
+                            <label class="d-flex align-items-start gap-3 p-3 dark-card-hover" 
+                                   style="cursor:pointer;border-radius:var(--mb-radius-sm);border:1px solid {{ $selectedShipping === 'standard' ? 'var(--mb-gold)' : 'var(--mb-border)' }};background:{{ $selectedShipping === 'standard' ? 'rgba(245,166,35,0.05)' : 'transparent' }};">
+                                <input type="radio" name="shipping_method" value="standard" class="form-check-input mt-1" 
+                                       {{ $selectedShipping === 'standard' ? 'checked' : '' }} required>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                        <div style="font-weight:700;color:#fff;font-size:.95rem;">
+                                            📦 J&amp;T Express (Standard Nationwide Shipping)
+                                        </div>
+                                        <span class="badge bg-danger text-white fw-bold" style="font-size:.7rem;background:#e30613!important;">Default Courier</span>
+                                    </div>
+                                    <div style="font-size:.82rem;color:var(--mb-muted);" class="mt-1">
+                                        Standard door-to-door courier delivery nationwide across Metro Manila &amp; Provinces (Est. 2-5 business days).
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+
+                    </div>
+                </div>
+
                 {{-- Order Notes --}}
                 <div class="dark-card p-4 mb-4">
                     <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1rem;">
@@ -114,16 +186,33 @@
                     <div class="d-flex flex-column gap-2">
                         @foreach([
                             ['cod', '&#x1F4B5;', 'Cash on Delivery (COD)', 'Pay cash when your order arrives at your doorstep.'],
+                            ['gcash', '<span class="badge text-white me-1" style="background:#007dfe;font-size:0.75rem;padding:3px 7px;font-weight:700;border-radius:4px;">GCash</span>', 'GCash E-Wallet', 'Direct e-wallet payment using your registered GCash mobile number.'],
                             ['google_pay', '<svg width="18" height="18" viewBox="0 0 24 24" class="me-1"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>', 'Google Pay', 'Fast 1-tap payment using your Google Account or saved cards.'],
                             ['qrph', '&#x1F4F2;', 'QR Ph (GCash / Maya / Banks)', 'Scan the QR code with any Philippine banking or e-wallet app — GCash, Maya, BPI, BDO, UnionBank, and more.'],
                         ] as [$val, $icon, $label, $desc])
-                        <label class="d-flex align-items-start gap-3 p-3 dark-card-hover" style="cursor:pointer;border-radius:var(--mb-radius-sm);border:1px solid var(--mb-border);">
-                            <input type="radio" name="payment_method" value="{{ $val }}" class="form-check-input mt-1" {{ old('payment_method', 'cod') === $val ? 'checked' : '' }} required>
-                            <div>
-                                <div style="font-weight:600;color:var(--mb-text);">{!! $icon !!} {{ $label }}</div>
-                                <div style="font-size:.82rem;color:var(--mb-muted);">{{ $desc }}</div>
+                        <div class="d-flex flex-column">
+                            <label class="d-flex align-items-start gap-3 p-3 dark-card-hover" style="cursor:pointer;border-radius:var(--mb-radius-sm);border:1px solid var(--mb-border);">
+                                <input type="radio" name="payment_method" value="{{ $val }}" class="form-check-input mt-1 payment-method-radio" {{ old('payment_method', 'cod') === $val ? 'checked' : '' }} required>
+                                <div>
+                                    <div style="font-weight:600;color:var(--mb-text);">{!! $icon !!} {{ $label }}</div>
+                                    <div style="font-size:.82rem;color:var(--mb-muted);">{{ $desc }}</div>
+                                </div>
+                            </label>
+                            @if($val === 'gcash')
+                            <div id="gcash-extra-fields" class="mt-2 p-3 {{ old('payment_method') === 'gcash' ? '' : 'd-none' }}" style="background:rgba(0,125,254,0.08);border:1px solid rgba(0,125,254,0.3);border-radius:var(--mb-radius-sm);">
+                                <label class="form-label mb-1" style="font-size:.85rem;font-weight:600;color:#fff;">
+                                    <i class="bi bi-phone me-1" style="color:#007dfe;"></i>GCash Account Mobile Number *
+                                </label>
+                                <input type="text" name="gcash_number" id="gcash_number" class="form-control form-control-sm @error('gcash_number') is-invalid @enderror" placeholder="e.g. 09171234567" value="{{ old('gcash_number', auth()->user()?->phone) }}" {{ old('payment_method') === 'gcash' ? 'required' : '' }}>
+                                <div class="form-text mt-1" style="font-size:.78rem;color:var(--mb-muted);">
+                                    Enter the 11-digit Philippines mobile number linked to your GCash account.
+                                </div>
+                                @error('gcash_number')
+                                    <div class="text-danger mt-1" style="font-size:.8rem;">{{ $message }}</div>
+                                @enderror
                             </div>
-                        </label>
+                            @endif
+                        </div>
                         @endforeach
                     </div>
                 </div>
@@ -188,6 +277,24 @@
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const radios = document.querySelectorAll('.payment-method-radio');
+    const gcashExtra = document.getElementById('gcash-extra-fields');
+    const gcashInput = document.getElementById('gcash_number');
+
+    radios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'gcash') {
+                gcashExtra.classList.remove('d-none');
+                if (gcashInput) gcashInput.required = true;
+            } else {
+                gcashExtra.classList.add('d-none');
+                if (gcashInput) gcashInput.required = false;
+            }
+        });
+    });
+});
+
 function handleCheckoutSubmit() {
     const form = document.getElementById('checkout-form');
     if (!form.checkValidity()) {

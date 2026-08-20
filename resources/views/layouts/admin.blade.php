@@ -44,9 +44,15 @@
             <i class="bi bi-clipboard-data"></i> Inventory
         </a>
 
+        @php
+            $unprocessedCount = \App\Models\Order::whereIn('status', ['confirmed', 'processing'])->count();
+        @endphp
         <div class="admin-nav-section mt-2">Orders</div>
-        <a href="{{ route('admin.orders.index') }}" class="admin-nav-item {{ request()->routeIs('admin.orders*') ? 'active' : '' }}">
-            <i class="bi bi-bag-check"></i> Orders
+        <a href="{{ route('admin.orders.index') }}" class="admin-nav-item {{ request()->routeIs('admin.orders*') ? 'active' : '' }} d-flex justify-content-between align-items-center">
+            <div><i class="bi bi-bag-check me-2"></i> Orders</div>
+            @if($unprocessedCount > 0)
+                <span class="badge bg-warning text-dark rounded-pill fw-bold" style="font-size:.7rem;padding:3px 8px;">{{ $unprocessedCount }} To Process</span>
+            @endif
         </a>
         <a href="{{ route('admin.customers.index') }}" class="admin-nav-item {{ request()->routeIs('admin.customers*') ? 'active' : '' }}">
             <i class="bi bi-people"></i> Customers
@@ -92,6 +98,12 @@
             <h1 class="mb-0" style="font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;color:#fff;">@yield('page-title', 'Dashboard')</h1>
         </div>
         <div class="d-flex gap-2 align-items-center">
+            @if($unprocessedCount > 0)
+            <a href="{{ route('admin.orders.index', ['status' => 'confirmed']) }}" class="btn btn-warning btn-sm fw-bold d-flex align-items-center gap-2 px-3 py-1" style="font-size:.82rem;border-radius:20px;box-shadow:0 0 12px rgba(255,193,7,0.35);">
+                <i class="bi bi-bell-fill"></i>
+                <span>{{ $unprocessedCount }} New Order(s) Need Processing</span>
+            </a>
+            @endif
             <a href="{{ route('home') }}" class="btn btn-outline-gold btn-sm" target="_blank">
                 <i class="bi bi-box-arrow-up-right me-1"></i>View Store
             </a>

@@ -32,7 +32,7 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        $order->load(['user', 'items.variant.product', 'shipments', 'payments']);
+        $order->load(['user', 'items.variant.product', 'shipments', 'payments', 'statusLogs']);
         return view('admin.orders.show', compact('order'));
     }
 
@@ -45,22 +45,51 @@ class OrderController extends Controller
     public function updateStatus(Request $request, Order $order)
     {
         $validated = $request->validate([
-            'status'         => 'required|in:pending_payment,confirmed,processing,shipped,delivered,completed,cancelled,return_requested,refunded',
+            'status'          => 'required|in:pending_payment,confirmed,processing,shipped,delivered,completed,cancelled,return_requested,refunded',
             'tracking_number' => 'nullable|string',
-            'courier'        => 'nullable|string',
+            'courier'         => 'nullable|string',
+            'log_title'       => 'nullable|string|max:255',
+            'log_description' => 'nullable|string|max:1000',
         ]);
 
-        $order->update($validated);
+        $order->update([
+            'status'          => $validated['status'],
+            'courier'         => $validated['courier'] ?? $order->courier,
+            'tracking_number' => $validated['tracking_number'] ?? $order->tracking_number,
+        ]);
+
+        $courierName = $order->courier ?? 'courier';
+        // Default timeline title based on status if not specified
+        $defaultTitle = match($validated['status']) {
+            'confirmed'        => 'Order Confirmed by Store',
+            'processing'       => 'To Ship — Seller is preparing your parcel at warehouse',
+            'shipped'          => "To Receive — Parcel picked up by {$courierName} rider",
+            'delivered'        => 'Received — Parcel delivered to buyer',
+            'completed'        => 'Order Completed',
+            'cancelled'        => 'Order Cancelled',
+            'return_requested' => 'Return Requested by Buyer',
+            'refunded'         => 'Order Payment Refunded',
+            default            => 'Status updated to ' . ucfirst(str_replace('_', ' ', $validated['status'])),
+        };
+
+        $title = !empty($validated['log_title']) ? $validated['log_title'] : $defaultTitle;
+        $description = $validated['log_description'] ?? null;
+
+        $order->statusLogs()->create([
+            'status'      => $validated['status'],
+            'title'       => $title,
+            'description' => $description,
+        ]);
 
         // If shipped, create shipment record
-        if ($validated['status'] === 'shipped' && !empty($validated['tracking_number'])) {
+        if ($validated['status'] === 'shipped' && !empty($order->tracking_number)) {
             Shipment::updateOrCreate(
                 ['order_id' => $order->id],
                 [
-                    'courier'          => $validated['courier'] ?? $order->courier,
-                    'tracking_number'  => $validated['tracking_number'],
-                    'status'           => 'in_transit',
-                    'shipped_at'       => now(),
+                    'courier'         => $order->courier ?? 'Lalamove Express',
+                    'tracking_number' => $order->tracking_number,
+                    'status'          => 'in_transit',
+                    'shipped_at'      => now(),
                 ]
             );
         }
@@ -70,7 +99,7 @@ class OrderController extends Controller
             $order->update(['payment_status' => $order->payment_method === 'cod' ? 'paid' : $order->payment_status]);
         }
 
-        return back()->with('success', "Order status updated to {$validated['status']}.");
+        return back()->with('success', "Order status updated to '{$validated['status']}' and timeline logged.");
     }
 
     public function packingSlip(Order $order)

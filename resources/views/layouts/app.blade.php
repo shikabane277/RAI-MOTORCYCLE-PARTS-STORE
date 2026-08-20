@@ -16,7 +16,7 @@
     <div class="container-fluid px-3">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
             <span class="text-gold fw-semibold">&#x1F3CD;&#xFE0F; FREE SHIPPING on orders &#x20B1;1,500+</span>
-            <span class="text-muted-custom">🛵 Lalamove Express Same-Day Delivery (Orders 8:00 AM – 4:00 PM)</span>
+            <span class="text-muted-custom">📦 J&amp;T Express Standard &amp; 🛵 Lalamove Express Same-Day (8:00 AM – 4:00 PM)</span>
             <div class="d-flex gap-3">
                 <a href="{{ route('order.track') }}" class="text-muted-custom text-decoration-none" style="font-size:.8rem"><i class="bi bi-geo-alt me-1"></i>Track Order</a>
                 @auth

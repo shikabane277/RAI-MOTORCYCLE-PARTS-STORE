@@ -60,6 +60,9 @@
                 <div class="d-flex justify-content-between"><span style="color:var(--mb-muted);">Order Number</span><span class="text-gold fw-bold">{{ $order->order_number }}</span></div>
                 <div class="d-flex justify-content-between"><span style="color:var(--mb-muted);">Date Placed</span><span>{{ $order->placed_at?->format('M d, Y H:i') }}</span></div>
                 <div class="d-flex justify-content-between"><span style="color:var(--mb-muted);">Payment</span><span>{{ strtoupper(str_replace('_',' ',$order->payment_method)) }}</span></div>
+                @if($order->gcash_number)
+                <div class="d-flex justify-content-between"><span style="color:var(--mb-muted);">GCash Mobile No.</span><span style="color:#007dfe;font-weight:600;">{{ $order->gcash_number }}</span></div>
+                @endif
                 <div class="d-flex justify-content-between align-items-center">
                     <span style="color:var(--mb-muted);">Pay Status</span>
                     <span style="color:{{ $order->payment_status === 'paid' ? 'var(--mb-green)' : 'var(--mb-gold)' }};font-weight:600;">{{ ucfirst($order->payment_status) }}</span>
@@ -69,44 +72,114 @@
             </div>
         </div>
 
+        {{-- Shopee Order Progress Stage --}}
+        <div class="dark-card p-4 mb-3">
+            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:#fff;margin-bottom:1rem;">
+                <i class="bi bi-diagram-3 text-gold me-2"></i>Shopee Order Lifecycle
+            </h2>
+            <div class="d-flex flex-column gap-2">
+                @php $step = $order->shopee_step; @endphp
+                @foreach([
+                    1 => ['Order Placed', 'bi-bag-check', 'pending_payment, confirmed'],
+                    2 => ['To Ship', 'bi-box-seam', 'processing'],
+                    3 => ['To Receive', 'bi-truck', 'shipped'],
+                    4 => ['Received', 'bi-check-circle', 'delivered, completed'],
+                ] as $num => [$label, $icon, $statuses])
+                <div class="d-flex align-items-center justify-content-between p-2" style="border-radius:6px;background:{{ $step >= $num ? 'rgba(245,166,35,0.1)' : 'var(--mb-surface)' }};border:1px solid {{ $step >= $num ? 'rgba(245,166,35,0.3)' : 'var(--mb-border)' }};">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi {{ $icon }}" style="color:{{ $step >= $num ? 'var(--mb-gold)' : 'var(--mb-muted)' }};"></i>
+                        <span style="font-size:.88rem;font-weight:{{ $step === $num ? '700' : '500' }};color:{{ $step >= $num ? '#fff' : 'var(--mb-muted)' }};">
+                            Step {{ $num }}: {{ $label }}
+                        </span>
+                    </div>
+                    @if($step > $num)
+                        <span class="badge bg-success" style="font-size:.65rem;">DONE</span>
+                    @elseif($step === $num)
+                        <span class="badge bg-warning text-dark" style="font-size:.65rem;">CURRENT</span>
+                    @endif
+                </div>
+                @endforeach
+            </div>
+        </div>
+
         {{-- Update Status --}}
         <div class="dark-card p-4 mb-3">
-            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:#fff;margin-bottom:1rem;">Update Status</h2>
+            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:#fff;margin-bottom:1rem;">
+                <i class="bi bi-pencil-square text-gold me-2"></i>Update Order Status &amp; Log Activity
+            </h2>
             <form method="POST" action="{{ route('admin.orders.status', $order) }}">
                 @csrf
                 <div class="mb-2">
-                    <label class="form-label">Status</label>
-                    <select name="status" class="form-select">
-                        @foreach(['pending_payment','confirmed','processing','shipped','delivered','completed','cancelled'] as $s)
-                        <option value="{{ $s }}" {{ $order->status === $s ? 'selected' : '' }}>{{ ucfirst(str_replace('_',' ',$s)) }}</option>
-                        @endforeach
+                    <label class="form-label">Status Stage *</label>
+                    <select name="status" id="admin_status_select" class="form-select" onchange="updatePresetTitle(this.value)">
+                        <option value="confirmed" {{ $order->status === 'confirmed' ? 'selected' : '' }}>Order Placed &mdash; Confirmed</option>
+                        <option value="processing" {{ $order->status === 'processing' ? 'selected' : '' }}>To Ship &mdash; Preparing &amp; Packing Items</option>
+                        <option value="shipped" {{ $order->status === 'shipped' ? 'selected' : '' }}>To Receive &mdash; Picked up / In Transit</option>
+                        <option value="delivered" {{ $order->status === 'delivered' ? 'selected' : '' }}>Received &mdash; Delivered to Buyer</option>
+                        <option value="completed" {{ $order->status === 'completed' ? 'selected' : '' }}>Completed</option>
+                        <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                     </select>
                 </div>
                 <div class="mb-2">
                     <label class="form-label">Courier</label>
-                    <select name="courier" class="form-select">
-                        <option value="J&T Express" {{ $order->courier === 'J&T Express' ? 'selected' : '' }}>J&T Express</option>
-                        <option value="Ninja Van" {{ $order->courier === 'Ninja Van' ? 'selected' : '' }}>Ninja Van</option>
-                        <option value="LBC" {{ $order->courier === 'LBC' ? 'selected' : '' }}>LBC</option>
-                        <option value="2GO" {{ $order->courier === '2GO' ? 'selected' : '' }}>2GO</option>
-                    </select>
+                    <input type="text" name="courier" class="form-control form-control-sm" value="{{ old('courier', $order->courier ?? 'J&T Express') }}" placeholder="J&T Express, Lalamove Express, etc.">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Tracking Number</label>
+                    <input type="text" name="tracking_number" class="form-control form-control-sm" value="{{ old('tracking_number', $order->tracking_number) }}" placeholder="e.g. JNT-PH-123456 or LLM-PH-123456">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Status Update Title for Buyer *</label>
+                    <input type="text" name="log_title" id="log_title_input" class="form-control form-control-sm" placeholder="e.g. Parcel picked up by rider" value="{{ old('log_title') }}">
+                    @php $isJnT = str_contains(strtolower($order->courier ?? ''), 'j&t'); @endphp
+                    <div class="d-flex flex-wrap gap-1 mt-1">
+                        @if($isJnT)
+                            <button type="button" class="btn btn-dark-surface py-0 px-2" style="font-size:.7rem;" onclick="setPreset('Parcel picked up by J&T Express rider')">📌 Picked up by J&T</button>
+                            <button type="button" class="btn btn-dark-surface py-0 px-2" style="font-size:.7rem;" onclick="setPreset('Package packed & handed to J&T hub')">📦 Handed to J&T Hub</button>
+                            <button type="button" class="btn btn-dark-surface py-0 px-2" style="font-size:.7rem;" onclick="setPreset('Parcel out for delivery by J&T rider')">🚚 Out for delivery</button>
+                        @else
+                            <button type="button" class="btn btn-dark-surface py-0 px-2" style="font-size:.7rem;" onclick="setPreset('Parcel picked up by Lalamove rider')">📌 Picked up by rider</button>
+                            <button type="button" class="btn btn-dark-surface py-0 px-2" style="font-size:.7rem;" onclick="setPreset('Package packed & awaiting rider pickup')">📦 Package packed</button>
+                            <button type="button" class="btn btn-dark-surface py-0 px-2" style="font-size:.7rem;" onclick="setPreset('Rider approaching delivery location')">🛵 Out for delivery</button>
+                        @endif
+                    </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Tracking Number</label>
-                    <input type="text" name="tracking_number" class="form-control" value="{{ $order->tracking_number }}" placeholder="e.g. JT123456789PH">
+                    <label class="form-label">Status Update Details (Optional)</label>
+                    <textarea name="log_description" class="form-control form-control-sm" rows="2" placeholder="e.g. Rider Juan (09171234567) has picked up the parcel. ETA 30 mins.">{{ old('log_description') }}</textarea>
                 </div>
-                <button type="submit" class="btn btn-gold w-100">Update</button>
+                <button type="submit" class="btn btn-gold w-100 py-2 fw-bold">
+                    <i class="bi bi-send me-1"></i>Save &amp; Notify Buyer
+                </button>
             </form>
         </div>
 
-        {{-- Tracking timeline --}}
-        @if($order->tracking_number)
+        {{-- Status Activity Log Feed --}}
         <div class="dark-card p-4 mb-3">
-            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:#fff;margin-bottom:.75rem;">Shipping</h2>
-            <div style="font-size:.88rem;color:var(--mb-muted);">{{ $order->courier }}</div>
-            <div style="font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--mb-gold);font-size:1rem;">{{ $order->tracking_number }}</div>
+            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:#fff;margin-bottom:1rem;">
+                <i class="bi bi-clock-history text-gold me-2"></i>Status Activity Log
+            </h2>
+            @if($order->statusLogs->isEmpty())
+                <div style="font-size:.85rem;color:var(--mb-muted);">No timeline logs recorded yet.</div>
+            @else
+                <div class="d-flex flex-column gap-3">
+                    @foreach($order->statusLogs as $log)
+                    <div class="p-2" style="background:var(--mb-surface);border-radius:6px;border-left:3px solid var(--mb-gold);">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div style="font-size:.88rem;font-weight:600;color:#fff;">{{ $log->title }}</div>
+                            <span class="badge bg-secondary" style="font-size:.65rem;">{{ strtoupper(str_replace('_',' ',$log->status)) }}</span>
+                        </div>
+                        @if($log->description)
+                        <div style="font-size:.8rem;color:var(--mb-text);" class="mt-1">{{ $log->description }}</div>
+                        @endif
+                        <div style="font-size:.72rem;color:var(--mb-muted);" class="mt-1">
+                            <i class="bi bi-clock me-1"></i>{{ $log->created_at->format('M d, Y h:i A') }} ({{ $log->created_at->diffForHumans() }})
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            @endif
         </div>
-        @endif
 
         <div class="d-flex gap-2">
             <a href="{{ route('admin.orders.packing-slip', $order) }}" class="btn btn-outline-gold btn-sm w-100" target="_blank">
@@ -115,5 +188,24 @@
             <a href="{{ route('admin.orders.index') }}" class="btn btn-dark-surface btn-sm w-100">Back</a>
         </div>
     </div>
+
+<script>
+function setPreset(text) {
+    document.getElementById('log_title_input').value = text;
+}
+function updatePresetTitle(status) {
+    const presets = {
+        'confirmed': 'Order Confirmed by Store',
+        'processing': 'To Ship — Seller is preparing your parcel at warehouse',
+        'shipped': 'To Receive — Parcel picked up by Lalamove rider',
+        'delivered': 'Received — Parcel delivered to buyer',
+        'completed': 'Order Completed',
+        'cancelled': 'Order Cancelled'
+    };
+    if (presets[status] && !document.getElementById('log_title_input').value) {
+        document.getElementById('log_title_input').value = presets[status];
+    }
+}
+</script>
 </div>
 @endsection

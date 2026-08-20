@@ -39,8 +39,12 @@ Route::prefix('checkout')->name('checkout.')->group(function () {
     Route::get('/', [CheckoutController::class, 'index'])->name('index');
     Route::post('/', [CheckoutController::class, 'store'])->name('store');
     Route::get('/success/{order:order_number}', [CheckoutController::class, 'success'])->name('success');
-    Route::post('/gpay-pay/{order:order_number}', [CheckoutController::class, 'processGooglePay'])->name('gpay.pay');
 });
+
+// PayMongo webhook - the authoritative "this order was paid" signal. Signature
+// verified in the controller; CSRF is excluded for it in bootstrap/app.php.
+Route::post('/webhooks/paymongo', [App\Http\Controllers\PayMongoWebhookController::class, 'handle'])
+    ->name('webhooks.paymongo');
 
 // Order tracking (public)
 Route::get('/track-order', [OrderController::class, 'trackForm'])->name('order.track');
@@ -116,6 +120,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('customers/{user}', [Admin\CustomerController::class, 'show'])->name('customers.show');
 
     // Coupons
+    Route::patch('coupons/{coupon}/toggle', [Admin\CouponController::class, 'toggleStatus'])->name('coupons.toggle');
     Route::resource('coupons', Admin\CouponController::class);
 
     // Banners

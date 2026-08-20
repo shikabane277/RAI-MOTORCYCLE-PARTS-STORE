@@ -10,21 +10,37 @@
 
         <div class="dark-card p-4 mb-4">
             <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;color:var(--mb-gold);margin-bottom:.75rem;">
-                🛵 Lalamove Express (Default Courier)
+                📦 J&amp;T Express (Default Standard Courier)
             </h2>
             <p style="color:var(--mb-text);line-height:1.7;">
-                <strong>RAI MOTORCYCLE PARTS</strong> uses <strong>Lalamove Express</strong> as our primary delivery courier for fast, reliable door-to-door delivery.
+                <strong>RAI MOTORCYCLE PARTS</strong> uses <strong>J&amp;T Express</strong> as our default courier service for standard nationwide doorstep delivery across Metro Manila and provinces.
+            </p>
+            <div class="p-3 mb-3" style="background:var(--mb-surface);border-radius:var(--mb-radius-sm);border-left:4px solid var(--mb-gold);">
+                <div style="font-weight:700;color:#fff;">🚚 Delivery Timelines</div>
+                <ul class="mb-0 mt-2" style="color:var(--mb-muted);font-size:.9rem;padding-left:1.2rem;line-height:1.7;">
+                    <li><strong>Metro Manila:</strong> 2–3 business days.</li>
+                    <li><strong>Luzon Provinces:</strong> 3–4 business days.</li>
+                    <li><strong>Visayas &amp; Mindanao:</strong> 4–7 business days.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="dark-card p-4 mb-4">
+            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;color:var(--mb-gold);margin-bottom:.75rem;">
+                🛵 Lalamove Express (Same-Day Delivery)
+            </h2>
+            <p style="color:var(--mb-text);line-height:1.7;">
+                Need your motorcycle parts immediately? Select <strong>Lalamove Express Same-Day Delivery</strong> during checkout.
             </p>
             <div class="p-3 mb-3" style="background:var(--mb-surface);border-radius:var(--mb-radius-sm);border-left:4px solid var(--mb-gold);">
                 <div style="font-weight:700;color:#fff;">⏰ Same-Day Dispatch Time Window (8:00 AM – 4:00 PM Manila Time)</div>
                 <ul class="mb-0 mt-2" style="color:var(--mb-muted);font-size:.9rem;padding-left:1.2rem;line-height:1.7;">
                     <li><strong>Orders placed between 8:00 AM and 4:00 PM:</strong> Dispatched via Lalamove on the same day.</li>
-                    <li><strong>Orders placed after 4:00 PM:</strong> Processed and scheduled for 8:00 AM Lalamove pickup the next morning.</li>
-                    <li><strong>Orders placed before 8:00 AM:</strong> Dispatched at 8:00 AM on the same business day.</li>
+                    <li><strong>Outside 8:00 AM – 4:00 PM window:</strong> Same-day shipping is automatically turned off. Please select J&amp;T Express standard shipping.</li>
                 </ul>
             </div>
             <p style="color:var(--mb-muted);font-size:.88rem;">
-                You can track your rider in real-time on our <a href="{{ route('order.track') }}" class="text-gold">Track Order</a> page.
+                You can track your order in real-time on our <a href="{{ route('order.track') }}" class="text-gold">Track Order</a> page.
             </p>
         </div>
 

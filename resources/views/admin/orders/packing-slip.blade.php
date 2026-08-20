@@ -41,6 +41,7 @@ th { background: #f0f0f0; font-weight: 700; }
     </div>
     <div>
         <strong>Payment:</strong> {{ strtoupper(str_replace('_',' ',$order->payment_method)) }}<br>
+        @if($order->gcash_number)<strong>GCash No:</strong> {{ $order->gcash_number }}<br>@endif
         <strong>Status:</strong> {{ ucfirst($order->payment_status) }}<br>
         @if($order->courier)<strong>Courier:</strong> {{ $order->courier }}<br>@endif
         @if($order->tracking_number)<strong>Tracking:</strong> {{ $order->tracking_number }}<br>@endif

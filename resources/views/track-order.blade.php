@@ -8,10 +8,10 @@
 
             <div class="text-center mb-4">
                 <h1 style="font-family:'Rajdhani',sans-serif;color:#fff;font-weight:700;font-size:2.2rem;" class="mb-2">
-                    <i class="bi bi-geo-alt text-gold me-2"></i>Track Your Lalamove Delivery
+                    <i class="bi bi-geo-alt text-gold me-2"></i>Track Your Order Delivery
                 </h1>
                 <p style="color:var(--mb-muted);font-size:.95rem;">
-                    RAI MOTORCYCLE PARTS uses <strong>Lalamove Express</strong> as our default same-day courier.
+                    RAI MOTORCYCLE PARTS ships via <strong>J&amp;T Express</strong> (Standard Shipping) and <strong>Lalamove Express</strong> (Same-Day Delivery).
                 </p>
             </div>
 
@@ -56,8 +56,73 @@
                             {{ ucfirst(str_replace('_',' ',$order->status)) }}
                         </span>
                         <div style="font-size:.78rem;color:var(--mb-muted);" class="mt-1">
-                            Pay Method: {{ strtoupper(str_replace('_',' ',$order->payment_method)) }} ({{ ucfirst($order->payment_status) }})
+                            Pay Method: {{ strtoupper(str_replace('_',' ',$order->payment_method)) }} @if($order->gcash_number) (GCash: {{ $order->gcash_number }}) @endif ({{ ucfirst($order->payment_status) }})
                         </div>
+                    </div>
+                {{-- 🛒 Shopee-Style 4-Stage Order Progress Tracker --}}
+                <div class="p-4 mb-4" style="background:var(--mb-surface);border-radius:var(--mb-radius);border:1px solid var(--mb-gold-dim);">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 style="font-family:'Rajdhani',sans-serif;font-size:1.15rem;color:#fff;margin:0;">
+                            <i class="bi bi-box-seam text-gold me-2"></i>Shopee Order Status: <span class="text-gold">{{ $order->shopee_status_label }}</span>
+                        </h3>
+                        <span class="badge bg-gold text-dark fw-bold px-3 py-1" style="font-size:.8rem;">
+                            Step {{ $order->shopee_step }} of 4
+                        </span>
+                    </div>
+
+                    {{-- Shopee Progress Pipeline Bar --}}
+                    <div class="row g-2 text-center my-3">
+                        @php $sStep = $order->shopee_step; @endphp
+                        @foreach([
+                            1 => ['Order Placed', '📝', 'Order confirmed'],
+                            2 => ['To Ship', '📦', 'Preparing items'],
+                            3 => ['To Receive', '🛵', 'In transit / Picked up'],
+                            4 => ['Received', '🎉', 'Parcel delivered']
+                        ] as $stepNum => [$stepTitle, $stepIcon, $stepDesc])
+                        <div class="col-3">
+                            <div class="p-3 position-relative" style="border-radius:var(--mb-radius-sm);background:{{ $sStep >= $stepNum ? 'rgba(245,166,35,0.12)' : 'rgba(255,255,255,0.02)' }};border:1.5px solid {{ $sStep >= $stepNum ? 'var(--mb-gold)' : 'var(--mb-border)' }};box-shadow:{{ $sStep === $stepNum ? '0 0 15px rgba(245,166,35,0.3)' : 'none' }};">
+                                <div style="font-size:1.6rem;margin-bottom:.3rem;">{{ $stepIcon }}</div>
+                                <div style="font-size:.85rem;font-weight:700;color:{{ $sStep >= $stepNum ? '#fff' : 'var(--mb-muted)' }};">{{ $stepTitle }}</div>
+                                <div style="font-size:.7rem;color:{{ $sStep >= $stepNum ? 'var(--mb-gold)' : 'var(--mb-muted)' }};" class="d-none d-md-block mt-1">{{ $stepDesc }}</div>
+                                @if($sStep >= $stepNum)
+                                <div class="mt-2" style="font-size:.65rem;color:var(--mb-green);font-weight:700;">
+                                    <i class="bi bi-check-circle-fill me-1"></i>{{ $sStep === $stepNum ? 'IN PROGRESS' : 'COMPLETED' }}
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+
+                    {{-- Detailed Activity Log Feed --}}
+                    <div class="mt-4 pt-3 border-top" style="border-color:var(--mb-border)!important;">
+                        <h4 style="font-family:'Rajdhani',sans-serif;font-size:1rem;color:#fff;margin-bottom:1rem;">
+                            <i class="bi bi-clock-history me-1 text-gold"></i>Detailed Parcel Activity Log
+                        </h4>
+                        @if($order->statusLogs->isEmpty())
+                        <div class="p-3 text-center" style="background:var(--mb-card);border-radius:6px;font-size:.85rem;color:var(--mb-muted);">
+                            Order confirmed and queued for fulfillment. Updates will appear here as the rider picks up your package.
+                        </div>
+                        @else
+                        <div class="d-flex flex-column gap-3 position-relative ps-3" style="border-left:2px solid var(--mb-gold-dim);">
+                            @foreach($order->statusLogs as $index => $log)
+                            <div class="position-relative">
+                                <div style="position:absolute;left:-23px;top:2px;width:12px;height:12px;border-radius:50%;background:{{ $index === 0 ? 'var(--mb-gold)' : 'var(--mb-muted)' }};box-shadow:{{ $index === 0 ? '0 0 8px var(--mb-gold)' : 'none' }};"></div>
+                                <div class="d-flex justify-content-between align-items-baseline">
+                                    <strong style="font-size:.92rem;color:{{ $index === 0 ? '#fff' : 'var(--mb-text)' }};">
+                                        {{ $log->title }}
+                                    </strong>
+                                    <span style="font-size:.75rem;color:var(--mb-muted);">{{ $log->created_at->format('M d, Y h:i A') }}</span>
+                                </div>
+                                @if($log->description)
+                                <div style="font-size:.83rem;color:var(--mb-muted);margin-top:.2rem;">
+                                    {{ $log->description }}
+                                </div>
+                                @endif
+                            </div>
+                            @endforeach
+                        </div>
+                        @endif
                     </div>
                 </div>
 
