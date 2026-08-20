@@ -28,14 +28,14 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
 
+        $shippingFee = $cart->subtotal >= 1500 ? 0 : 89;
+
         $coupon   = null;
         $discount = 0;
         if ($cart->coupon_code) {
             $coupon = Coupon::where('code', $cart->coupon_code)->first();
-            if ($coupon) $discount = $coupon->calculateDiscount($cart->subtotal);
+            if ($coupon) $discount = $coupon->calculateDiscount($cart->subtotal, $shippingFee);
         }
-
-        $shippingFee = $cart->subtotal >= 1500 ? 0 : 89;
         $defaultAddress = auth()->check() ? auth()->user()->addresses()->where('is_default', true)->first() : null;
 
         $lalamoveService = app(\App\Services\LalamoveService::class);
@@ -91,7 +91,7 @@ class CheckoutController extends Controller
         if ($cart->coupon_code) {
             $coupon = Coupon::where('code', $cart->coupon_code)->first();
             if ($coupon && $coupon->isValid($subtotal)) {
-                $discount = $coupon->calculateDiscount($subtotal);
+                $discount = $coupon->calculateDiscount($subtotal, $shippingFee);
                 $couponCode = $coupon->code;
                 $appliedCoupon = $coupon;
             }

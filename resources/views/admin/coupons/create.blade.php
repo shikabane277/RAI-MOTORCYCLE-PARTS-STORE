@@ -35,6 +35,7 @@
                         <select name="type" class="form-select @error('type') is-invalid @enderror" required>
                             <option value="percentage" {{ old('type') === 'percentage' ? 'selected' : '' }}>Percentage Discount (%)</option>
                             <option value="fixed" {{ old('type') === 'fixed' ? 'selected' : '' }}>Fixed Amount Off (₱)</option>
+                            <option value="free_shipping" {{ old('type') === 'free_shipping' ? 'selected' : '' }}>🚚 Free Shipping (100% Shipping Fee Off)</option>
                         </select>
                         @error('type')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>

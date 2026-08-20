@@ -125,7 +125,9 @@
                             </span>
                         </td>
                         <td>
-                            @if($coupon->type === 'percentage')
+                            @if($coupon->type === 'free_shipping')
+                                <span class="badge bg-primary text-white" style="font-size:.85rem;padding:6px 10px;">🚚 Free Shipping</span>
+                            @elseif($coupon->type === 'percentage')
                                 <span class="fw-bold text-success" style="font-size:1.05rem;">{{ (float)$coupon->value }}% OFF</span>
                             @else
                                 <span class="fw-bold text-gold" style="font-size:1.05rem;">&#x20B1;{{ number_format($coupon->value, 2) }} OFF</span>

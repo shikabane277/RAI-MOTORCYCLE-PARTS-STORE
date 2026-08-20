@@ -29,8 +29,11 @@ class Coupon extends Model
         return true;
     }
 
-    public function calculateDiscount(float $subtotal): float
+    public function calculateDiscount(float $subtotal, float $shippingFee = 0): float
     {
+        if ($this->type === 'free_shipping') {
+            return $shippingFee > 0 ? $shippingFee : ($this->value > 0 ? $this->value : 89.00);
+        }
         if ($this->type === 'percentage') {
             return round($subtotal * ($this->value / 100), 2);
         }

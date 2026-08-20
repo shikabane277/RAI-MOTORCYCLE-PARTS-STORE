@@ -24,16 +24,16 @@ class CartController extends Controller
         $cart = $this->getOrCreateCart();
         $cart->load('items.variant.product');
 
+        $shippingFee = $cart->subtotal >= 1500 ? 0 : 89;
+
         $coupon   = null;
         $discount = 0;
         if ($cart->coupon_code) {
             $coupon = Coupon::where('code', $cart->coupon_code)->first();
             if ($coupon) {
-                $discount = $coupon->calculateDiscount($cart->subtotal);
+                $discount = $coupon->calculateDiscount($cart->subtotal, $shippingFee);
             }
         }
-
-        $shippingFee = $cart->subtotal >= 1500 ? 0 : 89;
 
         return view('cart', compact('cart', 'coupon', 'discount', 'shippingFee'));
     }
