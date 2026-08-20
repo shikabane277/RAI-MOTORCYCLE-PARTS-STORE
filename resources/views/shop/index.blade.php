@@ -16,7 +16,7 @@
         {{-- ── Filter Sidebar ─────────────────────────────── --}}
         <div class="col-lg-3">
             <div class="dark-card p-3 sticky-top" style="top:80px;">
-                <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1rem;">
+                <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--mb-heading);margin-bottom:1rem;">
                     <i class="bi bi-funnel me-2 text-gold"></i>Filters
                 </h2>
                 <form method="GET" action="{{ isset($category) ? route('shop.category',$category->slug) : route('shop.index') }}" id="filter-form">
@@ -94,7 +94,7 @@
         <div class="col-lg-9">
             <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                 <div>
-                    <h1 style="font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700;color:#fff;margin:0;">
+                    <h1 style="font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700;color:var(--mb-heading);margin:0;">
                         {{ $category->name ?? 'All Products' }}
                     </h1>
                     <div style="color:var(--mb-muted);font-size:.85rem;">{{ $products->total() }} products</div>

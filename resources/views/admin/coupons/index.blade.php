@@ -69,7 +69,7 @@
         <div class="col-md-9">
             <div class="input-group">
                 <span class="input-group-text bg-transparent border-secondary text-muted"><i class="bi bi-search"></i></span>
-                <input type="text" name="search" class="form-control bg-transparent border-secondary text-white" placeholder="Search by coupon code (e.g. RAI10, SUMMER2026)..." value="{{ request('search') }}">
+                <input type="text" name="search" class="form-control bg-transparent border-secondary  " placeholder="Search by coupon code (e.g. RAI10, SUMMER2026)..." value="{{ request('search') }}">
             </div>
         </div>
         <div class="col-md-3 d-flex gap-2">

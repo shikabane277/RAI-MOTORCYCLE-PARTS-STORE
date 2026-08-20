@@ -102,11 +102,11 @@
         <a href="{{ route('home') }}" class="auth-logo d-flex align-items-center gap-2">
             <img src="/images/logo.png" alt="RAI Logo" style="height:44px;width:44px;object-fit:cover;border-radius:50%;border:1px solid var(--mb-gold);">
             <span style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.3rem;letter-spacing:.03em;">
-                <span class="text-gold">RAI</span> <span style="color:#fff;">MOTORCYCLE</span>
+                <span class="text-gold">RAI</span> <span class="brand-text-main">MOTORCYCLE</span>
             </span>
         </a>
 
-        <h1 style="font-family:'Rajdhani',sans-serif;font-size:2.5rem;font-weight:700;color:#fff;line-height:1.15;margin-bottom:1rem;">
+        <h1 style="font-family:'Rajdhani',sans-serif;font-size:2.5rem;font-weight:700;color:var(--mb-heading);line-height:1.15;margin-bottom:1rem;">
             Precision Parts.<br><span class="text-gold">Premium Experience.</span>
         </h1>
         <p style="color:var(--mb-muted);max-width:380px;line-height:1.7;margin-bottom:2.5rem;">
@@ -150,7 +150,7 @@
         <a href="{{ route('home') }}" class="auth-logo d-lg-none d-flex align-items-center gap-2">
             <img src="/images/logo.png" alt="RAI Logo" style="height:36px;width:36px;object-fit:cover;border-radius:50%;border:1px solid var(--mb-gold);">
             <span style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.1rem;">
-                <span class="text-gold">RAI</span> <span style="color:#fff;">MOTORCYCLE</span>
+                <span class="text-gold">RAI</span> <span class="brand-text-main">MOTORCYCLE</span>
             </span>
         </a>
 

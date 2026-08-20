@@ -7,7 +7,7 @@
     {{-- Main form --}}
     <div class="col-lg-8">
         <div class="dark-card p-4 mb-4">
-            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:#fff;margin-bottom:1.25rem;">Product Details</h2>
+            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:var(--mb-heading);margin-bottom:1.25rem;">Product Details</h2>
             <form method="POST" action="{{ route('admin.products.update', $product) }}">
                 @csrf @method('PUT')
                 <div class="mb-3">
@@ -80,7 +80,7 @@
         {{-- Variants Table --}}
         <div class="dark-card p-4 mb-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:#fff;margin:0;">Variants ({{ $product->variants->count() }})</h2>
+                <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:var(--mb-heading);margin:0;">Variants ({{ $product->variants->count() }})</h2>
                 <button class="btn btn-outline-gold btn-sm" data-bs-toggle="collapse" data-bs-target="#add-variant-form">
                     <i class="bi bi-plus-lg me-1"></i>Add Variant
                 </button>

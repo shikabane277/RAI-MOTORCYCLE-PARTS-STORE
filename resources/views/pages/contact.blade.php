@@ -3,7 +3,7 @@
 @section('content')
 <div class="container py-5">
     <div style="max-width:700px;">
-        <h1 style="font-family:'Rajdhani',sans-serif;color:#fff;font-weight:700;" class="mb-3">
+        <h1 style="font-family:'Rajdhani',sans-serif;color:var(--mb-heading);font-weight:700;" class="mb-3">
             <i class="bi bi-envelope text-gold me-2"></i>Contact Us
         </h1>
         <div class="dark-card p-4">

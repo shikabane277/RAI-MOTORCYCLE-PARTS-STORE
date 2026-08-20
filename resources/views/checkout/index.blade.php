@@ -3,7 +3,7 @@
 
 @section('content')
 <div class="container-xl py-4">
-    <h1 style="font-family:'Rajdhani',sans-serif;font-size:1.8rem;font-weight:700;color:#fff;margin-bottom:1rem;">
+    <h1 style="font-family:'Rajdhani',sans-serif;font-size:1.8rem;font-weight:700;color:var(--mb-heading);margin-bottom:1rem;">
         <i class="bi bi-bag-check text-gold me-2"></i>Checkout
     </h1>
 
@@ -30,7 +30,7 @@
 
                 {{-- Shipping Address --}}
                 <div class="dark-card p-4 mb-4">
-                    <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1.25rem;">
+                    <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--mb-heading);margin-bottom:1.25rem;">
                         <i class="bi bi-geo-alt text-gold me-2"></i>Shipping Address
                     </h2>
 
@@ -106,7 +106,7 @@
 
                 {{-- Delivery Service / Shipping Method --}}
                 <div class="dark-card p-4 mb-4">
-                    <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1.25rem;">
+                    <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--mb-heading);margin-bottom:1.25rem;">
                         <i class="bi bi-truck text-gold me-2"></i>Delivery Courier &amp; Service
                     </h2>
 
@@ -132,7 +132,7 @@
                                        {{ !$isLalamoveActive ? 'disabled' : '' }} required>
                                 <div class="flex-grow-1">
                                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                        <div style="font-weight:700;color:#fff;font-size:.95rem;">
+                                        <div style="font-weight:700;color:var(--mb-heading);font-size:.95rem;">
                                             🛵 Lalamove Express (Same-Day Delivery)
                                         </div>
                                         @if($isLalamoveActive)
@@ -161,7 +161,7 @@
                                        {{ $selectedShipping === 'standard' ? 'checked' : '' }} required>
                                 <div class="flex-grow-1">
                                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                        <div style="font-weight:700;color:#fff;font-size:.95rem;">
+                                        <div style="font-weight:700;color:var(--mb-heading);font-size:.95rem;">
                                             📦 J&amp;T Express (Standard Nationwide Shipping)
                                         </div>
                                         <span class="badge bg-danger text-white fw-bold" style="font-size:.7rem;background:#e30613!important;">Default Courier</span>
@@ -178,7 +178,7 @@
 
                 {{-- Order Notes --}}
                 <div class="dark-card p-4 mb-4">
-                    <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1rem;">
+                    <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--mb-heading);margin-bottom:1rem;">
                         <i class="bi bi-chat-text text-gold me-2"></i>Order Notes <span style="color:var(--mb-muted);font-weight:400;font-size:.9rem;">(Optional)</span>
                     </h2>
                     <textarea name="notes" class="form-control" rows="2" placeholder="Special instructions, color preferences, etc.">{{ old('notes') }}</textarea>
@@ -186,7 +186,7 @@
 
                 {{-- Payment Method --}}
                 <div class="dark-card p-4">
-                    <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1.25rem;">
+                    <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--mb-heading);margin-bottom:1.25rem;">
                         <i class="bi bi-wallet2 text-gold me-2"></i>Payment Method
                     </h2>
                     <div class="d-flex flex-column gap-2">
@@ -206,7 +206,7 @@
                             </label>
                             @if($val === 'gcash')
                             <div id="gcash-extra-fields" class="mt-2 p-3 {{ old('payment_method') === 'gcash' ? '' : 'd-none' }}" style="background:rgba(0,125,254,0.08);border:1px solid rgba(0,125,254,0.3);border-radius:var(--mb-radius-sm);">
-                                <label class="form-label mb-1" style="font-size:.85rem;font-weight:600;color:#fff;">
+                                <label class="form-label mb-1" style="font-size:.85rem;font-weight:600;color:var(--mb-heading);">
                                     <i class="bi bi-phone me-1" style="color:#007dfe;"></i>GCash Account Mobile Number *
                                 </label>
                                 <input type="text" name="gcash_number" id="gcash_number" class="form-control form-control-sm @error('gcash_number') is-invalid @enderror" placeholder="e.g. 09171234567" value="{{ old('gcash_number', auth()->user()?->phone) }}" {{ old('payment_method') === 'gcash' ? 'required' : '' }}>
@@ -228,7 +228,7 @@
         {{-- ── Right: Summary ──────────────────────────────── --}}
         <div class="col-lg-5">
             <div class="dark-card p-4 sticky-top" style="top:80px;">
-                <h3 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1.25rem;">Your Order</h3>
+                <h3 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--mb-heading);margin-bottom:1.25rem;">Your Order</h3>
 
                 {{-- Items --}}
                 <div class="checkout-items mb-3" style="max-height:240px;overflow-y:auto;">

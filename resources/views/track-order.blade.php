@@ -7,7 +7,7 @@
         <div class="col-lg-9">
 
             <div class="text-center mb-4">
-                <h1 style="font-family:'Rajdhani',sans-serif;color:#fff;font-weight:700;font-size:2.2rem;" class="mb-2">
+                <h1 style="font-family:'Rajdhani',sans-serif;color:var(--mb-heading);font-weight:700;font-size:2.2rem;" class="mb-2">
                     <i class="bi bi-geo-alt text-gold me-2"></i>Track Your Order Delivery
                 </h1>
                 <p style="color:var(--mb-muted);font-size:.95rem;">
@@ -27,7 +27,7 @@
                     @csrf
                     <div class="row g-3 align-items-end">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold" style="color:#fff;">Order Number *</label>
+                            <label class="form-label fw-bold" style="color:var(--mb-heading);">Order Number *</label>
                             <input type="text" name="order_number" class="form-control" placeholder="e.g. MB-2026-12345 or MB202612345" value="{{ old('order_number', isset($order) ? $order->order_number : '') }}" required>
                         </div>
                         <div class="col-md-4">
@@ -47,7 +47,7 @@
             @auth
             @if(isset($userOrders) && $userOrders->isNotEmpty() && !isset($order))
             <div class="dark-card p-4 mb-4">
-                <h3 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:#fff;margin-bottom:1rem;">
+                <h3 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:var(--mb-heading);margin-bottom:1rem;">
                     <i class="bi bi-clock-history text-gold me-2"></i>Your Recent Orders
                 </h3>
                 <div class="row g-3">
@@ -107,7 +107,7 @@
                 {{-- 🛒 4-Stage Order Progress Tracker --}}
                 <div class="p-4 mb-4" style="background:var(--mb-surface);border-radius:var(--mb-radius);border:1px solid var(--mb-gold-dim);">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3 style="font-family:'Rajdhani',sans-serif;font-size:1.15rem;color:#fff;margin:0;">
+                        <h3 style="font-family:'Rajdhani',sans-serif;font-size:1.15rem;color:var(--mb-heading);margin:0;">
                             <i class="bi bi-box-seam text-gold me-2"></i>Delivery Status: <span class="text-gold">{{ $order->shopee_status_label }}</span>
                         </h3>
                         <span class="badge bg-gold text-dark fw-bold px-3 py-1" style="font-size:.8rem;">
@@ -141,7 +141,7 @@
 
                     {{-- Detailed Activity Log Feed --}}
                     <div class="mt-4 pt-3 border-top" style="border-color:var(--mb-border)!important;">
-                        <h4 style="font-family:'Rajdhani',sans-serif;font-size:1rem;color:#fff;margin-bottom:1rem;">
+                        <h4 style="font-family:'Rajdhani',sans-serif;font-size:1rem;color:var(--mb-heading);margin-bottom:1rem;">
                             <i class="bi bi-clock-history me-1 text-gold"></i>Parcel Activity Log
                         </h4>
                         @if($order->statusLogs->isEmpty())
@@ -174,7 +174,7 @@
                 {{-- Shipping Address & Items --}}
                 <div class="row g-4 mb-3">
                     <div class="col-md-6">
-                        <h4 style="font-family:'Rajdhani',sans-serif;font-size:1rem;color:#fff;margin-bottom:.5rem;">
+                        <h4 style="font-family:'Rajdhani',sans-serif;font-size:1rem;color:var(--mb-heading);margin-bottom:.5rem;">
                             <i class="bi bi-geo-alt text-gold me-1"></i>Delivery Address
                         </h4>
                         <div style="font-size:.88rem;color:var(--mb-text);line-height:1.6;">
@@ -184,7 +184,7 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <h4 style="font-family:'Rajdhani',sans-serif;font-size:1rem;color:#fff;margin-bottom:.5rem;">
+                        <h4 style="font-family:'Rajdhani',sans-serif;font-size:1rem;color:var(--mb-heading);margin-bottom:.5rem;">
                             <i class="bi bi-receipt text-gold me-1"></i>Order Summary
                         </h4>
                         <div style="font-size:.88rem;color:var(--mb-text);line-height:1.6;">
@@ -199,7 +199,7 @@
                 </div>
 
                 {{-- Item list --}}
-                <h4 style="font-family:'Rajdhani',sans-serif;font-size:1rem;color:#fff;margin-bottom:.75rem;">Items Ordered</h4>
+                <h4 style="font-family:'Rajdhani',sans-serif;font-size:1rem;color:var(--mb-heading);margin-bottom:.75rem;">Items Ordered</h4>
                 @foreach($order->items as $item)
                 <div class="d-flex align-items-center gap-3 py-2" style="border-bottom:1px solid var(--mb-border);">
                     <div style="width:40px;height:40px;background:var(--mb-surface);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -222,7 +222,7 @@
                         🛵
                     </div>
                     <div>
-                        <h3 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;color:#fff;margin:0;">
+                        <h3 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;color:var(--mb-heading);margin:0;">
                             Lalamove Same-Day Delivery Schedule
                         </h3>
                         <div style="font-size:.88rem;color:var(--mb-muted);margin-top:.2rem;">

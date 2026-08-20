@@ -3,7 +3,7 @@
 
 @section('content')
 <div class="container-xl py-4">
-    <h1 style="font-family:'Rajdhani',sans-serif;font-size:1.8rem;font-weight:700;color:#fff;margin-bottom:1.5rem;">
+    <h1 style="font-family:'Rajdhani',sans-serif;font-size:1.8rem;font-weight:700;color:var(--mb-heading);margin-bottom:1.5rem;">
         <i class="bi bi-bag text-gold me-2"></i>Your Cart
     </h1>
 
@@ -100,7 +100,7 @@
         {{-- ── Summary ─────────────────────────────────────── --}}
         <div class="col-lg-4">
             <div class="dark-card p-4 sticky-top" style="top:80px;">
-                <h3 style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:#fff;margin-bottom:1.25rem;">Order Summary</h3>
+                <h3 style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:var(--mb-heading);margin-bottom:1.25rem;">Order Summary</h3>
                 <div class="d-flex justify-content-between mb-2" style="font-size:.9rem;">
                     <span style="color:var(--mb-muted);">Subtotal</span>
                     <span>&#x20B1;{{ number_format($cart->subtotal, 2) }}</span>

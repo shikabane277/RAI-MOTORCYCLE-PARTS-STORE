@@ -5,7 +5,7 @@
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-0 text-white font-weight-bold" style="font-family:'Rajdhani',sans-serif;">
+            <h1 class="h3 mb-0   font-weight-bold" style="font-family:'Rajdhani',sans-serif;">
                 <i class="bi bi-award text-gold me-2"></i>Brand Management
             </h1>
             <p class="text-muted small mb-0">Create, edit, toggle, and manage motorcycle part manufacturers &amp; brands.</p>
@@ -47,7 +47,7 @@
                                         <span style="font-weight:700;color:var(--mb-gold);font-size:1.1rem;">{{ substr($brand->name, 0, 1) }}</span>
                                     @endif
                                 </div>
-                                <div class="fw-bold text-white">{{ $brand->name }}</div>
+                                <div class="fw-bold  ">{{ $brand->name }}</div>
                             </div>
                         </td>
                         <td style="font-family:monospace;color:var(--mb-gold);font-size:.85rem;">{{ $brand->slug }}</td>
@@ -108,15 +108,15 @@
                 <div class="modal-body py-3">
                     <div class="mb-3">
                         <label class="form-label text-muted">Brand Name *</label>
-                        <input type="text" name="name" class="form-control bg-dark text-white border-secondary" placeholder="e.g. Akrapovič, Brembo, RAI" required>
+                        <input type="text" name="name" class="form-control bg-dark   border-secondary" placeholder="e.g. Akrapovič, Brembo, RAI" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label text-muted">Logo Image URL</label>
-                        <input type="url" name="logo_url" class="form-control bg-dark text-white border-secondary" placeholder="https://example.com/logo.png">
+                        <input type="url" name="logo_url" class="form-control bg-dark   border-secondary" placeholder="https://example.com/logo.png">
                     </div>
                     <div class="mb-3">
                         <label class="form-label text-muted">Description</label>
-                        <textarea name="description" class="form-control bg-dark text-white border-secondary" rows="3" placeholder="Brief manufacturer background..."></textarea>
+                        <textarea name="description" class="form-control bg-dark   border-secondary" rows="3" placeholder="Brief manufacturer background..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer border-0 pt-0">
@@ -142,19 +142,19 @@
                 <div class="modal-body py-3">
                     <div class="mb-3">
                         <label class="form-label text-muted">Brand Name *</label>
-                        <input type="text" name="name" id="edit-brand-name" class="form-control bg-dark text-white border-secondary" required>
+                        <input type="text" name="name" id="edit-brand-name" class="form-control bg-dark   border-secondary" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label text-muted">Logo Image URL</label>
-                        <input type="url" name="logo_url" id="edit-brand-logo" class="form-control bg-dark text-white border-secondary">
+                        <input type="url" name="logo_url" id="edit-brand-logo" class="form-control bg-dark   border-secondary">
                     </div>
                     <div class="mb-3">
                         <label class="form-label text-muted">Description</label>
-                        <textarea name="description" id="edit-brand-description" class="form-control bg-dark text-white border-secondary" rows="3"></textarea>
+                        <textarea name="description" id="edit-brand-description" class="form-control bg-dark   border-secondary" rows="3"></textarea>
                     </div>
                     <div class="form-check">
                         <input type="checkbox" name="is_active" id="edit-brand-active" value="1" class="form-check-input">
-                        <label class="form-check-label text-white" for="edit-brand-active">Active on store and in filters</label>
+                        <label class="form-check-label  " for="edit-brand-active">Active on store and in filters</label>
                     </div>
                 </div>
                 <div class="modal-footer border-0 pt-0">

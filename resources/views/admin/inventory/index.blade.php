@@ -52,7 +52,7 @@
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content" style="background:var(--mb-card);border:1px solid var(--mb-border);border-radius:var(--mb-radius);">
                                     <div class="modal-header" style="border-color:var(--mb-border);">
-                                        <h5 class="modal-title" style="font-family:'Rajdhani',sans-serif;color:#fff;">Adjust Stock — {{ $variant->variant_sku }}</h5>
+                                        <h5 class="modal-title" style="font-family:'Rajdhani',sans-serif;color:var(--mb-heading);">Adjust Stock — {{ $variant->variant_sku }}</h5>
                                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                     </div>
                                     <form method="POST" action="{{ route('admin.inventory.adjust', $variant) }}">
@@ -109,7 +109,7 @@
     {{-- Recent Logs --}}
     <div class="col-lg-4">
         <div class="dark-card p-4">
-            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:#fff;margin-bottom:1rem;">Recent Adjustments</h2>
+            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:var(--mb-heading);margin-bottom:1rem;">Recent Adjustments</h2>
             @forelse($logs as $log)
             <div class="py-2" style="border-bottom:1px solid var(--mb-border);">
                 <div class="d-flex justify-content-between align-items-start">

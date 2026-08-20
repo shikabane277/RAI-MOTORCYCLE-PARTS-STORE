@@ -7,7 +7,7 @@
     <div class="col-lg-8">
         {{-- Items --}}
         <div class="dark-card p-4 mb-4">
-            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:#fff;margin-bottom:1rem;">Items ({{ $order->items->count() }})</h2>
+            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:var(--mb-heading);margin-bottom:1rem;">Items ({{ $order->items->count() }})</h2>
             @foreach($order->items as $item)
             <div class="d-flex align-items-center gap-3 py-2" style="border-bottom:1px solid var(--mb-border);">
                 <div style="flex-shrink:0;width:50px;height:50px;background:var(--mb-surface);border-radius:var(--mb-radius-sm);display:flex;align-items:center;justify-content:center;">
@@ -32,7 +32,7 @@
 
         {{-- Shipping address --}}
         <div class="dark-card p-4 mb-4">
-            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:#fff;margin-bottom:1rem;"><i class="bi bi-geo-alt text-gold me-2"></i>Ship To</h2>
+            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:var(--mb-heading);margin-bottom:1rem;"><i class="bi bi-geo-alt text-gold me-2"></i>Ship To</h2>
             <div style="font-size:.9rem;line-height:2;color:var(--mb-text);">
                 <strong>{{ $order->ship_recipient }}</strong><br>
                 {{ $order->ship_line1 }}, Brgy. {{ $order->ship_barangay }}<br>
@@ -43,7 +43,7 @@
 
         {{-- Admin Notes --}}
         <div class="dark-card p-4">
-            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:#fff;margin-bottom:1rem;">Admin Notes</h2>
+            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:var(--mb-heading);margin-bottom:1rem;">Admin Notes</h2>
             <form method="POST" action="{{ route('admin.orders.update', $order) }}">
                 @csrf @method('PUT')
                 <textarea name="admin_notes" class="form-control mb-2" rows="3" placeholder="Internal notes...">{{ $order->admin_notes }}</textarea>
@@ -56,7 +56,7 @@
     <div class="col-lg-4">
         {{-- Quick Process Order Actions --}}
         <div class="dark-card p-4 mb-3" style="border:1px solid var(--mb-gold-border);">
-            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:#fff;margin-bottom:1rem;">
+            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:var(--mb-heading);margin-bottom:1rem;">
                 <i class="bi bi-play-circle text-gold me-2"></i>Quick Process Order
             </h2>
             <div class="d-grid gap-2">
@@ -101,7 +101,7 @@
         </div>
 
         <div class="dark-card p-4 mb-3">
-            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:#fff;margin-bottom:1rem;">Order Info</h2>
+            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:var(--mb-heading);margin-bottom:1rem;">Order Info</h2>
             <div class="d-flex flex-column gap-2" style="font-size:.88rem;">
                 <div class="d-flex justify-content-between"><span style="color:var(--mb-muted);">Order Number</span><span class="text-gold fw-bold">{{ $order->order_number }}</span></div>
                 <div class="d-flex justify-content-between"><span style="color:var(--mb-muted);">Date Placed</span><span>{{ $order->placed_at?->format('M d, Y H:i') }}</span></div>
@@ -120,7 +120,7 @@
 
         {{-- Shopee Order Progress Stage --}}
         <div class="dark-card p-4 mb-3">
-            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:#fff;margin-bottom:1rem;">
+            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:var(--mb-heading);margin-bottom:1rem;">
                 <i class="bi bi-diagram-3 text-gold me-2"></i>Shopee Order Lifecycle
             </h2>
             <div class="d-flex flex-column gap-2">
@@ -150,7 +150,7 @@
 
         {{-- Update Status --}}
         <div class="dark-card p-4 mb-3">
-            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:#fff;margin-bottom:1rem;">
+            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:var(--mb-heading);margin-bottom:1rem;">
                 <i class="bi bi-pencil-square text-gold me-2"></i>Update Order Status &amp; Log Activity
             </h2>
             <form method="POST" action="{{ route('admin.orders.status', $order) }}">
@@ -202,7 +202,7 @@
 
         {{-- Status Activity Log Feed --}}
         <div class="dark-card p-4 mb-3">
-            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:#fff;margin-bottom:1rem;">
+            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:var(--mb-heading);margin-bottom:1rem;">
                 <i class="bi bi-clock-history text-gold me-2"></i>Status Activity Log
             </h2>
             @if($order->statusLogs->isEmpty())
@@ -212,7 +212,7 @@
                     @foreach($order->statusLogs as $log)
                     <div class="p-2" style="background:var(--mb-surface);border-radius:6px;border-left:3px solid var(--mb-gold);">
                         <div class="d-flex justify-content-between align-items-start">
-                            <div style="font-size:.88rem;font-weight:600;color:#fff;">{{ $log->title }}</div>
+                            <div style="font-size:.88rem;font-weight:600;color:var(--mb-heading);">{{ $log->title }}</div>
                             <span class="badge bg-secondary" style="font-size:.65rem;">{{ strtoupper(str_replace('_',' ',$log->status)) }}</span>
                         </div>
                         @if($log->description)

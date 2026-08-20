@@ -4,7 +4,7 @@
 @section('content')
 <div class="container py-5">
     <div style="max-width:800px;">
-        <h1 style="font-family:'Rajdhani',sans-serif;color:#fff;font-weight:700;" class="mb-3">
+        <h1 style="font-family:'Rajdhani',sans-serif;color:var(--mb-heading);font-weight:700;" class="mb-3">
             <i class="bi bi-truck text-gold me-2"></i>Shipping &amp; Delivery Policy
         </h1>
 
@@ -16,7 +16,7 @@
                 <strong>RAI MOTORCYCLE PARTS</strong> uses <strong>J&amp;T Express</strong> as our default courier service for standard nationwide doorstep delivery across Metro Manila and provinces.
             </p>
             <div class="p-3 mb-3" style="background:var(--mb-surface);border-radius:var(--mb-radius-sm);border-left:4px solid var(--mb-gold);">
-                <div style="font-weight:700;color:#fff;">🚚 Delivery Timelines</div>
+                <div style="font-weight:700;color:var(--mb-heading);">🚚 Delivery Timelines</div>
                 <ul class="mb-0 mt-2" style="color:var(--mb-muted);font-size:.9rem;padding-left:1.2rem;line-height:1.7;">
                     <li><strong>Metro Manila:</strong> 2–3 business days.</li>
                     <li><strong>Luzon Provinces:</strong> 3–4 business days.</li>
@@ -33,7 +33,7 @@
                 Need your motorcycle parts immediately? Select <strong>Lalamove Express Same-Day Delivery</strong> during checkout.
             </p>
             <div class="p-3 mb-3" style="background:var(--mb-surface);border-radius:var(--mb-radius-sm);border-left:4px solid var(--mb-gold);">
-                <div style="font-weight:700;color:#fff;">⏰ Same-Day Dispatch Time Window (8:00 AM – 4:00 PM Manila Time)</div>
+                <div style="font-weight:700;color:var(--mb-heading);">⏰ Same-Day Dispatch Time Window (8:00 AM – 4:00 PM Manila Time)</div>
                 <ul class="mb-0 mt-2" style="color:var(--mb-muted);font-size:.9rem;padding-left:1.2rem;line-height:1.7;">
                     <li><strong>Orders placed between 8:00 AM and 4:00 PM:</strong> Dispatched via Lalamove on the same day.</li>
                     <li><strong>Outside 8:00 AM – 4:00 PM window:</strong> Same-day shipping is automatically turned off. Please select J&amp;T Express standard shipping.</li>

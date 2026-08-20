@@ -53,7 +53,7 @@
             @if($product->brand)
                 <div class="product-brand mb-1">{{ $product->brand->name }}</div>
             @endif
-            <h1 style="font-family:'Rajdhani',sans-serif;font-size:1.8rem;font-weight:700;color:#fff;line-height:1.2;margin-bottom:.75rem;">
+            <h1 style="font-family:'Rajdhani',sans-serif;font-size:1.8rem;font-weight:700;color:var(--mb-heading);line-height:1.2;margin-bottom:.75rem;">
                 {{ $product->name }}
             </h1>
 
@@ -233,7 +233,7 @@
 
                 @auth
                 <div class="mt-4 dark-card p-4" style="max-width:700px;">
-                    <h3 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;color:#fff;margin-bottom:1rem;">Write a Review</h3>
+                    <h3 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;color:var(--mb-heading);margin-bottom:1rem;">Write a Review</h3>
                     <form method="POST" action="{{ route('reviews.store') }}">
                         @csrf
                         <input type="hidden" name="product_id" value="{{ $product->id }}">

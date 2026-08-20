@@ -16,13 +16,13 @@
         <div style="width:80px;height:80px;background:rgba(255,171,0,0.12);border:2px solid rgba(255,171,0,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:2rem;">
             ⏳
         </div>
-        <h1 style="font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:#fff;">Order Placed — Awaiting Payment</h1>
+        <h1 style="font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:var(--mb-heading);">Order Placed — Awaiting Payment</h1>
         <p style="color:var(--mb-muted);font-size:1rem;">We've reserved your parts. We'll start preparing them as soon as your payment clears.</p>
         @else
         <div style="width:80px;height:80px;background:rgba(0,200,83,0.12);border:2px solid rgba(0,200,83,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:2rem;">
             ✅
         </div>
-        <h1 style="font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:#fff;">Order Confirmed!</h1>
+        <h1 style="font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:var(--mb-heading);">Order Confirmed!</h1>
         <p style="color:var(--mb-muted);font-size:1rem;">Thanks for your order. We're preparing your parts now.</p>
         @endif
         <div style="font-family:'Rajdhani',sans-serif;font-size:1.3rem;color:var(--mb-gold);font-weight:700;margin-top:.5rem;">
@@ -34,7 +34,7 @@
         <div class="col-lg-7">
             {{-- Order details --}}
             <div class="dark-card p-4 mb-4">
-                <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;color:#fff;margin-bottom:1rem;">Order Details</h2>
+                <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;color:var(--mb-heading);margin-bottom:1rem;">Order Details</h2>
                 @foreach($order->items as $item)
                 <div class="d-flex justify-content-between align-items-center py-2" style="border-bottom:1px solid var(--mb-border);">
                     <div>
@@ -63,7 +63,7 @@
                     <div class="d-flex align-items-center gap-2">
                         <span style="font-size:1.5rem;">{{ str_contains(strtolower($order->courier), 'j&t') ? '📦' : '🛵' }}</span>
                         <div>
-                            <h3 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;color:#fff;margin:0;">
+                            <h3 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;color:var(--mb-heading);margin:0;">
                                 {{ $order->courier ?? 'J&T Express' }} Delivery
                             </h3>
                             <div style="font-size:.78rem;color:var(--mb-muted);">
@@ -155,7 +155,7 @@
             </div>
             @else
             <div class="dark-card p-4 mb-4">
-                <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;color:#fff;margin-bottom:.75rem;">
+                <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;color:var(--mb-heading);margin-bottom:.75rem;">
                     <i class="bi bi-cash-coin text-gold me-2"></i>Cash on Delivery
                 </h2>
                 <p style="color:var(--mb-muted);font-size:.9rem;">Prepare <strong style="color:var(--mb-text);">&#x20B1;{{ number_format($order->grand_total, 2) }}</strong> in exact change when your rider arrives. COD orders are processed within 1 business day.</p>
@@ -164,7 +164,7 @@
 
             {{-- Shipping address --}}
             <div class="dark-card p-4 mb-4">
-                <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;color:#fff;margin-bottom:.75rem;"><i class="bi bi-geo-alt text-gold me-2"></i>Deliver To</h2>
+                <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;color:var(--mb-heading);margin-bottom:.75rem;"><i class="bi bi-geo-alt text-gold me-2"></i>Deliver To</h2>
                 <div style="color:var(--mb-text);font-size:.9rem;line-height:1.8;">
                     <strong>{{ $order->ship_recipient }}</strong><br>
                     {{ $order->ship_line1 }}, Brgy. {{ $order->ship_barangay }}<br>

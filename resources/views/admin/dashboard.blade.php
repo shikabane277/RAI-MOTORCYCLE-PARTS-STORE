@@ -62,7 +62,7 @@
     <div class="col-lg-8">
         <div class="dark-card p-4 h-100">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700;color:#fff;margin:0;">Revenue — Last 7 Days</h2>
+                <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700;color:var(--mb-heading);margin:0;">Revenue — Last 7 Days</h2>
                 <span style="font-size:.8rem;color:var(--mb-muted);">Completed + Delivered orders</span>
             </div>
             <canvas id="revenue-chart" style="max-height:220px;"></canvas>
@@ -72,7 +72,7 @@
     {{-- Alerts ──────────────────────────────────────────── --}}
     <div class="col-lg-4">
         <div class="dark-card p-4 h-100">
-            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:1rem;">Alerts</h2>
+            <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700;color:var(--mb-heading);margin-bottom:1rem;">Alerts</h2>
             <div class="d-flex flex-column gap-2">
                 @if($pendingOrders > 0)
                 <a href="{{ route('admin.orders.index', ['status' => 'confirmed']) }}" class="d-flex align-items-center gap-3 p-3 dark-card-hover text-decoration-none" style="border-radius:var(--mb-radius-sm);border:1px solid var(--mb-border);">
@@ -128,7 +128,7 @@
     <div class="col-lg-7">
         <div class="dark-card p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700;color:#fff;margin:0;">New Orders</h2>
+                <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700;color:var(--mb-heading);margin:0;">New Orders</h2>
                 <a href="{{ route('admin.orders.index') }}" class="btn btn-outline-gold btn-sm">View All</a>
             </div>
             <div class="table-responsive">
@@ -156,7 +156,7 @@
     <div class="col-lg-5">
         <div class="dark-card p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700;color:#fff;margin:0;">Low Stock Items</h2>
+                <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700;color:var(--mb-heading);margin:0;">Low Stock Items</h2>
                 <a href="{{ route('admin.inventory.index') }}" class="btn btn-outline-gold btn-sm">Manage</a>
             </div>
             @forelse($lowStockItems->take(6) as $variant)
