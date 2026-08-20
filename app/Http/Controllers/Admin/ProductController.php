@@ -217,15 +217,18 @@ class ProductController extends Controller
         ]);
 
         $vName = $validated['variant_name'] ?? 'Standard';
-        $sku = strtoupper(
-            substr(preg_replace('/[^A-Za-z0-9]/', '', $product->slug), 0, 8) .
-            '-' . strtoupper(substr(Str::slug($vName), 0, 4)) .
-            '-' . Str::random(4)
-        );
+        $vImg = null;
+        if ($request->hasFile('image_file')) {
+            $vFile = $request->file('image_file');
+            $vFilename = 'var_' . time() . '_' . rand(100, 999) . '.' . $vFile->getClientOriginalExtension();
+            $vFile->move(public_path('uploads/products'), $vFilename);
+            $vImg = '/uploads/products/' . $vFilename;
+        }
 
         $product->variants()->create(array_merge($validated, [
             'variant_name' => $vName,
             'variant_sku'  => $sku,
+            'image_url'    => $vImg,
             'low_stock_threshold' => 5,
             'is_active'    => true,
         ]));

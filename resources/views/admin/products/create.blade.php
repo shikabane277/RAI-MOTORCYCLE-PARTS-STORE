@@ -76,6 +76,11 @@
     padding: 2px 6px;
     border-radius: 4px;
   }
+  .btn-xs {
+    font-size: 0.72rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
 </style>
 
 <form method="POST" action="{{ route('admin.products.store') }}" enctype="multipart/form-data" id="shopee-product-form">
@@ -91,7 +96,7 @@
                 <nav class="d-flex flex-column gap-1">
                     <a href="#section-basic" class="shopee-nav-link active"><i class="bi bi-info-circle"></i> 1. Basic Information</a>
                     <a href="#section-media" class="shopee-nav-link"><i class="bi bi-images"></i> 2. Product Images</a>
-                    <a href="#section-variations" class="shopee-nav-link"><i class="bi bi-diagram-3"></i> 3. Sales &amp; Variants</a>
+                    <a href="#section-variations" class="shopee-nav-link"><i class="bi bi-diagram-3"></i> 3. Connected Variants</a>
                     <a href="#section-shipping" class="shopee-nav-link"><i class="bi bi-truck"></i> 4. Shipping &amp; Logistics</a>
                     <a href="#section-others" class="shopee-nav-link"><i class="bi bi-gear"></i> 5. Settings</a>
                 </nav>
@@ -148,30 +153,26 @@
                 </div>
             </div>
 
-            {{-- ── 2. Product Images (Exact Shopee Image 2 Layout) ── --}}
+            {{-- ── 2. Product Images (Shopee 1:1 Upload Grid) ── --}}
             <div class="shopee-section-card" id="section-media">
                 <div class="shopee-section-title">
                     <i class="bi bi-images text-gold"></i> 2. Product Images
                 </div>
                 
                 <div class="mb-2">
-                    <label class="form-label font-bold mb-1">Product Images</label>
+                    <label class="form-label font-bold mb-1">Product Gallery Images</label>
                     <div style="font-size:.85rem;color:var(--mb-muted);" class="mb-3">
-                        <span class="text-danger fw-bold">*</span> 1:1 Image (Square 1:1 aspect ratio recommended)
+                        <span class="text-danger fw-bold">*</span> 1:1 Image (Square aspect ratio recommended)
                     </div>
 
                     {{-- Shopee Upload Grid --}}
                     <div class="d-flex flex-wrap gap-3 align-items-center mb-2">
-                        {{-- Add Image Card Button --}}
                         <label for="image_files_input" class="shopee-upload-card" style="width:100px;height:100px;border:2px dashed #f56c6c;border-radius:8px;background:var(--mb-surface);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;text-align:center;padding:8px;">
                             <i class="bi bi-image-fill text-danger fs-3 mb-1"></i>
                             <span style="font-size:.78rem;color:#f56c6c;font-weight:600;" id="image-counter-text">Add Image<br>(0/9)</span>
                         </label>
 
-                        {{-- Hidden File Input --}}
                         <input type="file" name="image_files[]" id="image_files_input" class="d-none" multiple accept="image/*">
-
-                        {{-- Image Previews Container --}}
                         <div id="image-thumbnails-wrapper" class="d-flex flex-wrap gap-3"></div>
                     </div>
 
@@ -181,13 +182,40 @@
                 </div>
             </div>
 
-            {{-- ── 3. Sales & Manually Added Variants ───────── --}}
+            {{-- ── 3. Connected Variants & Sub-Variants Builder ── --}}
             <div class="shopee-section-card" id="section-variations">
-                <div class="shopee-section-title justify-content-between">
-                    <span><i class="bi bi-diagram-3-fill text-gold"></i> 3. Sales &amp; Custom Variants</span>
-                    <button type="button" class="btn btn-gold btn-sm" id="btn-add-manual-variant">
-                        <i class="bi bi-plus-lg me-1"></i> + Add Variant Row
-                    </button>
+                <div class="shopee-section-title justify-content-between flex-wrap gap-2">
+                    <span><i class="bi bi-diagram-3-fill text-gold"></i> 3. Connected Variant &amp; Sub-Variant Builder</span>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-gold btn-sm" id="btn-quick-connect">
+                            <i class="bi bi-node-plus me-1"></i> Connect Sub-Variants Generator
+                        </button>
+                        <button type="button" class="btn btn-gold btn-sm" id="btn-add-manual-variant">
+                            <i class="bi bi-plus-lg me-1"></i> + Add Variant Row
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Quick Connected Sub-Variant Generator Collapse --}}
+                <div class="p-3 mb-3" style="background:var(--mb-surface);border:1px solid var(--mb-gold-border);border-radius:8px;">
+                    <h6 style="font-family:'Rajdhani',sans-serif;color:var(--mb-gold);font-weight:700;" class="mb-2">
+                        <i class="bi bi-diagram-2 me-1"></i> Connected 2-Tier Sub-Variant Generator
+                    </h6>
+                    <div class="row g-2 align-items-center mb-2">
+                        <div class="col-md-5">
+                            <label class="form-label small font-bold">Tier 1 Main Options (Comma Separated)</label>
+                            <input type="text" id="gen-tier1" class="form-control form-control-sm" value="5x25/CNC/4pcs, 5x25/CON/4pcs, 5x20/HEXA/4pcs" placeholder="e.g. 5x25/CNC/4pcs, 5x20/CON/4pcs">
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label small font-bold">Tier 2 Sub-Options (Comma Separated)</label>
+                            <input type="text" id="gen-tier2" class="form-control form-control-sm" value="Gold, Titanium, Black" placeholder="e.g. Gold, Titanium, Black">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="button" class="btn btn-gold btn-sm w-100 mt-4" id="btn-generate-connected">
+                                Build Connected Matrix
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- Shopee Batch Setting Tool --}}
@@ -210,71 +238,21 @@
                     </div>
                 </div>
 
-                {{-- Variants Table with Manual Addition --}}
+                {{-- Connected Variants Table with Photo Upload Column --}}
                 <div class="table-responsive">
                     <table class="table table-dark-custom mb-0" id="variant-manual-table">
                         <thead>
                             <tr>
-                                <th style="min-width:200px;">Variant Name / Label *</th>
+                                <th style="width:110px;" class="text-center">Variant Photo</th>
+                                <th style="min-width:220px;">Connected Variant &amp; Sub-Variant Label *</th>
                                 <th style="width:130px;">Price (₱) *</th>
                                 <th style="width:110px;">Stock Qty *</th>
-                                <th style="width:140px;">SKU (Optional)</th>
+                                <th style="width:130px;">SKU (Optional)</th>
                                 <th style="width:50px;" class="text-center">Action</th>
                             </tr>
                         </thead>
                         <tbody id="variant-manual-rows">
-                            {{-- Pre-populated manual rows matching Screenshot 1 --}}
-                            <tr class="manual-variant-row">
-                                <td>
-                                    <input type="text" name="variants[0][variant_name]" class="form-control form-control-sm font-bold text-gold" value="5x25/CNC/4pcs" required>
-                                </td>
-                                <td>
-                                    <input type="number" step="0.01" name="variants[0][price]" class="form-control form-control-sm input-price" value="250.00" required>
-                                </td>
-                                <td>
-                                    <input type="number" name="variants[0][stock_qty]" class="form-control form-control-sm input-stock" value="50" min="0" required>
-                                </td>
-                                <td>
-                                    <input type="text" name="variants[0][sku]" class="form-control form-control-sm" placeholder="Auto SKU">
-                                </td>
-                                <td class="text-center">
-                                    <button type="button" class="btn btn-sm btn-link text-danger btn-remove-row" style="text-decoration:none;"><i class="bi bi-trash"></i></button>
-                                </td>
-                            </tr>
-                            <tr class="manual-variant-row">
-                                <td>
-                                    <input type="text" name="variants[1][variant_name]" class="form-control form-control-sm font-bold text-gold" value="5x25/CON/4pcs" required>
-                                </td>
-                                <td>
-                                    <input type="number" step="0.01" name="variants[1][price]" class="form-control form-control-sm input-price" value="250.00" required>
-                                </td>
-                                <td>
-                                    <input type="number" name="variants[1][stock_qty]" class="form-control form-control-sm input-stock" value="50" min="0" required>
-                                </td>
-                                <td>
-                                    <input type="text" name="variants[1][sku]" class="form-control form-control-sm" placeholder="Auto SKU">
-                                </td>
-                                <td class="text-center">
-                                    <button type="button" class="btn btn-sm btn-link text-danger btn-remove-row" style="text-decoration:none;"><i class="bi bi-trash"></i></button>
-                                </td>
-                            </tr>
-                            <tr class="manual-variant-row">
-                                <td>
-                                    <input type="text" name="variants[2][variant_name]" class="form-control form-control-sm font-bold text-gold" value="5x20/HEXA/4pcs" required>
-                                </td>
-                                <td>
-                                    <input type="number" step="0.01" name="variants[2][price]" class="form-control form-control-sm input-price" value="250.00" required>
-                                </td>
-                                <td>
-                                    <input type="number" name="variants[2][stock_qty]" class="form-control form-control-sm input-stock" value="0" min="0" required>
-                                </td>
-                                <td>
-                                    <input type="text" name="variants[2][sku]" class="form-control form-control-sm" placeholder="Auto SKU">
-                                </td>
-                                <td class="text-center">
-                                    <button type="button" class="btn btn-sm btn-link text-danger btn-remove-row" style="text-decoration:none;"><i class="bi bi-trash"></i></button>
-                                </td>
-                            </tr>
+                            {{-- Initial Connected Sub-Variant Rows --}}
                         </tbody>
                     </table>
                 </div>
@@ -350,39 +328,93 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Manual Variant Rows Add / Remove
-    let variantRowCounter = 3;
+    let variantRowCounter = 0;
     const tbody = document.getElementById('variant-manual-rows');
     const btnAddVariant = document.getElementById('btn-add-manual-variant');
+    const btnGenerateConnected = document.getElementById('btn-generate-connected');
     const btnApplyBatch = document.getElementById('btn-apply-batch');
 
+    function createVariantRow(label = '', price = '250.00', stock = '50') {
+        const tr = document.createElement('tr');
+        tr.className = 'manual-variant-row';
+        const rowId = variantRowCounter++;
+
+        tr.innerHTML = `
+            <td class="text-center align-middle">
+                <div class="d-flex flex-column align-items-center gap-1">
+                    <div class="variant-img-preview" id="v-preview-${rowId}" style="width:42px;height:42px;border-radius:6px;overflow:hidden;border:1px solid var(--mb-border);background:var(--mb-surface);display:flex;align-items:center;justify-content:center;">
+                        <i class="bi bi-image text-muted fs-5"></i>
+                    </div>
+                    <label class="btn btn-outline-gold btn-xs py-0 px-1" style="font-size:.68rem;cursor:pointer;">
+                        <i class="bi bi-upload"></i> Photo
+                        <input type="file" name="variants[${rowId}][image_file]" accept="image/*" class="d-none variant-file-input" data-target="v-preview-${rowId}">
+                    </label>
+                </div>
+            </td>
+            <td class="align-middle">
+                <input type="text" name="variants[${rowId}][variant_name]" class="form-control form-control-sm font-bold text-gold" value="${label}" placeholder="e.g. 5x25/CNC/4pcs - Gold" required>
+            </td>
+            <td class="align-middle">
+                <input type="number" step="0.01" name="variants[${rowId}][price]" class="form-control form-control-sm input-price" value="${price}" required>
+            </td>
+            <td class="align-middle">
+                <input type="number" name="variants[${rowId}][stock_qty]" class="form-control form-control-sm input-stock" value="${stock}" min="0" required>
+            </td>
+            <td class="align-middle">
+                <input type="text" name="variants[${rowId}][sku]" class="form-control form-control-sm" placeholder="Auto SKU">
+            </td>
+            <td class="text-center align-middle">
+                <button type="button" class="btn btn-sm btn-link text-danger btn-remove-row" style="text-decoration:none;"><i class="bi bi-trash fs-5"></i></button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    // Default Connected Sub-Variant Rows matching screenshots
+    const initialRows = [
+        { label: '5x25/CNC/4pcs - Gold', price: '250.00', stock: '50' },
+        { label: '5x25/CNC/4pcs - Titanium', price: '250.00', stock: '50' },
+        { label: '5x25/CNC/4pcs - Black', price: '250.00', stock: '50' },
+        { label: '5x25/CON/4pcs - Gold', price: '250.00', stock: '50' },
+        { label: '5x25/CON/4pcs - Titanium', price: '250.00', stock: '50' },
+        { label: '5x20/HEXA/4pcs - Black', price: '250.00', stock: '0' },
+    ];
+    initialRows.forEach(r => createVariantRow(r.label, r.price, r.stock));
+
+    // Add single manual variant row
     if (btnAddVariant) {
         btnAddVariant.addEventListener('click', function() {
-            const tr = document.createElement('tr');
-            tr.className = 'manual-variant-row';
-            tr.innerHTML = `
-                <td>
-                    <input type="text" name="variants[${variantRowCounter}][variant_name]" class="form-control form-control-sm font-bold text-gold" placeholder="e.g. 5x20/CON/4pcs or 8GB+256GB" required>
-                </td>
-                <td>
-                    <input type="number" step="0.01" name="variants[${variantRowCounter}][price]" class="form-control form-control-sm input-price" placeholder="250.00" value="250.00" required>
-                </td>
-                <td>
-                    <input type="number" name="variants[${variantRowCounter}][stock_qty]" class="form-control form-control-sm input-stock" placeholder="50" value="50" min="0" required>
-                </td>
-                <td>
-                    <input type="text" name="variants[${variantRowCounter}][sku]" class="form-control form-control-sm" placeholder="Auto SKU">
-                </td>
-                <td class="text-center">
-                    <button type="button" class="btn btn-sm btn-link text-danger btn-remove-row" style="text-decoration:none;"><i class="bi bi-trash"></i></button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-            variantRowCounter++;
+            createVariantRow('', '250.00', '50');
         });
     }
 
-    // Batch Apply
+    // Generator for Connected 2-Tier Sub-Variants Matrix
+    if (btnGenerateConnected) {
+        btnGenerateConnected.addEventListener('click', function() {
+            const t1Opts = document.getElementById('gen-tier1').value.split(',').map(s => s.trim()).filter(Boolean);
+            const t2Opts = document.getElementById('gen-tier2').value.split(',').map(s => s.trim()).filter(Boolean);
+
+            if (t1Opts.length === 0) {
+                alert('Please enter Tier 1 options.');
+                return;
+            }
+
+            tbody.innerHTML = '';
+            variantRowCounter = 0;
+
+            if (t2Opts.length > 0) {
+                t1Opts.forEach(o1 => {
+                    t2Opts.forEach(o2 => {
+                        createVariantRow(`${o1} - ${o2}`, '250.00', '50');
+                    });
+                });
+            } else {
+                t1Opts.forEach(o1 => createVariantRow(o1, '250.00', '50'));
+            }
+        });
+    }
+
+    // Batch Apply Tool
     if (btnApplyBatch) {
         btnApplyBatch.addEventListener('click', function() {
             const bPrice = document.getElementById('batch-price').value;
@@ -397,7 +429,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Remove row
+    // Remove variant row
     tbody.addEventListener('click', function(e) {
         if (e.target.closest('.btn-remove-row')) {
             const row = e.target.closest('.manual-variant-row');
@@ -409,19 +441,30 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Shopee Image Upload Dropzone Handler (Image 2 style)
+    // Image preview for variant rows when uploading
+    tbody.addEventListener('change', function(e) {
+        if (e.target.classList.contains('variant-file-input')) {
+            const targetId = e.target.dataset.target;
+            const previewBox = document.getElementById(targetId);
+            if (e.target.files && e.target.files[0] && previewBox) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    previewBox.innerHTML = `<img src="${evt.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        }
+    });
+
+    // Main Shopee Gallery Image Upload Dropzone Handler
     const fileInput = document.getElementById('image_files_input');
     const thumbnailsWrapper = document.getElementById('image-thumbnails-wrapper');
     const counterText = document.getElementById('image-counter-text');
     const warningText = document.getElementById('image-warning-text');
 
-    let selectedFiles = [];
-
     if (fileInput) {
         fileInput.addEventListener('change', function(e) {
-            const files = Array.from(e.target.files);
-            selectedFiles = files.slice(0, 9); // Max 9 images
-
+            const selectedFiles = Array.from(e.target.files).slice(0, 9);
             thumbnailsWrapper.innerHTML = '';
 
             if (selectedFiles.length > 0) {

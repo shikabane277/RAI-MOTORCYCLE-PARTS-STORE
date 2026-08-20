@@ -112,24 +112,28 @@
             {{-- Add variant form --}}
             <div class="collapse mb-3" id="add-variant-form">
                 <div style="background:var(--mb-surface);border-radius:var(--mb-radius-sm);padding:1rem;border:1px solid var(--mb-border);">
-                    <form method="POST" action="{{ route('admin.products.variants.store', $product) }}">
+                    <form method="POST" action="{{ route('admin.products.variants.store', $product) }}" enctype="multipart/form-data">
                         @csrf
                         <div class="row g-2 mb-2">
-                            <div class="col-md-6">
-                                <label class="form-label font-bold">Custom Variant Name / Label *</label>
-                                <input type="text" name="variant_name" class="form-control" placeholder="e.g. 5x25/CNC/4pcs, 8GB+256GB, Gold/M6x20" required>
+                            <div class="col-md-5">
+                                <label class="form-label font-bold">Custom Variant Label / Combination *</label>
+                                <input type="text" name="variant_name" class="form-control" placeholder="e.g. 5x25/CNC/4pcs - Gold, 8GB+256GB - Black" required>
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label font-bold">Price (₱) *</label>
                                 <input type="number" name="price" step="0.01" class="form-control" value="{{ $product->base_price }}" required>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label font-bold">Stock Qty *</label>
                                 <input type="number" name="stock_qty" class="form-control" value="50" required>
                             </div>
+                            <div class="col-md-2">
+                                <label class="form-label font-bold">Variant Photo</label>
+                                <input type="file" name="image_file" class="form-control" accept="image/*">
+                            </div>
                         </div>
                         <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-gold btn-sm"><i class="bi bi-plus-lg me-1"></i> Add Custom Variant</button>
+                            <button type="submit" class="btn btn-gold btn-sm"><i class="bi bi-plus-lg me-1"></i> Add Connected Variant</button>
                         </div>
                     </form>
                 </div>
@@ -137,10 +141,17 @@
 
             <div class="table-responsive">
                 <table class="table table-dark-custom mb-0">
-                    <thead><tr><th>Variant Label</th><th>SKU</th><th>Price</th><th>Sale</th><th>Stock</th><th>Active</th></tr></thead>
+                    <thead><tr><th>Photo</th><th>Variant Label</th><th>SKU</th><th>Price</th><th>Sale</th><th>Stock</th><th>Status</th></tr></thead>
                     <tbody>
                         @foreach($product->variants as $v)
                         <tr>
+                            <td>
+                                @if($v->image_url)
+                                    <img src="{{ $v->image_url }}" alt="{{ $v->label }}" style="width:36px;height:36px;object-fit:cover;border-radius:6px;border:1px solid var(--mb-border);">
+                                @else
+                                    <div style="width:36px;height:36px;border-radius:6px;background:var(--mb-surface);display:flex;align-items:center;justify-content:center;color:var(--mb-muted);"><i class="bi bi-image"></i></div>
+                                @endif
+                            </td>
                             <td>
                                 <span class="fw-bold text-gold" style="font-size:.95rem;">{{ $v->label }}</span>
                             </td>
