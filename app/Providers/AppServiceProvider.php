@@ -22,8 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Auto-run database migrations in production if database tables are missing
         if ($this->app->environment('production')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+
             try {
                 if (!Schema::hasTable('orders')) {
                     Artisan::call('migrate', ['--force' => true]);
