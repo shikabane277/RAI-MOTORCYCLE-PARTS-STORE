@@ -12,7 +12,7 @@
     <div class="swiper-wrapper">
         @forelse($banners as $banner)
         <div class="swiper-slide">
-            <div class="hero-slide" style="{{ $banner->image_url && file_exists(public_path(ltrim($banner->image_url,'/'))) ? 'background-image:url('.$banner->image_url.');background-size:cover;background-position:center;' : '' }}">
+            <div class="hero-slide" style="{{ $banner->image_url ? 'background-image:url(' . e($banner->image_url) . ');background-size:cover;background-position:center;' : '' }}">
                 <div class="hero-overlay" style="position:absolute;inset:0;pointer-events:none;"></div>
                 <div class="container-xl hero-slide-content">
                     <div class="col-lg-6">

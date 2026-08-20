@@ -6,7 +6,7 @@
 <div class="row justify-content-center">
     <div class="col-lg-8">
         <div class="dark-card p-4">
-            <form method="POST" action="{{ route('admin.products.store') }}">
+            <form method="POST" action="{{ route('admin.products.store') }}" enctype="multipart/form-data">
                 @csrf
                 <div class="mb-3">
                     <label class="form-label">Product Name *</label>
@@ -51,6 +51,23 @@
                     <div class="col-md-4">
                         <label class="form-label">Weight (grams)</label>
                         <input type="number" name="weight_grams" class="form-control" value="{{ old('weight_grams', 100) }}">
+                    </div>
+                </div>
+
+                {{-- Product Photo / Image Upload Section --}}
+                <div class="p-3 mb-3" style="background:var(--mb-surface);border:1px solid var(--mb-border);border-radius:var(--mb-radius-sm);">
+                    <h6 style="font-family:'Rajdhani',sans-serif;color:var(--mb-gold);font-weight:700;" class="mb-2">
+                        <i class="bi bi-image me-1"></i> Product Photo / Image
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small">Option A: Upload Image File</label>
+                            <input type="file" name="image_file" class="form-control" accept="image/*">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small">Option B: Image URL</label>
+                            <input type="text" name="image_url" class="form-control" value="{{ old('image_url') }}" placeholder="https://example.com/photo.jpg or /images/logo.png">
+                        </div>
                     </div>
                 </div>
 

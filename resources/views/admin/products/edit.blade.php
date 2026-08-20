@@ -8,11 +8,34 @@
     <div class="col-lg-8">
         <div class="dark-card p-4 mb-4">
             <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;color:var(--mb-heading);margin-bottom:1.25rem;">Product Details</h2>
-            <form method="POST" action="{{ route('admin.products.update', $product) }}">
+            <form method="POST" action="{{ route('admin.products.update', $product) }}" enctype="multipart/form-data">
                 @csrf @method('PUT')
                 <div class="mb-3">
                     <label class="form-label">Product Name *</label>
                     <input type="text" name="name" class="form-control" value="{{ old('name', $product->name) }}" required>
+                </div>
+
+                {{-- Product Photo / Image Upload Section --}}
+                <div class="p-3 mb-3" style="background:var(--mb-surface);border:1px solid var(--mb-border);border-radius:var(--mb-radius-sm);">
+                    <h6 style="font-family:'Rajdhani',sans-serif;color:var(--mb-gold);font-weight:700;" class="mb-2">
+                        <i class="bi bi-image me-1"></i> Product Photo / Image
+                    </h6>
+                    @if($product->primary_image_url)
+                    <div class="mb-3 d-flex align-items-center gap-3">
+                        <img src="{{ $product->primary_image_url }}" alt="Preview" style="height:60px;width:60px;object-fit:cover;border-radius:6px;border:1px solid var(--mb-border);">
+                        <span class="small text-muted">Current photo: {{ $product->primary_image_url }}</span>
+                    </div>
+                    @endif
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small">Option A: Upload New Image File</label>
+                            <input type="file" name="image_file" class="form-control" accept="image/*">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small">Option B: Image URL</label>
+                            <input type="text" name="image_url" class="form-control" value="{{ old('image_url', $product->primary_image_url) }}" placeholder="https://example.com/photo.jpg or /images/logo.png">
+                        </div>
+                    </div>
                 </div>
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">

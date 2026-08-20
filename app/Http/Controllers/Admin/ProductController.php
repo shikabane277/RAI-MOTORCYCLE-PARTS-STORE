@@ -57,6 +57,14 @@ class ProductController extends Controller
         $skuInput = $validated['sku'] ?? null;
         unset($validated['initial_stock'], $validated['sku']);
 
+        $imageUrl = $request->input('image_url');
+        if ($request->hasFile('image_file')) {
+            $file = $request->file('image_file');
+            $filename = 'product_' . time() . '_' . rand(1000, 9999) . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/products'), $filename);
+            $imageUrl = '/uploads/products/' . $filename;
+        }
+
         $product = Product::create($validated);
 
         $sku = $skuInput ? strtoupper(trim($skuInput)) : 'RAI-' . strtoupper(Str::slug(substr($product->name, 0, 10))) . '-' . rand(100, 999);
@@ -70,10 +78,11 @@ class ProductController extends Controller
             'price'               => $product->base_price,
             'stock_qty'           => $initialStock,
             'low_stock_threshold' => 5,
+            'image_url'           => $imageUrl,
             'is_active'           => true,
         ]);
 
-        return redirect()->route('admin.products.index')->with('success', "Product '{$product->name}' created with initial stock of {$initialStock} units!");
+        return redirect()->route('admin.products.index')->with('success', "Product '{$product->name}' created successfully!");
     }
 
     public function edit(Product $product)
@@ -102,8 +111,24 @@ class ProductController extends Controller
             'is_new_arrival'    => 'boolean',
         ]);
 
+        $imageUrl = $request->input('image_url');
+        if ($request->hasFile('image_file')) {
+            $file = $request->file('image_file');
+            $filename = 'product_' . time() . '_' . rand(1000, 9999) . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/products'), $filename);
+            $imageUrl = '/uploads/products/' . $filename;
+        }
+
         $product->update($validated);
-        return back()->with('success', 'Product updated!');
+
+        if ($imageUrl) {
+            $variant = $product->variants()->first();
+            if ($variant) {
+                $variant->update(['image_url' => $imageUrl]);
+            }
+        }
+
+        return back()->with('success', 'Product updated successfully!');
     }
 
     public function destroy(Product $product)

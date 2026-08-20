@@ -95,5 +95,14 @@ class Product extends Model
         }
         return $this->variants()->sum('stock_qty');
     }
+
+    public function getPrimaryImageUrlAttribute(): ?string
+    {
+        $variant = $this->relationLoaded('variants') ? $this->variants->first() : $this->variants()->first();
+        if ($variant && $variant->image_url) {
+            return $variant->image_url;
+        }
+        return null;
+    }
 }
 

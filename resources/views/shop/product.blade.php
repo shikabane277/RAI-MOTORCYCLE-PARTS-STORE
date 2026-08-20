@@ -22,9 +22,12 @@
         <div class="col-lg-6">
             <div class="dark-card p-3" style="border-radius:var(--mb-radius);">
                 {{-- Main image --}}
+                @php
+                    $mainImg = $firstVariant?->image_url ?: $product->primary_image_url;
+                @endphp
                 <div id="main-image-wrap" style="aspect-ratio:1;border-radius:var(--mb-radius-sm);overflow:hidden;background:var(--mb-surface);display:flex;align-items:center;justify-content:center;">
-                    @if($firstVariant?->image_url)
-                        <img id="main-image" src="{{ $firstVariant->image_url }}" alt="{{ $product->name }}"
+                    @if($mainImg)
+                        <img id="main-image" src="{{ $mainImg }}" alt="{{ $product->name }}"
                              style="width:100%;height:100%;object-fit:cover;" loading="eager">
                     @else
                         <div style="font-size:6rem;opacity:.3;">&#x1F529;</div>

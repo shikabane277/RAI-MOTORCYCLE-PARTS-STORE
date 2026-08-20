@@ -23,9 +23,12 @@
     @endauth
 
     {{-- Image --}}
+    @php
+        $cardImg = $displayVariant?->image_url ?: $product->primary_image_url;
+    @endphp
     <a href="{{ route('product.show', $product->slug) }}" class="product-card-img-wrap">
-        @if($displayVariant?->image_url)
-            <img src="{{ $displayVariant->image_url }}" alt="{{ $product->name }}" class="product-card-img" loading="lazy">
+        @if($cardImg)
+            <img src="{{ $cardImg }}" alt="{{ $product->name }}" class="product-card-img" loading="lazy">
         @else
             {{-- Placeholder with gradient --}}
             <div class="product-card-img d-flex align-items-center justify-content-center"
