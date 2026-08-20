@@ -32,7 +32,7 @@ return new class extends Migration
             $table->decimal('grand_total', 10, 2)->default(0);
             $table->string('coupon_code')->nullable();
             // Payment & Fulfillment
-            $table->enum('payment_method', ['cod', 'gcash', 'maya', 'bank_transfer'])->default('cod');
+            $table->string('payment_method', 50)->default('cod');
             $table->enum('payment_status', ['pending', 'paid', 'failed', 'refunded'])->default('pending');
             $table->enum('status', ['pending_payment', 'confirmed', 'processing', 'shipped', 'delivered', 'completed', 'cancelled', 'return_requested', 'refunded'])->default('pending_payment');
             $table->string('courier')->nullable();
