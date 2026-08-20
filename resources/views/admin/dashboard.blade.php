@@ -186,21 +186,36 @@ new Chart(ctx, {
     type: 'bar',
     data: {
         labels: {!! json_encode($revenueChart->pluck('date')) !!},
-        datasets: [{
-            label: 'Revenue (₱)',
-            data: {!! json_encode($revenueChart->pluck('revenue')) !!},
-            backgroundColor: 'rgba(245,166,35,0.25)',
-            borderColor: 'rgba(245,166,35,0.8)',
-            borderWidth: 2,
-            borderRadius: 6,
-        }]
+        datasets: [
+            {
+                label: 'Product Sales (₱)',
+                data: {!! json_encode($revenueChart->pluck('product_revenue')) !!},
+                backgroundColor: 'rgba(245, 166, 35, 0.85)',
+                borderColor: '#F5A623',
+                borderWidth: 1,
+                borderRadius: 4,
+            },
+            {
+                label: 'Shipping Fees (₱)',
+                data: {!! json_encode($revenueChart->pluck('shipping_revenue')) !!},
+                backgroundColor: 'rgba(0, 210, 255, 0.85)',
+                borderColor: '#00D2FF',
+                borderWidth: 1,
+                borderRadius: 4,
+            }
+        ]
     },
     options: {
         responsive: true,
-        plugins: { legend: { display: false } },
+        plugins: { 
+            legend: { 
+                display: true,
+                labels: { color: '#B3B3C1', font: { family: 'Rajdhani', size: 13 } }
+            } 
+        },
         scales: {
-            y: { ticks: { color: '#7A7A8C', callback: v => '₱'+v.toLocaleString() }, grid: { color: 'rgba(255,255,255,0.05)' } },
-            x: { ticks: { color: '#7A7A8C' }, grid: { display: false } }
+            x: { stacked: true, ticks: { color: '#7A7A8C' }, grid: { display: false } },
+            y: { stacked: true, ticks: { color: '#7A7A8C', callback: v => '₱'+v.toLocaleString() }, grid: { color: 'rgba(255,255,255,0.05)' } }
         }
     }
 });

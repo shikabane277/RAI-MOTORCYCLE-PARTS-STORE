@@ -12,7 +12,35 @@
 @import 'swiper/swiper-bundle.css';
 
 /* ── CSS Custom Properties ───────────────────────────────── */
+/* Default: Light Mode */
 :root {
+  --mb-dark:       #F8F9FA;
+  --mb-darker:     #FFFFFF;
+  --mb-card:       #FFFFFF;
+  --mb-card-hover: #F1F5F9;
+  --mb-border:     rgba(0,0,0,0.12);
+  --mb-gold:       #D97706;
+  --mb-gold-light: #F59E0B;
+  --mb-gold-dim:   rgba(217,119,6,0.12);
+  --mb-red:        #DC2626;
+  --mb-red-dim:    rgba(220,38,38,0.12);
+  --mb-blue:       #2563EB;
+  --mb-blue-dim:   rgba(37,99,235,0.12);
+  --mb-green:      #16A34A;
+  --mb-text:       #1F2937;
+  --mb-muted:      #6B7280;
+  --mb-surface:    #F3F4F6;
+  --mb-radius:     12px;
+  --mb-radius-sm:  8px;
+  --mb-shadow:     0 8px 32px rgba(0,0,0,0.08);
+  --mb-shadow-sm:  0 4px 16px rgba(0,0,0,0.05);
+  --mb-transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+  --bs-body-bg:    #F8F9FA;
+  --bs-body-color: #1F2937;
+}
+
+/* Dark Mode Override */
+[data-theme="dark"] {
   --mb-dark:       #0D0D0F;
   --mb-darker:     #080809;
   --mb-card:       #14141A;
@@ -29,11 +57,8 @@
   --mb-text:       #E8E8F0;
   --mb-muted:      #7A7A8C;
   --mb-surface:    #1A1A22;
-  --mb-radius:     12px;
-  --mb-radius-sm:  8px;
   --mb-shadow:     0 8px 32px rgba(0,0,0,0.4);
   --mb-shadow-sm:  0 4px 16px rgba(0,0,0,0.3);
-  --mb-transition: 0.25s cubic-bezier(0.4,0,0.2,1);
   --bs-body-bg:    #0D0D0F;
   --bs-body-color: #E8E8F0;
 }

@@ -7,6 +7,12 @@
     <title>@yield('title', 'RAI MOTORCYCLE PARTS') — Your Trusted Motorcycle Parts Store</title>
     <meta name="description" content="@yield('meta_description', 'RAI MOTORCYCLE PARTS — Premium CNC-machined bolts, fasteners, and motorcycle accessories for Filipino riders. Titanium, stainless, anodized aluminum. Fast shipping via J&T and Ninja Van.')">
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <script>
+        (function() {
+            var theme = localStorage.getItem('rai_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
@@ -53,13 +59,17 @@
                 <i class="bi bi-list text-gold fs-4"></i>
             </button>
             <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-dark-surface btn-sm d-flex align-items-center justify-content-center" id="theme-toggle-btn" style="border-radius:50px;width:38px;height:38px;" title="Toggle Light / Dark Mode">
+                    <i class="bi bi-moon-stars-fill text-gold fs-6" id="theme-icon-dark"></i>
+                    <i class="bi bi-sun-fill text-gold fs-6 d-none" id="theme-icon-light"></i>
+                </button>
                 @auth
-                    <a href="{{ route('account.wishlist') }}" class="btn btn-dark-surface btn-sm d-none d-lg-flex align-items-center" style="border-radius:50px;"><i class="bi bi-heart"></i></a>
-                    <a href="{{ route('account.dashboard') }}" class="btn btn-dark-surface btn-sm d-none d-lg-flex align-items-center" style="border-radius:50px;"><i class="bi bi-person"></i></a>
+                    <a href="{{ route('account.wishlist') }}" class="btn btn-dark-surface btn-sm d-none d-lg-flex align-items-center" style="border-radius:50px;" title="Wishlist"><i class="bi bi-heart"></i></a>
+                    <a href="{{ route('account.dashboard') }}" class="btn btn-dark-surface btn-sm d-none d-lg-flex align-items-center" style="border-radius:50px;" title="My Account"><i class="bi bi-person"></i></a>
                 @else
                     <a href="{{ route('login') }}" class="btn btn-dark-surface btn-sm d-none d-lg-flex align-items-center" style="border-radius:50px;"><i class="bi bi-person me-1"></i>Login</a>
                 @endauth
-                <a href="{{ route('cart.index') }}" class="btn btn-dark-surface btn-sm position-relative" style="border-radius:50px;">
+                <a href="{{ route('cart.index') }}" class="btn btn-dark-surface btn-sm position-relative" style="border-radius:50px;" title="Shopping Cart">
                     <i class="bi bi-bag fs-5"></i>
                     <span class="cart-badge" style="display:none;">0</span>
                 </a>
@@ -175,6 +185,34 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // Theme Switcher Logic
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const darkIcon = document.getElementById('theme-icon-dark');
+    const lightIcon = document.getElementById('theme-icon-light');
+
+    function updateIcons(theme) {
+        if (!darkIcon || !lightIcon) return;
+        if (theme === 'dark') {
+            darkIcon.classList.add('d-none');
+            lightIcon.classList.remove('d-none');
+        } else {
+            darkIcon.classList.remove('d-none');
+            lightIcon.classList.add('d-none');
+        }
+    }
+
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    updateIcons(currentTheme);
+
+    if (themeBtn) {
+        themeBtn.addEventListener('click', () => {
+            const active = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', active);
+            localStorage.setItem('rai_theme', active);
+            updateIcons(active);
+        });
+    }
+
     fetch('/cart/count').then(r => r.json()).then(data => {
         document.querySelectorAll('.cart-badge').forEach(b => {
             b.textContent = data.count;

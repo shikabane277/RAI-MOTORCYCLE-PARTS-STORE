@@ -70,7 +70,7 @@ class SocialAuthController extends Controller
 
             Auth::login($user, true);
 
-            return redirect()->intended(route('dashboard'))->with('success', 'Logged in successfully with ' . ucfirst($provider) . '!');
+            return redirect()->intended(route('home'))->with('success', 'Logged in successfully with ' . ucfirst($provider) . '!');
         } catch (\Exception $e) {
             return redirect()->route('login')->with('error', 'Failed to authenticate via ' . ucfirst($provider) . ': ' . $e->getMessage());
         }
@@ -100,6 +100,6 @@ class SocialAuthController extends Controller
 
         Auth::login($user, true);
 
-        return redirect()->route('dashboard')->with('success', "Logged in with {$providerName} (Demo Account). Configure {$providerName} Client ID & Secret in .env for live OAuth.");
+        return redirect()->route('home')->with('success', "Logged in with {$providerName} (Demo Account).");
     }
 }

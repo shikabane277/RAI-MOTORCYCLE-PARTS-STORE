@@ -28,14 +28,22 @@ class DashboardController extends Controller
         $totalProducts  = Product::active()->count();
         $totalCustomers = \App\Models\User::where('role', 'customer')->count();
 
-        // Revenue last 7 days
+        // Revenue last 7 days (separated by Product Sales and Shipping Fees)
         $revenueChart = collect(range(6, 0))->map(function ($daysAgo) {
             $date = now()->subDays($daysAgo);
+            $productRevenue = (float) Order::whereIn('status', ['completed', 'delivered'])
+                                           ->whereDate('placed_at', $date)
+                                           ->sum('subtotal');
+
+            $shippingRevenue = (float) Order::whereIn('status', ['completed', 'delivered'])
+                                            ->whereDate('placed_at', $date)
+                                            ->sum('shipping_fee');
+
             return [
-                'date'    => $date->format('M d'),
-                'revenue' => Order::whereIn('status', ['completed', 'delivered'])
-                                   ->whereDate('placed_at', $date)
-                                   ->sum('grand_total'),
+                'date'             => $date->format('M d'),
+                'product_revenue'  => $productRevenue,
+                'shipping_revenue' => $shippingRevenue,
+                'revenue'          => $productRevenue + $shippingRevenue,
             ];
         });
 
