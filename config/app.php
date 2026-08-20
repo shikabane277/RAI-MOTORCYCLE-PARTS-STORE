@@ -53,8 +53,18 @@ return [
     */
 
     'url' => (function() {
-        $rawUrl = (string) env('APP_URL', 'http://localhost');
-        return (filter_var($rawUrl, FILTER_VALIDATE_URL) !== false) ? $rawUrl : 'http://localhost';
+        $rawUrl = (string) env('APP_URL', '');
+        if (empty($rawUrl) || str_contains($rawUrl, '${') || filter_var($rawUrl, FILTER_VALIDATE_URL) === false) {
+            if (isset($_SERVER['HTTP_HOST']) && !empty($_SERVER['HTTP_HOST'])) {
+                $scheme = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ? 'https' : 'http';
+                return $scheme . '://' . $_SERVER['HTTP_HOST'];
+            }
+            if (env('RAILWAY_PUBLIC_DOMAIN')) {
+                return 'https://' . env('RAILWAY_PUBLIC_DOMAIN');
+            }
+            return 'http://localhost';
+        }
+        return $rawUrl;
     })(),
 
     /*
