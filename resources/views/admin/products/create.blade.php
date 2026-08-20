@@ -185,10 +185,10 @@
             {{-- ── 3. Connected Variants & Sub-Variants Builder ── --}}
             <div class="shopee-section-card" id="section-variations">
                 <div class="shopee-section-title justify-content-between flex-wrap gap-2">
-                    <span><i class="bi bi-diagram-3-fill text-gold"></i> 3. Connected Variant &amp; Sub-Variant Builder</span>
+                    <span><i class="bi bi-diagram-3-fill text-gold"></i> 3. Sales &amp; Custom Variants</span>
                     <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-outline-gold btn-sm" id="btn-quick-connect">
-                            <i class="bi bi-node-plus me-1"></i> Connect Sub-Variants Generator
+                        <button type="button" class="btn btn-outline-gold btn-sm" id="btn-add-tier2-suboption">
+                            <i class="bi bi-node-plus me-1"></i> + Add Tier 2 Sub-Option
                         </button>
                         <button type="button" class="btn btn-gold btn-sm" id="btn-add-manual-variant">
                             <i class="bi bi-plus-lg me-1"></i> + Add Variant Row
@@ -196,27 +196,9 @@
                     </div>
                 </div>
 
-                {{-- Quick Connected Sub-Variant Generator Collapse --}}
-                <div class="p-3 mb-3" style="background:var(--mb-surface);border:1px solid var(--mb-gold-border);border-radius:8px;">
-                    <h6 style="font-family:'Rajdhani',sans-serif;color:var(--mb-gold);font-weight:700;" class="mb-2">
-                        <i class="bi bi-diagram-2 me-1"></i> Connected 2-Tier Sub-Variant Generator
-                    </h6>
-                    <div class="row g-2 align-items-center mb-2">
-                        <div class="col-md-5">
-                            <label class="form-label small font-bold">Tier 1 Main Options (Comma Separated)</label>
-                            <input type="text" id="gen-tier1" class="form-control form-control-sm" value="5x25/CNC/4pcs, 5x25/CON/4pcs, 5x20/HEXA/4pcs" placeholder="e.g. 5x25/CNC/4pcs, 5x20/CON/4pcs">
-                        </div>
-                        <div class="col-md-5">
-                            <label class="form-label small font-bold">Tier 2 Sub-Options (Comma Separated)</label>
-                            <input type="text" id="gen-tier2" class="form-control form-control-sm" value="Gold, Titanium, Black" placeholder="e.g. Gold, Titanium, Black">
-                        </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button type="button" class="btn btn-gold btn-sm w-100 mt-4" id="btn-generate-connected">
-                                Build Connected Matrix
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <p style="font-size:.85rem;color:var(--mb-muted);" class="mb-3">
+                    Add custom variant rows (e.g. <code>5x25/CNC/4pcs</code>) or use <strong>+ Add Tier 2 Sub-Option</strong> to connect sub-options (e.g. <code>5x25/CNC/4pcs - Gold</code>). Each row has its own dedicated photo file upload!
+                </p>
 
                 {{-- Shopee Batch Setting Tool --}}
                 <div class="batch-edit-bar mb-3">
@@ -370,47 +352,30 @@ document.addEventListener('DOMContentLoaded', function() {
         tbody.appendChild(tr);
     }
 
-    // Default Connected Sub-Variant Rows matching screenshots
-    const initialRows = [
-        { label: '5x25/CNC/4pcs - Gold', price: '250.00', stock: '50' },
-        { label: '5x25/CNC/4pcs - Titanium', price: '250.00', stock: '50' },
-        { label: '5x25/CNC/4pcs - Black', price: '250.00', stock: '50' },
-        { label: '5x25/CON/4pcs - Gold', price: '250.00', stock: '50' },
-        { label: '5x25/CON/4pcs - Titanium', price: '250.00', stock: '50' },
-        { label: '5x20/HEXA/4pcs - Black', price: '250.00', stock: '0' },
-    ];
-    initialRows.forEach(r => createVariantRow(r.label, r.price, r.stock));
+    // Start with 1 clean empty row (NO pre-populated presets)
+    createVariantRow('', '', '50');
 
     // Add single manual variant row
     if (btnAddVariant) {
         btnAddVariant.addEventListener('click', function() {
-            createVariantRow('', '250.00', '50');
+            createVariantRow('', '', '50');
         });
     }
 
-    // Generator for Connected 2-Tier Sub-Variants Matrix
-    if (btnGenerateConnected) {
-        btnGenerateConnected.addEventListener('click', function() {
-            const t1Opts = document.getElementById('gen-tier1').value.split(',').map(s => s.trim()).filter(Boolean);
-            const t2Opts = document.getElementById('gen-tier2').value.split(',').map(s => s.trim()).filter(Boolean);
-
-            if (t1Opts.length === 0) {
-                alert('Please enter Tier 1 options.');
-                return;
+    // Add Connected Tier 2 Sub-Option row
+    const btnAddTier2 = document.getElementById('btn-add-tier2-suboption');
+    if (btnAddTier2) {
+        btnAddTier2.addEventListener('click', function() {
+            const rows = tbody.querySelectorAll('.manual-variant-row');
+            let parentLabel = '';
+            if (rows.length > 0) {
+                const lastVal = rows[rows.length - 1].querySelector('input[name*="[variant_name]"]').value.trim();
+                if (lastVal) {
+                    parentLabel = lastVal.split(' - ')[0];
+                }
             }
-
-            tbody.innerHTML = '';
-            variantRowCounter = 0;
-
-            if (t2Opts.length > 0) {
-                t1Opts.forEach(o1 => {
-                    t2Opts.forEach(o2 => {
-                        createVariantRow(`${o1} - ${o2}`, '250.00', '50');
-                    });
-                });
-            } else {
-                t1Opts.forEach(o1 => createVariantRow(o1, '250.00', '50'));
-            }
+            const defaultCombo = parentLabel ? `${parentLabel} - Sub Option` : 'Main Option - Sub Option';
+            createVariantRow(defaultCombo, '', '50');
         });
     }
 
