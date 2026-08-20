@@ -10,33 +10,54 @@ class OrderController extends Controller
 {
     public function trackForm()
     {
-        return view('track-order');
+        $userOrders = auth()->check() ? auth()->user()->orders()->with(['items'])->latest()->take(5)->get() : collect();
+        return view('track-order', compact('userOrders'));
     }
 
     public function track(Request $request)
     {
         $request->validate([
             'order_number' => 'required|string',
-            'email'        => 'required|email',
+            'email'        => 'nullable|string',
         ]);
 
-        $order = Order::where('order_number', strtoupper(trim($request->order_number)))
-                      ->with(['items', 'shipments'])
-                      ->first();
+        $rawInput = trim($request->order_number);
+        $searchQuery = strtoupper($rawInput);
+        $cleanQuery = str_replace('-', '', $searchQuery);
+
+        // Flexible Order Lookup (with dashes, without dashes, or by tracking number)
+        $order = Order::where('order_number', $rawInput)
+            ->orWhere('order_number', $searchQuery)
+            ->orWhereRaw("REPLACE(order_number, '-', '') = ?", [$cleanQuery])
+            ->orWhere('tracking_number', $rawInput)
+            ->with(['items', 'shipments', 'user', 'statusLogs'])
+            ->first();
 
         if (!$order) {
-            return back()->withErrors(['order_number' => 'Order not found. Please check your order number.']);
+            $userOrders = auth()->check() ? auth()->user()->orders()->with(['items'])->latest()->take(5)->get() : collect();
+            return back()->withInput()->withErrors(['order_number' => "Order '{$rawInput}' was not found. Please verify your order number (e.g. MB-2026-12345)."]);
         }
 
-        // Verify ownership via email
-        $email = $order->user?->email ?? $order->guest_email;
-        if ($email && strtolower(trim($email)) !== strtolower(trim($request->email))) {
-            return back()->withErrors(['order_number' => 'Order number and email address do not match our records.']);
+        // Optional email verification if user supplied an email
+        if (!empty($request->email)) {
+            $orderEmail = strtolower(trim($order->user?->email ?? $order->guest_email ?? ''));
+            $inputEmail = strtolower(trim($request->email));
+            if ($orderEmail && $orderEmail !== $inputEmail) {
+                $userOrders = auth()->check() ? auth()->user()->orders()->with(['items'])->latest()->take(5)->get() : collect();
+                return back()->withInput()->withErrors(['email' => 'The email address provided does not match this order.']);
+            }
         }
 
         $lalamoveService = app(LalamoveService::class);
-        $lalamoveTracking = $lalamoveService->getTrackingStatus($order->tracking_number ?? 'LLM-PH-ORDER');
+        $lalamoveTracking = null;
+        try {
+            $lalamoveTracking = $lalamoveService->getTrackingStatus($order->tracking_number ?? 'LLM-PH-ORDER');
+        } catch (\Throwable $e) {
+            // Safe fallback
+        }
 
-        return view('track-order', compact('order', 'lalamoveTracking'));
+        $userOrders = auth()->check() ? auth()->user()->orders()->with(['items'])->latest()->take(5)->get() : collect();
+
+        return view('track-order', compact('order', 'lalamoveTracking', 'userOrders'));
     }
 }
