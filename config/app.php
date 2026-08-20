@@ -52,7 +52,10 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => (function() {
+        $rawUrl = (string) env('APP_URL', 'http://localhost');
+        return (filter_var($rawUrl, FILTER_VALIDATE_URL) !== false) ? $rawUrl : 'http://localhost';
+    })(),
 
     /*
     |--------------------------------------------------------------------------

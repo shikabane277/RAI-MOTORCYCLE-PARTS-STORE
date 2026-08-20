@@ -46,7 +46,10 @@ return [
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
             'timeout' => null,
-            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+            'local_domain' => env('MAIL_EHLO_DOMAIN', (function() {
+                $host = parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST);
+                return filter_var($host, FILTER_VALIDATE_DOMAIN) !== false ? $host : 'localhost';
+            })()),
         ],
 
         'ses' => [
