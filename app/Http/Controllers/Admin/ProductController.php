@@ -42,7 +42,7 @@ class ProductController extends Controller
             'category_id'       => 'nullable|exists:categories,id',
             'description'       => 'nullable|string',
             'short_description' => 'nullable|string|max:500',
-            'base_price'        => 'required|numeric|min:0',
+            'base_price'        => 'nullable|numeric|min:0',
             'weight_grams'      => 'nullable|integer',
             'status'            => 'required|in:active,draft,archived',
             'is_featured'       => 'boolean',
@@ -70,6 +70,12 @@ class ProductController extends Controller
         $imageUrl = $request->input('image_url');
         if (empty($imageUrl) && !empty($uploadedImages)) {
             $imageUrl = $uploadedImages[0];
+        }
+
+        if (empty($validated['base_price']) && $request->has('variants') && is_array($request->variants)) {
+            $prices = array_column($request->variants, 'price');
+            $validPrices = array_filter($prices, fn($p) => is_numeric($p) && $p > 0);
+            $validated['base_price'] = !empty($validPrices) ? min($validPrices) : 0;
         }
 
         $product = Product::create($validated);
