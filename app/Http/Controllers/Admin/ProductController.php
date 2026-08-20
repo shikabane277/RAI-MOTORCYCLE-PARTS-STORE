@@ -47,14 +47,33 @@ class ProductController extends Controller
             'status'            => 'required|in:active,draft,archived',
             'is_featured'       => 'boolean',
             'is_new_arrival'    => 'boolean',
-            'meta_title'        => 'nullable|string|max:200',
-            'meta_description'  => 'nullable|string|max:300',
+            'initial_stock'     => 'nullable|integer|min:0',
+            'sku'               => 'nullable|string|max:100',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']) . '-' . Str::random(4);
 
-        Product::create($validated);
-        return redirect()->route('admin.products.index')->with('success', 'Product created!');
+        $initialStock = (int) ($validated['initial_stock'] ?? 50);
+        $skuInput = $validated['sku'] ?? null;
+        unset($validated['initial_stock'], $validated['sku']);
+
+        $product = Product::create($validated);
+
+        $sku = $skuInput ? strtoupper(trim($skuInput)) : 'RAI-' . strtoupper(Str::slug(substr($product->name, 0, 10))) . '-' . rand(100, 999);
+
+        ProductVariant::create([
+            'product_id'          => $product->id,
+            'variant_sku'         => $sku,
+            'color'               => 'Standard',
+            'material'            => 'Standard',
+            'pack_qty'            => 1,
+            'price'               => $product->base_price,
+            'stock_qty'           => $initialStock,
+            'low_stock_threshold' => 5,
+            'is_active'           => true,
+        ]);
+
+        return redirect()->route('admin.products.index')->with('success', "Product '{$product->name}' created with initial stock of {$initialStock} units!");
     }
 
     public function edit(Product $product)

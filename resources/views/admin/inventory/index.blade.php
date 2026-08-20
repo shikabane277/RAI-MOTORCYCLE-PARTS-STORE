@@ -88,7 +88,16 @@
                             </div>
                         </div>
                         @empty
-                        <tr><td colspan="6" class="text-center py-4" style="color:var(--mb-muted);">No variants found.</td></tr>
+                        <tr>
+                            <td colspan="6" class="text-center py-5" style="color:var(--mb-muted);">
+                                <i class="bi bi-box-seam d-block mb-2" style="font-size:2rem;color:var(--mb-gold);"></i>
+                                <div class="fw-semibold mb-1" style="color:var(--mb-text);">No inventory SKUs found</div>
+                                <div style="font-size:.8rem;" class="mb-3">Create a new product with initial stock to start tracking inventory.</div>
+                                <a href="{{ route('admin.products.create') }}" class="btn btn-gold btn-sm">
+                                    <i class="bi bi-plus-lg me-1"></i> Add Product & Initial Stock
+                                </a>
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>

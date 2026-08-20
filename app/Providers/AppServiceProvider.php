@@ -34,5 +34,26 @@ class AppServiceProvider extends ServiceProvider
                 Log::warning('AppServiceProvider: Auto-migration attempt skipped: ' . $e->getMessage());
             }
         }
+
+        // Guarantee every product has at least 1 stock variant
+        try {
+            if (Schema::hasTable('products') && Schema::hasTable('product_variants')) {
+                \App\Models\Product::doesntHave('variants')->get()->each(function ($product) {
+                    \App\Models\ProductVariant::create([
+                        'product_id'          => $product->id,
+                        'variant_sku'         => 'RAI-' . strtoupper(\Illuminate\Support\Str::slug(substr($product->name, 0, 10))) . '-' . $product->id,
+                        'color'               => 'Standard',
+                        'material'            => 'Standard',
+                        'pack_qty'            => 1,
+                        'price'               => $product->base_price ?: 100,
+                        'stock_qty'           => 50,
+                        'low_stock_threshold' => 5,
+                        'is_active'           => true,
+                    ]);
+                });
+            }
+        } catch (\Throwable $e) {
+            // Ignore during initial migration bootstrap
+        }
     }
 }

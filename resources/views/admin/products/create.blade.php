@@ -44,22 +44,42 @@
                     <div class="col-md-4">
                         <label class="form-label">Status</label>
                         <select name="status" class="form-select">
-                            <option value="draft">Draft</option>
                             <option value="active">Active</option>
+                            <option value="draft">Draft</option>
                         </select>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Weight (grams)</label>
-                        <input type="number" name="weight_grams" class="form-control" value="{{ old('weight_grams') }}">
+                        <input type="number" name="weight_grams" class="form-control" value="{{ old('weight_grams', 100) }}">
                     </div>
                 </div>
+
+                {{-- Initial Inventory & Stock Section --}}
+                <div class="p-3 mb-3" style="background:var(--mb-surface);border:1px solid var(--mb-gold-border);border-radius:var(--mb-radius-sm);">
+                    <h6 style="font-family:'Rajdhani',sans-serif;color:var(--mb-gold);font-weight:700;" class="mb-3">
+                        <i class="bi bi-box-seam me-1"></i> Initial Inventory & Stock
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Initial Stock Quantity *</label>
+                            <input type="number" name="initial_stock" class="form-control" value="{{ old('initial_stock', 50) }}" min="0" required>
+                            <span style="font-size:.75rem;color:var(--mb-muted);">Number of items available for sale immediately.</span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">SKU (Stock Keeping Unit)</label>
+                            <input type="text" name="sku" class="form-control" value="{{ old('sku') }}" placeholder="Auto-generated if left blank (e.g. RAI-BOLT-001)">
+                            <span style="font-size:.75rem;color:var(--mb-muted);">Unique SKU identifier.</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="d-flex gap-3 mb-4">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" name="is_featured" value="1" id="is_featured">
-                        <label class="form-check-label" for="is_featured" style="color:var(--mb-text);">Featured</label>
+                        <input class="form-check-input" type="checkbox" name="is_featured" value="1" id="is_featured" {{ old('is_featured') ? 'checked' : '' }}>
+                        <label class="form-check-label" for="is_featured" style="color:var(--mb-text);">Featured Product</label>
                     </div>
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" name="is_new_arrival" value="1" id="is_new_arrival">
+                        <input class="form-check-input" type="checkbox" name="is_new_arrival" value="1" id="is_new_arrival" {{ old('is_new_arrival', 1) ? 'checked' : '' }}>
                         <label class="form-check-label" for="is_new_arrival" style="color:var(--mb-text);">New Arrival</label>
                     </div>
                 </div>
