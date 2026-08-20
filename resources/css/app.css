@@ -1322,3 +1322,113 @@ html:not([data-theme="dark"]) .bg-dark:not(.btn) {
   border-color: var(--mb-border) !important;
 }
 
+/* ── Hero Carousel & Swiper Banner Styles ─────────────────── */
+.hero-carousel {
+  position: relative;
+  width: 100%;
+  min-height: 480px;
+  background: #0d0e12;
+  overflow: hidden;
+}
+
+.hero-slide {
+  position: relative;
+  width: 100%;
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+  padding: 4rem 0;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(13,14,18,0.92) 0%, rgba(13,14,18,0.7) 50%, rgba(13,14,18,0.3) 100%);
+  z-index: 1;
+}
+
+.hero-slide-content {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-eyebrow {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--mb-gold);
+  text-transform: uppercase;
+}
+
+.hero-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1.15;
+  color: #ffffff !important;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+}
+
+.hero-title span {
+  color: var(--mb-gold);
+}
+
+.hero-slide p {
+  color: #e2e8f0 !important;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+}
+
+.swiper-pagination-bullet {
+  background: #ffffff !important;
+  opacity: 0.5;
+  width: 10px;
+  height: 10px;
+  transition: all 0.3s ease;
+}
+
+.swiper-pagination-bullet-active {
+  background: var(--mb-gold) !important;
+  opacity: 1;
+  width: 28px;
+  border-radius: 6px;
+}
+
+.swiper-button-next, .swiper-button-prev {
+  color: var(--mb-gold) !important;
+  background: rgba(0,0,0,0.4);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(245,166,35,0.3);
+  transition: all 0.3s ease;
+}
+
+.swiper-button-next:after, .swiper-button-prev:after {
+  font-size: 1.2rem !important;
+  font-weight: bold;
+}
+
+.swiper-button-next:hover, .swiper-button-prev:hover {
+  background: var(--mb-gold);
+  color: #000000 !important;
+  box-shadow: 0 0 15px rgba(245,166,35,0.5);
+}
+
+@media (max-width: 768px) {
+  .hero-carousel, .hero-slide {
+    min-height: 380px;
+    padding: 2.5rem 0;
+  }
+  .hero-title {
+    font-size: 2rem;
+  }
+  .swiper-button-next, .swiper-button-prev {
+    display: none !important;
+  }
+}
+
