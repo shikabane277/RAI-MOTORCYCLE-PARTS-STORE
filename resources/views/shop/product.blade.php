@@ -311,14 +311,16 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const variantsData = @json($product->variants->map(fn($v) => [
-        'id'         => $v->id,
-        'label'      => $v->label,
-        'price'      => (float)$v->price,
-        'sale_price' => $v->sale_price ? (float)$v->sale_price : null,
-        'stock'      => (int)$v->stock_qty,
-        'image'      => $v->image_url ?: $product->primary_image_url,
-    ]));
+    const variantsData = <?php echo json_encode($product->variants->map(function($v) use ($product) {
+        return [
+            'id'         => $v->id,
+            'label'      => $v->label,
+            'price'      => (float)$v->price,
+            'sale_price' => $v->sale_price ? (float)$v->sale_price : null,
+            'stock'      => (int)$v->stock_qty,
+            'image'      => $v->image_url ?: $product->primary_image_url,
+        ];
+    })); ?>;
 
     // Handle Dynamic Option Button Click across unlimited groups
     document.querySelectorAll('.dynamic-option-btn').forEach(btn => {

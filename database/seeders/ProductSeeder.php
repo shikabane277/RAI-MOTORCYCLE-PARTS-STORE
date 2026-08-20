@@ -262,22 +262,26 @@ class ProductSeeder extends Seeder
                     substr(preg_replace('/[^A-Za-z0-9]/', '', $product->slug), 0, 8) .
                     '-' . str_pad($i + 1, 2, '0', STR_PAD_LEFT)
                 );
+                $vSpec = array_filter([$v['thread_size'] ? $v['thread_size'] . ' Thread' : null, $v['pack_qty'] > 1 ? $v['pack_qty'] . ' Pcs Set' : null, $v['material']]);
+                $vName = (!empty($vSpec) ? implode(' / ', $vSpec) : 'Standard') . ' - ' . $v['color'];
+
                 ProductVariant::create([
-                    'product_id'  => $product->id,
-                    'variant_sku' => $sku,
-                    'thread_size' => $v['thread_size'] ?? null,
+                    'product_id'   => $product->id,
+                    'variant_name' => $vName,
+                    'variant_sku'  => $sku,
+                    'thread_size'  => $v['thread_size'] ?? null,
                     'thread_pitch' => null,
-                    'length_mm'   => null,
-                    'head_type'   => 'flange',
-                    'material'    => $v['material'],
-                    'color'       => $v['color'],
-                    'finish'      => 'anodized',
-                    'pack_qty'    => $v['pack_qty'],
-                    'price'       => $v['price'],
-                    'sale_price'  => $v['sale_price'] ?? null,
-                    'stock_qty'   => $v['stock_qty'],
+                    'length_mm'    => null,
+                    'head_type'    => 'flange',
+                    'material'     => $v['material'],
+                    'color'        => $v['color'],
+                    'finish'       => 'anodized',
+                    'pack_qty'     => $v['pack_qty'],
+                    'price'        => $v['price'],
+                    'sale_price'   => $v['sale_price'] ?? null,
+                    'stock_qty'    => $v['stock_qty'],
                     'low_stock_threshold' => 10,
-                    'is_active'   => true,
+                    'is_active'    => true,
                 ]);
             }
         }
