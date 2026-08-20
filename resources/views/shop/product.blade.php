@@ -94,43 +94,51 @@
             <p style="color:var(--mb-muted);font-size:.93rem;line-height:1.7;margin-bottom:1.5rem;">{{ $product->short_description }}</p>
             @endif
 
-            {{-- Customizable Variant Button Matrix (Matching Screenshots) --}}
-            @if($product->variants->count() > 0)
-            <div class="mb-4">
-                <label class="form-label font-bold text-uppercase" style="letter-spacing:1px;font-size:.85rem;color:var(--mb-heading);">
-                    SELECT VARIANT: <span id="selected-variant-label" class="text-gold fw-bold">{{ $firstVariant?->label }}</span>
-                </label>
-                
-                <div class="d-flex flex-wrap gap-2 mt-2" id="variant-swatch-group">
-                    @foreach($product->variants as $v)
-                    @php
-                        $isOutOfStock = $v->stock_qty <= 0;
-                        $vImg = $v->image_url ?: $product->primary_image_url;
-                    @endphp
-                    <div class="variant-box-btn {{ $loop->first && !$isOutOfStock ? 'active' : '' }} {{ $isOutOfStock ? 'disabled-out-of-stock' : '' }}"
-                         data-variant-id="{{ $v->id }}"
-                         data-label="{{ e($v->label) }}"
-                         data-price="{{ $v->price }}"
-                         data-sale-price="{{ $v->sale_price }}"
-                         data-stock="{{ $v->stock_qty }}"
-                         data-img="{{ $vImg }}"
-                         style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid {{ $loop->first && !$isOutOfStock ? 'var(--mb-gold)' : 'var(--mb-border)' }};border-radius:6px;background:{{ $loop->first && !$isOutOfStock ? 'var(--mb-gold-dim)' : 'var(--mb-card)' }};cursor:{{ $isOutOfStock ? 'not-allowed' : 'pointer' }};transition:all 0.2s ease;{{ $isOutOfStock ? 'opacity:0.45;background:var(--mb-surface);' : '' }}">
-                        
-                        @if($vImg)
-                            <img src="{{ $vImg }}" alt="{{ $v->label }}" style="width:28px;height:28px;object-fit:cover;border-radius:4px;border:1px solid var(--mb-border);">
-                        @endif
-                        
-                        <span style="font-family:'Rajdhani',sans-serif;font-size:0.95rem;font-weight:600;color:var(--mb-text);{{ $isOutOfStock ? 'text-decoration:line-through;' : '' }}">
-                            {{ $v->label }}
-                        </span>
-                        
-                        @if($isOutOfStock)
-                            <span class="badge bg-secondary ms-1" style="font-size:0.65rem;">SOLD OUT</span>
-                        @endif
+            {{-- Data-Driven Dynamic Multi-Group Option Selector System --}}
+            @php
+                $optionGroups = $product->parsed_option_groups;
+            @endphp
+
+            @if(count($optionGroups) > 0)
+                <div class="d-flex flex-column gap-3 mb-4" id="dynamic-option-groups-container">
+                    @foreach($optionGroups as $gIdx => $group)
+                    <div class="option-group-wrapper">
+                        <label class="form-label font-bold text-uppercase mb-2" style="letter-spacing:1px;font-size:.85rem;color:var(--mb-heading);">
+                            {{ $group['name'] }}: 
+                            <span id="group-selected-val-{{ $gIdx }}" class="text-gold fw-bold ms-1">
+                                {{ $group['values'][0]['label'] ?? '' }}
+                            </span>
+                        </label>
+
+                        <div class="d-flex flex-wrap gap-2 group-values-container" data-group-index="{{ $gIdx }}" data-group-name="{{ e($group['name']) }}">
+                            @foreach($group['values'] as $vIdx => $val)
+                            @php
+                                $vLabel = $val['label'];
+                                $vImg   = $val['image'] ?? null;
+                                $isDis  = $val['disabled'] ?? false;
+                            @endphp
+                            <div class="dynamic-option-btn {{ $vIdx === 0 && !$isDis ? 'active' : '' }} {{ $isDis ? 'disabled-out-of-stock' : '' }}"
+                                 data-group-index="{{ $gIdx }}"
+                                 data-value="{{ e($vLabel) }}"
+                                 style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid {{ $vIdx === 0 && !$isDis ? 'var(--mb-gold)' : 'var(--mb-border)' }};border-radius:6px;background:{{ $vIdx === 0 && !$isDis ? 'var(--mb-gold-dim)' : 'var(--mb-card)' }};cursor:{{ $isDis ? 'not-allowed' : 'pointer' }};transition:all 0.2s ease;{{ $isDis ? 'opacity:0.45;background:var(--mb-surface);' : '' }}">
+                                
+                                @if(!empty($vImg))
+                                    <img src="{{ $vImg }}" alt="{{ $vLabel }}" style="width:28px;height:28px;object-fit:cover;border-radius:4px;border:1px solid var(--mb-border);">
+                                @endif
+                                
+                                <span style="font-family:'Rajdhani',sans-serif;font-size:0.95rem;font-weight:600;color:var(--mb-text);{{ $isDis ? 'text-decoration:line-through;' : '' }}">
+                                    {{ $vLabel }}
+                                </span>
+
+                                @if($isDis)
+                                    <span class="badge bg-secondary ms-1" style="font-size:0.65rem;">UNAVAILABLE</span>
+                                @endif
+                            </div>
+                            @endforeach
+                        </div>
                     </div>
                     @endforeach
                 </div>
-            </div>
             @endif
 
             {{-- Customer Live Stock Available Counter --}}
@@ -303,67 +311,107 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.variant-box-btn').forEach(btn => {
+    const variantsData = @json($product->variants->map(fn($v) => [
+        'id'         => $v->id,
+        'label'      => $v->label,
+        'price'      => (float)$v->price,
+        'sale_price' => $v->sale_price ? (float)$v->sale_price : null,
+        'stock'      => (int)$v->stock_qty,
+        'image'      => $v->image_url ?: $product->primary_image_url,
+    ]));
+
+    // Handle Dynamic Option Button Click across unlimited groups
+    document.querySelectorAll('.dynamic-option-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             if (btn.classList.contains('disabled-out-of-stock')) return;
 
-            document.querySelectorAll('.variant-box-btn').forEach(b => {
-                b.classList.remove('active');
-                b.style.borderColor = 'var(--mb-border)';
-                b.style.background = 'var(--mb-card)';
-            });
+            const groupIdx = btn.dataset.groupIndex;
+            const val = btn.dataset.value;
 
+            // Deselect other buttons in the same group
+            const container = btn.closest('.group-values-container');
+            if (container) {
+                container.querySelectorAll('.dynamic-option-btn').forEach(b => {
+                    b.classList.remove('active');
+                    b.style.borderColor = 'var(--mb-border)';
+                    b.style.background = 'var(--mb-card)';
+                });
+            }
+
+            // Highlight selected button
             btn.classList.add('active');
             btn.style.borderColor = 'var(--mb-gold)';
             btn.style.background = 'var(--mb-gold-dim)';
 
-            const variantId = btn.dataset.variantId;
-            const label = btn.dataset.label;
-            const price = parseFloat(btn.dataset.price);
-            const salePrice = btn.dataset.salePrice ? parseFloat(btn.dataset.salePrice) : null;
-            const stock = parseInt(btn.dataset.stock);
-            const img = btn.dataset.img;
+            // Update group selected label text
+            const labelEl = document.getElementById(`group-selected-val-${groupIdx}`);
+            if (labelEl) labelEl.textContent = val;
 
-            const hiddenInput = document.getElementById('selected-variant-id');
-            if (hiddenInput) hiddenInput.value = variantId;
+            // Collect selections across all option groups
+            const selectedVals = [];
+            document.querySelectorAll('.group-values-container').forEach(cnt => {
+                const activeBtn = cnt.querySelector('.dynamic-option-btn.active');
+                if (activeBtn) selectedVals.push(activeBtn.dataset.value);
+            });
 
-            const labelEl = document.getElementById('selected-variant-label');
-            if (labelEl) labelEl.textContent = label;
+            // Find matching variant
+            const selectedComboName = selectedVals.join(' - ');
+            let matchedVariant = variantsData.find(v => v.label === selectedComboName);
 
-            if (img) {
-                const mainImg = document.getElementById('main-image');
-                if (mainImg) mainImg.src = img;
+            // Fallback matches
+            if (!matchedVariant && selectedVals.length > 0) {
+                matchedVariant = variantsData.find(v => selectedVals.every(sv => v.label.includes(sv)));
+            }
+            if (!matchedVariant && selectedVals.length > 0) {
+                matchedVariant = variantsData.find(v => v.label.includes(selectedVals[0]));
+            }
+            if (!matchedVariant && variantsData.length > 0) {
+                matchedVariant = variantsData[0];
             }
 
-            // Update price
-            const priceContainer = document.querySelector('.selected-price');
-            if (priceContainer) {
-                if (salePrice && salePrice < price) {
-                    priceContainer.innerHTML = `
-                        <span class="product-price" style="font-size:1.6rem;">₱${salePrice.toLocaleString('en-PH', {minimumFractionDigits:2})}</span>
-                        <span class="product-price-original ms-2">₱${price.toLocaleString('en-PH', {minimumFractionDigits:2})}</span>
-                        <span class="badge ms-2" style="background:var(--mb-red);font-size:.8rem;">SALE</span>
-                    `;
-                } else {
-                    priceContainer.innerHTML = `
-                        <span class="product-price" style="font-size:1.6rem;">₱${price.toLocaleString('en-PH', {minimumFractionDigits:2})}</span>
-                    `;
+            if (matchedVariant) {
+                // Hidden variant ID input
+                const hiddenInput = document.getElementById('selected-variant-id');
+                if (hiddenInput) hiddenInput.value = matchedVariant.id;
+
+                // Main Image
+                if (matchedVariant.image) {
+                    const mainImg = document.getElementById('main-image');
+                    if (mainImg) mainImg.src = matchedVariant.image;
                 }
-            }
 
-            // Update live stock status display
-            const stockContainer = document.getElementById('stock-badge-container');
-            const submitBtn = document.getElementById('btn-add-to-cart');
-            if (stockContainer) {
-                if (stock > 10) {
-                    stockContainer.innerHTML = `<span class="badge bg-success" style="font-size:.85rem;padding:6px 12px;"><i class="bi bi-check-circle me-1"></i> In Stock (${stock} units available)</span>`;
-                    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="bi bi-cart-plus me-1"></i> Add To Cart'; }
-                } else if (stock > 0) {
-                    stockContainer.innerHTML = `<span class="badge bg-warning text-dark" style="font-size:.85rem;padding:6px 12px;"><i class="bi bi-exclamation-triangle me-1"></i> Low Stock (Only ${stock} left!)</span>`;
-                    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="bi bi-cart-plus me-1"></i> Add To Cart'; }
-                } else {
-                    stockContainer.innerHTML = `<span class="badge bg-danger" style="font-size:.85rem;padding:6px 12px;"><i class="bi bi-x-circle me-1"></i> Out of Stock (0 items)</span>`;
-                    if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = 'Out of Stock'; }
+                // Price Display
+                const priceContainer = document.querySelector('.selected-price');
+                if (priceContainer) {
+                    if (matchedVariant.sale_price && matchedVariant.sale_price < matchedVariant.price) {
+                        priceContainer.innerHTML = `
+                            <span class="product-price" style="font-size:1.6rem;">₱${matchedVariant.sale_price.toLocaleString('en-PH', {minimumFractionDigits:2})}</span>
+                            <span class="product-price-original ms-2">₱${matchedVariant.price.toLocaleString('en-PH', {minimumFractionDigits:2})}</span>
+                            <span class="badge ms-2" style="background:var(--mb-red);font-size:.8rem;">SALE</span>
+                        `;
+                    } else {
+                        priceContainer.innerHTML = `
+                            <span class="product-price" style="font-size:1.6rem;">₱${matchedVariant.price.toLocaleString('en-PH', {minimumFractionDigits:2})}</span>
+                        `;
+                    }
+                }
+
+                // Stock Badge Display
+                const stockContainer = document.getElementById('stock-badge-container');
+                const submitBtn = document.getElementById('btn-add-to-cart');
+                const stock = matchedVariant.stock;
+
+                if (stockContainer) {
+                    if (stock > 10) {
+                        stockContainer.innerHTML = `<span class="badge bg-success" style="font-size:.85rem;padding:6px 12px;"><i class="bi bi-check-circle me-1"></i> In Stock (${stock} units available)</span>`;
+                        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="bi bi-cart-plus me-1"></i> Add To Cart'; }
+                    } else if (stock > 0) {
+                        stockContainer.innerHTML = `<span class="badge bg-warning text-dark" style="font-size:.85rem;padding:6px 12px;"><i class="bi bi-exclamation-triangle me-1"></i> Low Stock (Only ${stock} left!)</span>`;
+                        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="bi bi-cart-plus me-1"></i> Add To Cart'; }
+                    } else {
+                        stockContainer.innerHTML = `<span class="badge bg-danger" style="font-size:.85rem;padding:6px 12px;"><i class="bi bi-x-circle me-1"></i> Out of Stock (0 items)</span>`;
+                        if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = 'Out of Stock'; }
+                    }
                 }
             }
         });
