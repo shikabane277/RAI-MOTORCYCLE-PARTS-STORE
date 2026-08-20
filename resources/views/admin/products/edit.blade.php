@@ -18,7 +18,7 @@
                 {{-- Product Photo / Image Upload Section --}}
                 <div class="p-3 mb-3" style="background:var(--mb-surface);border:1px solid var(--mb-border);border-radius:var(--mb-radius-sm);">
                     <h6 style="font-family:'Rajdhani',sans-serif;color:var(--mb-gold);font-weight:700;" class="mb-2">
-                        <i class="bi bi-image me-1"></i> Product Photo / Image
+                        <i class="bi bi-images me-1"></i> Product Photos (Multiple Images Support)
                     </h6>
                     @if($product->primary_image_url)
                     <div class="mb-3 d-flex align-items-center gap-3">
@@ -28,11 +28,11 @@
                     @endif
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label small">Option A: Upload New Image File</label>
-                            <input type="file" name="image_file" class="form-control" accept="image/*">
+                            <label class="form-label small">Option A: Upload Multiple Image Files</label>
+                            <input type="file" name="image_files[]" class="form-control" multiple accept="image/*">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small">Option B: Image URL</label>
+                            <label class="form-label small">Option B: Primary Image URL</label>
                             <input type="text" name="image_url" class="form-control" value="{{ old('image_url', $product->primary_image_url) }}" placeholder="https://example.com/photo.jpg or /images/logo.png">
                         </div>
                     </div>
@@ -114,37 +114,22 @@
                 <div style="background:var(--mb-surface);border-radius:var(--mb-radius-sm);padding:1rem;border:1px solid var(--mb-border);">
                     <form method="POST" action="{{ route('admin.products.variants.store', $product) }}">
                         @csrf
-                        <div class="row g-2">
-                            <div class="col-md-3"><label class="form-label">Color *</label>
-                                <select name="color" class="form-select" required>
-                                    <option value="">— Select Color —</option>
-                                    @if(isset($colors))
-                                        @foreach($colors as $c)<option value="{{ $c->name }}">{{ $c->name }}</option>@endforeach
-                                    @endif
-                                </select>
+                        <div class="row g-2 mb-2">
+                            <div class="col-md-6">
+                                <label class="form-label font-bold">Custom Variant Name / Label *</label>
+                                <input type="text" name="variant_name" class="form-control" placeholder="e.g. 5x25/CNC/4pcs, 8GB+256GB, Gold/M6x20" required>
                             </div>
-                            <div class="col-md-3"><label class="form-label">Material *</label>
-                                <select name="material" class="form-select" required>
-                                    <option value="">— Select Material —</option>
-                                    @if(isset($materials))
-                                        @foreach($materials as $m)<option value="{{ $m->name }}">{{ $m->name }}</option>@endforeach
-                                    @endif
-                                </select>
+                            <div class="col-md-3">
+                                <label class="form-label font-bold">Price (₱) *</label>
+                                <input type="number" name="price" step="0.01" class="form-control" value="{{ $product->base_price }}" required>
                             </div>
-                            <div class="col-md-2"><label class="form-label">Thread Size</label>
-                                <select name="thread_size" class="form-select">
-                                    <option value="">— N/A —</option>
-                                    @if(isset($threadSizes))
-                                        @foreach($threadSizes as $ts)<option value="{{ $ts->name }}">{{ $ts->name }}</option>@endforeach
-                                    @endif
-                                </select>
+                            <div class="col-md-3">
+                                <label class="form-label font-bold">Stock Qty *</label>
+                                <input type="number" name="stock_qty" class="form-control" value="50" required>
                             </div>
-                            <div class="col-md-2"><label class="form-label">Pack Qty *</label><input type="number" name="pack_qty" class="form-control" value="1" required></div>
-                            <div class="col-md-2"><label class="form-label">Finish</label><input type="text" name="finish" class="form-control" placeholder="anodized"></div>
-                            <div class="col-md-3"><label class="form-label">Price (₱) *</label><input type="number" name="price" step="0.01" class="form-control" required></div>
-                            <div class="col-md-3"><label class="form-label">Sale Price (₱)</label><input type="number" name="sale_price" step="0.01" class="form-control"></div>
-                            <div class="col-md-3"><label class="form-label">Stock Qty *</label><input type="number" name="stock_qty" class="form-control" value="0" required></div>
-                            <div class="col-md-3 d-flex align-items-end"><button type="submit" class="btn btn-gold w-100">Add</button></div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-gold btn-sm"><i class="bi bi-plus-lg me-1"></i> Add Custom Variant</button>
                         </div>
                     </form>
                 </div>
@@ -152,20 +137,14 @@
 
             <div class="table-responsive">
                 <table class="table table-dark-custom mb-0">
-                    <thead><tr><th>SKU</th><th>Color</th><th>Material</th><th>Thread</th><th>Pack</th><th>Price</th><th>Sale</th><th>Stock</th><th>Active</th></tr></thead>
+                    <thead><tr><th>Variant Label</th><th>SKU</th><th>Price</th><th>Sale</th><th>Stock</th><th>Active</th></tr></thead>
                     <tbody>
                         @foreach($product->variants as $v)
                         <tr>
-                            <td style="font-size:.78rem;color:var(--mb-gold);">{{ $v->variant_sku }}</td>
                             <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="color-swatch swatch-{{ strtolower($v->color) }}" style="width:16px;height:16px;cursor:default;border-radius:50%;"></div>
-                                    <span style="font-size:.85rem;">{{ $v->color }}</span>
-                                </div>
+                                <span class="fw-bold text-gold" style="font-size:.95rem;">{{ $v->label }}</span>
                             </td>
-                            <td style="font-size:.82rem;color:var(--mb-muted);">{{ $v->material }}</td>
-                            <td style="font-size:.82rem;">{{ $v->thread_size ?? '—' }}</td>
-                            <td style="font-size:.82rem;">{{ $v->pack_qty }}pc</td>
+                            <td style="font-size:.78rem;color:var(--mb-muted);">{{ $v->variant_sku }}</td>
                             <td style="font-family:'Rajdhani',sans-serif;font-weight:700;">&#x20B1;{{ number_format($v->price, 2) }}</td>
                             <td style="color:var(--mb-green);font-size:.85rem;">{{ $v->sale_price ? '₱'.number_format($v->sale_price,2) : '—' }}</td>
                             <td>
@@ -173,9 +152,9 @@
                             </td>
                             <td>
                                 @if($v->is_active)
-                                    <span style="color:var(--mb-green);"><i class="bi bi-check-circle-fill"></i></span>
+                                    <span style="color:var(--mb-green);"><i class="bi bi-check-circle-fill"></i> Active</span>
                                 @else
-                                    <span style="color:var(--mb-red);"><i class="bi bi-x-circle-fill"></i></span>
+                                    <span style="color:var(--mb-red);"><i class="bi bi-x-circle-fill"></i> Inactive</span>
                                 @endif
                             </td>
                         </tr>

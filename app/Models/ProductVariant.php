@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class ProductVariant extends Model
 {
     protected $fillable = [
-        'product_id', 'variant_sku', 'thread_size', 'thread_pitch', 'length_mm',
+        'product_id', 'variant_name', 'variant_sku', 'thread_size', 'thread_pitch', 'length_mm',
         'head_type', 'material', 'color', 'finish', 'pack_qty',
         'price', 'sale_price', 'stock_qty', 'low_stock_threshold', 'image_url', 'images', 'is_active',
     ];
@@ -66,12 +66,15 @@ class ProductVariant extends Model
 
     public function getLabelAttribute(): string
     {
+        if (!empty($this->variant_name)) {
+            return $this->variant_name;
+        }
         $parts = array_filter([
             $this->thread_size,
             $this->length_mm ? $this->length_mm . 'mm' : null,
             $this->color,
             $this->pack_qty > 1 ? $this->pack_qty . 'pc' : null,
         ]);
-        return implode(' × ', $parts);
+        return !empty($parts) ? implode(' × ', $parts) : ($this->variant_sku ?? 'Standard');
     }
 }

@@ -57,30 +57,71 @@ class ProductController extends Controller
         $skuInput = $validated['sku'] ?? null;
         unset($validated['initial_stock'], $validated['sku']);
 
+        // Process multiple photo uploads
+        $uploadedImages = [];
+        if ($request->hasFile('image_files')) {
+            foreach ($request->file('image_files') as $idx => $file) {
+                $filename = 'prod_' . time() . '_' . $idx . '_' . rand(100, 999) . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/products'), $filename);
+                $uploadedImages[] = '/uploads/products/' . $filename;
+            }
+        }
+
         $imageUrl = $request->input('image_url');
-        if ($request->hasFile('image_file')) {
-            $file = $request->file('image_file');
-            $filename = 'product_' . time() . '_' . rand(1000, 9999) . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/products'), $filename);
-            $imageUrl = '/uploads/products/' . $filename;
+        if (empty($imageUrl) && !empty($uploadedImages)) {
+            $imageUrl = $uploadedImages[0];
         }
 
         $product = Product::create($validated);
 
-        $sku = $skuInput ? strtoupper(trim($skuInput)) : 'RAI-' . strtoupper(Str::slug(substr($product->name, 0, 10))) . '-' . rand(100, 999);
+        // Check if customizable variants array was submitted
+        if ($request->has('variants') && is_array($request->variants) && count($request->variants) > 0) {
+            foreach ($request->variants as $idx => $vData) {
+                if (empty($vData['variant_name']) && empty($vData['price'])) continue;
 
-        ProductVariant::create([
-            'product_id'          => $product->id,
-            'variant_sku'         => $sku,
-            'color'               => 'Standard',
-            'material'            => 'Standard',
-            'pack_qty'            => 1,
-            'price'               => $product->base_price,
-            'stock_qty'           => $initialStock,
-            'low_stock_threshold' => 5,
-            'image_url'           => $imageUrl,
-            'is_active'           => true,
-        ]);
+                $vImg = $vData['image_url'] ?? ($uploadedImages[$idx] ?? ($uploadedImages[0] ?? $imageUrl));
+                if ($request->hasFile("variants.{$idx}.image_file")) {
+                    $vFile = $request->file("variants.{$idx}.image_file");
+                    $vFilename = 'var_' . time() . '_' . $idx . '.' . $vFile->getClientOriginalExtension();
+                    $vFile->move(public_path('uploads/products'), $vFilename);
+                    $vImg = '/uploads/products/' . $vFilename;
+                }
+
+                $vSku = !empty($vData['sku'])
+                    ? strtoupper(trim($vData['sku']))
+                    : 'RAI-' . strtoupper(Str::slug(substr($product->name, 0, 8))) . '-' . strtoupper(Str::slug(substr($vData['variant_name'] ?? 'VAR', 0, 6))) . '-' . rand(10, 99);
+
+                ProductVariant::create([
+                    'product_id'          => $product->id,
+                    'variant_name'        => $vData['variant_name'] ?? 'Standard',
+                    'variant_sku'         => $vSku,
+                    'price'               => !empty($vData['price']) ? $vData['price'] : $product->base_price,
+                    'sale_price'          => !empty($vData['sale_price']) ? $vData['sale_price'] : null,
+                    'stock_qty'           => (int) ($vData['stock_qty'] ?? 0),
+                    'low_stock_threshold' => 5,
+                    'image_url'           => $vImg,
+                    'images'              => !empty($uploadedImages) ? $uploadedImages : null,
+                    'is_active'           => true,
+                ]);
+            }
+        } else {
+            // Default single variant
+            $sku = $skuInput ? strtoupper(trim($skuInput)) : 'RAI-' . strtoupper(Str::slug(substr($product->name, 0, 10))) . '-' . rand(100, 999);
+            ProductVariant::create([
+                'product_id'          => $product->id,
+                'variant_name'        => 'Standard',
+                'variant_sku'         => $sku,
+                'color'               => 'Standard',
+                'material'            => 'Standard',
+                'pack_qty'            => 1,
+                'price'               => $product->base_price,
+                'stock_qty'           => $initialStock,
+                'low_stock_threshold' => 5,
+                'image_url'           => $imageUrl,
+                'images'              => !empty($uploadedImages) ? $uploadedImages : null,
+                'is_active'           => true,
+            ]);
+        }
 
         return redirect()->route('admin.products.index')->with('success', "Product '{$product->name}' created successfully!");
     }
@@ -111,24 +152,38 @@ class ProductController extends Controller
             'is_new_arrival'    => 'boolean',
         ]);
 
+        // Process multiple photo uploads
+        $uploadedImages = [];
+        if ($request->hasFile('image_files')) {
+            foreach ($request->file('image_files') as $idx => $file) {
+                $filename = 'prod_' . time() . '_' . $idx . '_' . rand(100, 999) . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/products'), $filename);
+                $uploadedImages[] = '/uploads/products/' . $filename;
+            }
+        }
+
         $imageUrl = $request->input('image_url');
-        if ($request->hasFile('image_file')) {
-            $file = $request->file('image_file');
-            $filename = 'product_' . time() . '_' . rand(1000, 9999) . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/products'), $filename);
-            $imageUrl = '/uploads/products/' . $filename;
+        if (empty($imageUrl) && !empty($uploadedImages)) {
+            $imageUrl = $uploadedImages[0];
         }
 
         $product->update($validated);
 
-        if ($imageUrl) {
-            $variant = $product->variants()->first();
-            if ($variant) {
-                $variant->update(['image_url' => $imageUrl]);
+        // Update primary variant image or images if new ones were uploaded
+        $primaryVariant = $product->variants()->first();
+        if ($primaryVariant) {
+            $updates = [];
+            if ($imageUrl) $updates['image_url'] = $imageUrl;
+            if (!empty($uploadedImages)) {
+                $existingImages = $primaryVariant->images ?? [];
+                $updates['images'] = array_values(array_merge($existingImages, $uploadedImages));
+            }
+            if (!empty($updates)) {
+                $primaryVariant->update($updates);
             }
         }
 
-        return back()->with('success', 'Product updated successfully!');
+        return back()->with('success', 'Product details updated successfully!');
     }
 
     public function destroy(Product $product)
@@ -141,42 +196,47 @@ class ProductController extends Controller
     public function storeVariant(Request $request, Product $product)
     {
         $validated = $request->validate([
+            'variant_name' => 'nullable|string|max:100',
             'thread_size'  => 'nullable|string|max:20',
             'thread_pitch' => 'nullable|string|max:10',
             'length_mm'    => 'nullable|integer',
             'head_type'    => 'nullable|string|max:50',
-            'material'     => 'required|string|max:100',
-            'color'        => 'required|string|max:50',
+            'material'     => 'nullable|string|max:100',
+            'color'        => 'nullable|string|max:50',
             'finish'       => 'nullable|string|max:50',
-            'pack_qty'     => 'required|integer|min:1',
+            'pack_qty'     => 'nullable|integer|min:1',
             'price'        => 'required|numeric|min:0',
             'sale_price'   => 'nullable|numeric|min:0',
             'stock_qty'    => 'required|integer|min:0',
         ]);
 
+        $vName = $validated['variant_name'] ?? 'Standard';
         $sku = strtoupper(
             substr(preg_replace('/[^A-Za-z0-9]/', '', $product->slug), 0, 8) .
-            '-' . strtoupper(substr($validated['color'], 0, 3)) .
+            '-' . strtoupper(substr(Str::slug($vName), 0, 4)) .
             '-' . Str::random(4)
         );
 
         $product->variants()->create(array_merge($validated, [
-            'variant_sku' => $sku,
-            'low_stock_threshold' => 10,
-            'is_active' => true,
+            'variant_name' => $vName,
+            'variant_sku'  => $sku,
+            'low_stock_threshold' => 5,
+            'is_active'    => true,
         ]));
 
-        return back()->with('success', 'Variant added!');
+        return back()->with('success', 'Variant added successfully!');
     }
 
     public function updateVariant(Request $request, Product $product, ProductVariant $variant)
     {
-        $variant->update($request->validate([
-            'price'      => 'required|numeric|min:0',
-            'sale_price' => 'nullable|numeric|min:0',
-            'stock_qty'  => 'required|integer|min:0',
-            'is_active'  => 'boolean',
-        ]));
+        $validated = $request->validate([
+            'variant_name' => 'nullable|string|max:100',
+            'price'        => 'required|numeric|min:0',
+            'sale_price'   => 'nullable|numeric|min:0',
+            'stock_qty'    => 'required|integer|min:0',
+            'is_active'    => 'boolean',
+        ]);
+        $variant->update($validated);
         return back()->with('success', 'Variant updated!');
     }
 

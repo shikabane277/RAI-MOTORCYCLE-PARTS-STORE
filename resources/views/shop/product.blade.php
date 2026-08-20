@@ -18,13 +18,22 @@
     </nav>
 
     <div class="row g-5">
-        {{-- ── Image Gallery ─────────────────────────────── --}}
+        {{-- ── Image Gallery (All Product Photos) ────────────── --}}
         <div class="col-lg-6">
             <div class="dark-card p-3" style="border-radius:var(--mb-radius);">
-                {{-- Main image --}}
                 @php
-                    $mainImg = $firstVariant?->image_url ?: $product->primary_image_url;
+                    $allImages = collect([$product->primary_image_url]);
+                    foreach ($product->variants as $v) {
+                        if ($v->image_url) $allImages->push($v->image_url);
+                        if (is_array($v->images)) {
+                            foreach ($v->images as $extraImg) $allImages->push($extraImg);
+                        }
+                    }
+                    $allImages = $allImages->filter()->unique()->values();
+                    $mainImg = $allImages->first() ?: '/images/logo.png';
                 @endphp
+                
+                {{-- Main image --}}
                 <div id="main-image-wrap" style="aspect-ratio:1;border-radius:var(--mb-radius-sm);overflow:hidden;background:var(--mb-surface);display:flex;align-items:center;justify-content:center;">
                     @if($mainImg)
                         <img id="main-image" src="{{ $mainImg }}" alt="{{ $product->name }}"
@@ -33,17 +42,14 @@
                         <div style="font-size:6rem;opacity:.3;">&#x1F529;</div>
                     @endif
                 </div>
-                {{-- Thumbnail strip --}}
-                @if($product->variants->count() > 1)
+
+                {{-- Thumbnail strip for all uploaded product photos --}}
+                @if($allImages->count() > 1)
                 <div class="d-flex gap-2 mt-3 overflow-auto" style="padding-bottom:.5rem;">
-                    @foreach($product->variants as $v)
-                    <div class="thumb-img {{ $loop->first ? 'active' : '' }}" data-src="{{ $v->image_url }}"
+                    @foreach($allImages as $idx => $imgUrl)
+                    <div class="thumb-img {{ $loop->first ? 'active' : '' }}" onclick="document.getElementById('main-image').src='{{ $imgUrl }}'; document.querySelectorAll('.thumb-img').forEach(t=>t.style.borderColor='var(--mb-border)'); this.style.borderColor='var(--mb-gold)';"
                          style="width:64px;height:64px;flex-shrink:0;border-radius:8px;overflow:hidden;border:2px solid {{ $loop->first ? 'var(--mb-gold)' : 'var(--mb-border)' }};cursor:pointer;background:var(--mb-surface);">
-                        @if($v->image_url)
-                        <img src="{{ $v->image_url }}" alt="{{ $v->color }}" style="width:100%;height:100%;object-fit:cover;">
-                        @else
-                        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">&#x1F529;</div>
-                        @endif
+                        <img src="{{ $imgUrl }}" alt="Photo {{ $idx+1 }}" style="width:100%;height:100%;object-fit:cover;">
                     </div>
                     @endforeach
                 </div>
@@ -51,7 +57,7 @@
             </div>
         </div>
 
-        {{-- ── Product Info ──────────────────────────────── --}}
+        {{-- ── Product Details & Customizable Variants ──────── --}}
         <div class="col-lg-6">
             @if($product->brand)
                 <div class="product-brand mb-1">{{ $product->brand->name }}</div>
@@ -88,70 +94,84 @@
             <p style="color:var(--mb-muted);font-size:.93rem;line-height:1.7;margin-bottom:1.5rem;">{{ $product->short_description }}</p>
             @endif
 
-            {{-- Color swatches --}}
-            @if($variantsByColor->count() > 1)
-            <div class="mb-3">
-                <div class="form-label">Color: <span id="selected-color-label" class="text-gold">{{ $firstVariant?->color }}</span></div>
-                <div class="color-swatch-wrap">
-                    @foreach($variantsByColor as $color => $variants)
-                    @php $v = $variants->first(); @endphp
-                    <div class="color-swatch swatch-{{ strtolower($color) }} {{ $loop->first ? 'active' : '' }}"
+            {{-- Customizable Variant Button Matrix (Matching Screenshots) --}}
+            @if($product->variants->count() > 0)
+            <div class="mb-4">
+                <label class="form-label font-bold text-uppercase" style="letter-spacing:1px;font-size:.85rem;color:var(--mb-heading);">
+                    SELECT VARIANT: <span id="selected-variant-label" class="text-gold fw-bold">{{ $firstVariant?->label }}</span>
+                </label>
+                
+                <div class="d-flex flex-wrap gap-2 mt-2" id="variant-swatch-group">
+                    @foreach($product->variants as $v)
+                    @php
+                        $isOutOfStock = $v->stock_qty <= 0;
+                        $vImg = $v->image_url ?: $product->primary_image_url;
+                    @endphp
+                    <div class="variant-box-btn {{ $loop->first && !$isOutOfStock ? 'active' : '' }} {{ $isOutOfStock ? 'disabled-out-of-stock' : '' }}"
                          data-variant-id="{{ $v->id }}"
+                         data-label="{{ e($v->label) }}"
                          data-price="{{ $v->price }}"
                          data-sale-price="{{ $v->sale_price }}"
                          data-stock="{{ $v->stock_qty }}"
-                         data-color="{{ $color }}"
-                         title="{{ $color }}">
+                         data-img="{{ $vImg }}"
+                         style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid {{ $loop->first && !$isOutOfStock ? 'var(--mb-gold)' : 'var(--mb-border)' }};border-radius:6px;background:{{ $loop->first && !$isOutOfStock ? 'var(--mb-gold-dim)' : 'var(--mb-card)' }};cursor:{{ $isOutOfStock ? 'not-allowed' : 'pointer' }};transition:all 0.2s ease;{{ $isOutOfStock ? 'opacity:0.45;background:var(--mb-surface);' : '' }}">
+                        
+                        @if($vImg)
+                            <img src="{{ $vImg }}" alt="{{ $v->label }}" style="width:28px;height:28px;object-fit:cover;border-radius:4px;border:1px solid var(--mb-border);">
+                        @endif
+                        
+                        <span style="font-family:'Rajdhani',sans-serif;font-size:0.95rem;font-weight:600;color:var(--mb-text);{{ $isOutOfStock ? 'text-decoration:line-through;' : '' }}">
+                            {{ $v->label }}
+                        </span>
+                        
+                        @if($isOutOfStock)
+                            <span class="badge bg-secondary ms-1" style="font-size:0.65rem;">SOLD OUT</span>
+                        @endif
                     </div>
                     @endforeach
                 </div>
             </div>
             @endif
 
-            {{-- Pack qty selectors --}}
-            @php $packOptions = $product->variants->pluck('pack_qty')->unique()->sort(); @endphp
-            @if($packOptions->count() > 1)
-            <div class="mb-3">
-                <div class="form-label">Pack Quantity</div>
-                <div class="d-flex gap-2 flex-wrap">
-                    @foreach($packOptions as $qty)
-                    <div class="size-option {{ $loop->first ? 'active' : '' }}">{{ $qty }}pc</div>
-                    @endforeach
-                </div>
-            </div>
-            @endif
-
-            {{-- Stock status --}}
-            <div class="stock-status mb-3">
-                @if($firstVariant)
-                    @if($firstVariant->is_in_stock)
-                        @if($firstVariant->is_low_stock)
-                            <span class="text-warning"><i class="bi bi-exclamation-triangle me-1"></i>Low Stock ({{ $firstVariant->stock_qty }} left)</span>
-                        @else
-                            <span style="color:var(--mb-green);"><i class="bi bi-check-circle me-1"></i>In Stock</span>
+            {{-- Customer Live Stock Available Counter --}}
+            <div class="stock-status mb-4 p-3" style="background:var(--mb-surface);border:1px solid var(--mb-border);border-radius:8px;">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <span style="color:var(--mb-muted);font-size:.88rem;"><i class="bi bi-box-seam text-gold me-1"></i> Available Inventory Stock:</span>
+                    <div id="stock-badge-container">
+                        @if($firstVariant)
+                            @if($firstVariant->stock_qty > 10)
+                                <span class="badge bg-success" style="font-size:.85rem;padding:6px 12px;">
+                                    <i class="bi bi-check-circle me-1"></i> In Stock ({{ $firstVariant->stock_qty }} units available)
+                                </span>
+                            @elseif($firstVariant->stock_qty > 0)
+                                <span class="badge bg-warning text-dark" style="font-size:.85rem;padding:6px 12px;">
+                                    <i class="bi bi-exclamation-triangle me-1"></i> Low Stock (Only {{ $firstVariant->stock_qty }} left!)
+                                </span>
+                            @else
+                                <span class="badge bg-danger" style="font-size:.85rem;padding:6px 12px;">
+                                    <i class="bi bi-x-circle me-1"></i> Out of Stock (0 items)
+                                </span>
+                            @endif
                         @endif
-                    @else
-                        <span class="text-danger"><i class="bi bi-x-circle me-1"></i>Out of Stock</span>
-                    @endif
-                @endif
+                    </div>
+                </div>
             </div>
 
             {{-- Add to Cart form --}}
-            @if($firstVariant && $firstVariant->is_in_stock)
-            <form class="ajax-add-to-cart d-flex gap-3 align-items-center mb-3" method="POST" action="{{ route('cart.add') }}">
+            <form action="{{ route('cart.add') }}" method="POST" class="ajax-add-to-cart">
                 @csrf
-                <input type="hidden" name="variant_id" id="selected-variant-id" value="{{ $firstVariant->id }}">
-                <div class="qty-control">
-                    <button type="button" class="qty-btn" data-action="minus"><i class="bi bi-dash"></i></button>
-                    <input type="number" name="qty" class="qty-input" value="1" min="1" max="99">
-                    <button type="button" class="qty-btn" data-action="plus"><i class="bi bi-plus"></i></button>
+                <input type="hidden" name="variant_id" id="selected-variant-id" value="{{ $firstVariant?->id }}">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="qty-control d-flex align-items-center">
+                        <button type="button" class="qty-btn" data-action="minus">-</button>
+                        <input type="number" name="qty" class="qty-input" value="1" min="1" max="99">
+                        <button type="button" class="qty-btn" data-action="plus">+</button>
+                    </div>
+                    <button type="submit" class="btn btn-gold btn-lg flex-grow-1" id="btn-add-to-cart" {{ $firstVariant?->stock_qty <= 0 ? 'disabled' : '' }}>
+                        <i class="bi bi-cart-plus me-1"></i> Add To Cart
+                    </button>
                 </div>
-                <button type="submit" class="btn btn-gold flex-grow-1 py-2">
-                    <i class="bi bi-bag-plus me-1"></i>Add to Cart
-                </button>
             </form>
-            <a href="{{ route('cart.index') }}" class="btn btn-outline-gold w-100 mb-3">Buy Now — Checkout</a>
-            @endif
 
             {{-- Meta (SKU, brand) --}}
             <div style="font-size:.8rem;color:var(--mb-muted);">
@@ -281,27 +301,73 @@
     @endif
 </div>
 
-@push('scripts')
 <script>
-// Thumbnail swap
-document.querySelectorAll('.thumb-img').forEach(thumb => {
-    thumb.addEventListener('click', () => {
-        document.querySelectorAll('.thumb-img').forEach(t => t.style.borderColor = 'var(--mb-border)');
-        thumb.style.borderColor = 'var(--mb-gold)';
-        const src = thumb.dataset.src;
-        if (src) {
-            const mainImg = document.getElementById('main-image');
-            if (mainImg) mainImg.src = src;
-        }
-    });
-});
-// Update color label on swatch click
-document.querySelectorAll('.color-swatch').forEach(s => {
-    s.addEventListener('click', () => {
-        const label = document.getElementById('selected-color-label');
-        if (label && s.dataset.color) label.textContent = s.dataset.color;
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.variant-box-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (btn.classList.contains('disabled-out-of-stock')) return;
+
+            document.querySelectorAll('.variant-box-btn').forEach(b => {
+                b.classList.remove('active');
+                b.style.borderColor = 'var(--mb-border)';
+                b.style.background = 'var(--mb-card)';
+            });
+
+            btn.classList.add('active');
+            btn.style.borderColor = 'var(--mb-gold)';
+            btn.style.background = 'var(--mb-gold-dim)';
+
+            const variantId = btn.dataset.variantId;
+            const label = btn.dataset.label;
+            const price = parseFloat(btn.dataset.price);
+            const salePrice = btn.dataset.salePrice ? parseFloat(btn.dataset.salePrice) : null;
+            const stock = parseInt(btn.dataset.stock);
+            const img = btn.dataset.img;
+
+            const hiddenInput = document.getElementById('selected-variant-id');
+            if (hiddenInput) hiddenInput.value = variantId;
+
+            const labelEl = document.getElementById('selected-variant-label');
+            if (labelEl) labelEl.textContent = label;
+
+            if (img) {
+                const mainImg = document.getElementById('main-image');
+                if (mainImg) mainImg.src = img;
+            }
+
+            // Update price
+            const priceContainer = document.querySelector('.selected-price');
+            if (priceContainer) {
+                if (salePrice && salePrice < price) {
+                    priceContainer.innerHTML = `
+                        <span class="product-price" style="font-size:1.6rem;">₱${salePrice.toLocaleString('en-PH', {minimumFractionDigits:2})}</span>
+                        <span class="product-price-original ms-2">₱${price.toLocaleString('en-PH', {minimumFractionDigits:2})}</span>
+                        <span class="badge ms-2" style="background:var(--mb-red);font-size:.8rem;">SALE</span>
+                    `;
+                } else {
+                    priceContainer.innerHTML = `
+                        <span class="product-price" style="font-size:1.6rem;">₱${price.toLocaleString('en-PH', {minimumFractionDigits:2})}</span>
+                    `;
+                }
+            }
+
+            // Update live stock status display
+            const stockContainer = document.getElementById('stock-badge-container');
+            const submitBtn = document.getElementById('btn-add-to-cart');
+            if (stockContainer) {
+                if (stock > 10) {
+                    stockContainer.innerHTML = `<span class="badge bg-success" style="font-size:.85rem;padding:6px 12px;"><i class="bi bi-check-circle me-1"></i> In Stock (${stock} units available)</span>`;
+                    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="bi bi-cart-plus me-1"></i> Add To Cart'; }
+                } else if (stock > 0) {
+                    stockContainer.innerHTML = `<span class="badge bg-warning text-dark" style="font-size:.85rem;padding:6px 12px;"><i class="bi bi-exclamation-triangle me-1"></i> Low Stock (Only ${stock} left!)</span>`;
+                    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="bi bi-cart-plus me-1"></i> Add To Cart'; }
+                } else {
+                    stockContainer.innerHTML = `<span class="badge bg-danger" style="font-size:.85rem;padding:6px 12px;"><i class="bi bi-x-circle me-1"></i> Out of Stock (0 items)</span>`;
+                    if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = 'Out of Stock'; }
+                }
+            }
+        });
     });
 });
 </script>
-@endpush
 @endsection
