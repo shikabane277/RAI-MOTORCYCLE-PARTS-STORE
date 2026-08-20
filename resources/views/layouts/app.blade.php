@@ -42,15 +42,14 @@
             <a class="navbar-brand me-4 d-flex align-items-center gap-2" href="{{ route('home') }}">
                 <img src="/images/logo.png" alt="RAI MOTORCYCLE PARTS Logo" style="height:42px;width:42px;object-fit:cover;border-radius:50%;border:1px solid var(--mb-gold);">
                 <span style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.2rem;letter-spacing:.03em;">
-                    <span class="text-gold">RAI</span> <span style="color:#fff;">MOTORCYCLE</span> <span style="color:var(--mb-muted);font-size:.7em;">PARTS</span>
+                    <span class="text-gold">RAI</span> <span class="brand-text-main">MOTORCYCLE</span> <span style="color:var(--mb-muted);font-size:.7em;">PARTS</span>
                 </span>
             </a>
-            <form class="d-none d-lg-flex flex-grow-1 me-4" action="{{ route('shop.index') }}" method="GET">
-                <div class="input-group">
-                    <input type="search" name="search" class="search-input form-control border-end-0"
-                           placeholder="Search bolts, levers, foot pegs..." value="{{ request('search') }}"
-                           style="border-radius:50px 0 0 50px;border-right:none!important;">
-                    <button class="btn btn-dark-surface px-3" type="submit" style="border-radius:0 50px 50px 0;border:1px solid var(--mb-border);border-left:none;">
+            <form class="d-none d-lg-flex flex-grow-1 mx-4" action="{{ route('shop.index') }}" method="GET" style="max-width: 480px;">
+                <div class="search-bar-wrap">
+                    <input type="search" name="search" class="search-input-field"
+                           placeholder="Search bolts, levers, foot pegs..." value="{{ request('search') }}">
+                    <button class="search-btn" type="submit" aria-label="Search">
                         <i class="bi bi-search"></i>
                     </button>
                 </div>
