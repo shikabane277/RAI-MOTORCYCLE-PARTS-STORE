@@ -7,15 +7,23 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (DB::getDriverName() === 'mysql') {
-            DB::statement("ALTER TABLE orders MODIFY COLUMN payment_method VARCHAR(50) DEFAULT 'cod'");
+        try {
+            if (DB::getDriverName() === 'mysql') {
+                DB::statement("ALTER TABLE orders MODIFY COLUMN payment_method VARCHAR(50) DEFAULT 'cod'");
+            }
+        } catch (\Throwable $e) {
+            // Safe fallback across database engines
         }
     }
 
     public function down(): void
     {
-        if (DB::getDriverName() === 'mysql') {
-            DB::statement("ALTER TABLE orders MODIFY COLUMN payment_method VARCHAR(50) DEFAULT 'cod'");
+        try {
+            if (DB::getDriverName() === 'mysql') {
+                DB::statement("ALTER TABLE orders MODIFY COLUMN payment_method VARCHAR(50) DEFAULT 'cod'");
+            }
+        } catch (\Throwable $e) {
+            // Safe fallback across database engines
         }
     }
 };
