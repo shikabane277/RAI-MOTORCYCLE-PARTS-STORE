@@ -219,9 +219,9 @@
             {{-- ── 3. Separated Tier 1 & Tier 2 Sub-Option Builder ── --}}
             @php
                 $parsedGroups = $product->parsed_option_groups;
-                $t1Name = $parsedGroups[0]['name'] ?? 'Size / Specification';
-                $t2Name = $parsedGroups[1]['name'] ?? 'Color';
-                $hasTier2 = count($parsedGroups) > 1;
+                $t1Name = $parsedGroups[0]['name'] ?? '';
+                $t2Name = $parsedGroups[1]['name'] ?? '';
+                $hasTier2 = count($parsedGroups) > 1 && !empty($t2Name);
 
                 $t1Vals = array_map(fn($v) => $v['label'], $parsedGroups[0]['values'] ?? []);
                 $t2Vals = $hasTier2 ? array_map(fn($v) => $v['label'], $parsedGroups[1]['values'] ?? []) : [];
@@ -471,12 +471,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function rebuildCombinationMatrix() {
         const isTier2Enabled = tier2Toggle && tier2Toggle.checked;
-        const t1Vals = Array.from(tier1Container.querySelectorAll('.tier1-input-val'))
+        let t1Vals = Array.from(tier1Container.querySelectorAll('.tier1-input-val'))
                             .map(input => input.value.trim())
                             .filter(Boolean);
-        const t2Vals = Array.from(tier2Container.querySelectorAll('.tier2-input-val'))
+        let t2Vals = Array.from(tier2Container.querySelectorAll('.tier2-input-val'))
                             .map(input => input.value.trim())
                             .filter(Boolean);
+
+        if (t1Vals.length === 0) {
+            t1Vals = ['Standard'];
+        }
+
+        if (isTier2Enabled && t2Vals.length === 0) {
+            t2Vals = ['Standard'];
+        }
 
         const existingData = {};
         // Map pre-loaded variants
@@ -507,8 +515,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.tier2-matrix-col').forEach(el => {
             el.style.display = isTier2Enabled ? '' : 'none';
         });
-
-        if (t1Vals.length === 0) return;
 
         if (isTier2Enabled && t2Vals.length > 0) {
             t1Vals.forEach(v1 => {

@@ -208,7 +208,7 @@
                 <div class="p-3 mb-3" style="background:var(--mb-surface);border:1px solid var(--mb-border);border-radius:10px;">
                     <div class="mb-3">
                         <label class="form-label font-bold text-gold">Tier 1 Main Group Name *</label>
-                        <input type="text" name="tier1_name" id="tier1_name" class="form-control form-control-sm" placeholder="e.g. Size / Specification or Model" value="Size / Specification">
+                        <input type="text" name="tier1_name" id="tier1_name" class="form-control form-control-sm" placeholder="e.g. Size, Specification, or Model" value="">
                     </div>
 
                     <label class="form-label font-bold small">Tier 1 Option Values *</label>
@@ -238,7 +238,7 @@
                     <div id="tier2-config-wrapper" style="display:none;" class="mt-3 pt-2 border-top border-secondary">
                         <div class="mb-3">
                             <label class="form-label font-bold text-gold small">Tier 2 Sub-Group Name</label>
-                            <input type="text" name="tier2_name" id="tier2_name" class="form-control form-control-sm" placeholder="e.g. Color or Finish" value="Color">
+                            <input type="text" name="tier2_name" id="tier2_name" class="form-control form-control-sm" placeholder="e.g. Color, Finish, or Material" value="">
                         </div>
 
                         <label class="form-label font-bold small">Tier 2 Sub-Option Values</label>
@@ -437,12 +437,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Rebuild Combination Matrix Table
     function rebuildCombinationMatrix() {
         const isTier2Enabled = tier2Toggle && tier2Toggle.checked;
-        const t1Vals = Array.from(tier1Container.querySelectorAll('.tier1-input-val'))
+        let t1Vals = Array.from(tier1Container.querySelectorAll('.tier1-input-val'))
                             .map(input => input.value.trim())
                             .filter(Boolean);
-        const t2Vals = Array.from(tier2Container.querySelectorAll('.tier2-input-val'))
+        let t2Vals = Array.from(tier2Container.querySelectorAll('.tier2-input-val'))
                             .map(input => input.value.trim())
                             .filter(Boolean);
+
+        if (t1Vals.length === 0) {
+            t1Vals = ['Standard'];
+        }
+
+        if (isTier2Enabled && t2Vals.length === 0) {
+            t2Vals = ['Standard'];
+        }
 
         // Keep existing prices/stocks if already entered
         const existingData = {};
@@ -466,8 +474,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.tier2-matrix-col').forEach(el => {
             el.style.display = isTier2Enabled ? '' : 'none';
         });
-
-        if (t1Vals.length === 0) return;
 
         if (isTier2Enabled && t2Vals.length > 0) {
             t1Vals.forEach(v1 => {
