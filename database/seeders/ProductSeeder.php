@@ -250,6 +250,7 @@ class ProductSeeder extends Seeder
             unset($pd['fitments'], $pd['variants']);
 
             $pd['base_price'] = $pd['base_price'] ?? ($variants[0]['price'] ?? 0);
+            $pd['image_url'] = '/images/logo.png';
 
             $product = Product::create($pd);
 

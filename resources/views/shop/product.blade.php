@@ -23,20 +23,32 @@
             <div class="dark-card p-3" style="border-radius:var(--mb-radius);">
                 @php
                     $allImages = collect();
-                    // Primary/cover image first
-                    if ($product->image_url) $allImages->push($product->image_url);
-                    // Gallery images from product
+                    $primaryImg = $product->primary_image_url;
+                    if ($primaryImg) $allImages->push($primaryImg);
+
+                    if (!empty($product->image_url) && !$allImages->contains($product->image_url)) {
+                        $allImages->push($product->image_url);
+                    }
+
                     if (is_array($product->images)) {
                         foreach ($product->images as $gi) {
-                            if ($gi && $gi !== $product->image_url) $allImages->push($gi);
+                            if (!empty($gi) && is_string($gi) && !$allImages->contains($gi)) {
+                                $allImages->push($gi);
+                            }
                         }
                     }
-                    // Variant-specific images
+
                     foreach ($product->variants as $v) {
-                        if ($v->image_url && !$allImages->contains($v->image_url)) $allImages->push($v->image_url);
+                        if (!empty($v->image_url) && is_string($v->image_url) && !$allImages->contains($v->image_url)) {
+                            $allImages->push($v->image_url);
+                        }
                     }
-                    $allImages = $allImages->filter()->unique()->values();
-                    $mainImg = $allImages->first() ?: '/images/logo.png';
+
+                    $allImages = $allImages->filter(fn($img) => !empty($img) && is_string($img))->unique()->values();
+                    if ($allImages->isEmpty()) {
+                        $allImages->push('/images/logo.png');
+                    }
+                    $mainImg = $allImages->first();
                 @endphp
                 
                 {{-- Main image --}}

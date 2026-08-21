@@ -99,13 +99,20 @@ class Product extends Model
         return $this->variants()->sum('stock_qty');
     }
 
-    public function getPrimaryImageUrlAttribute(): ?string
+    public function getPrimaryImageUrlAttribute(): string
     {
+        if (!empty($this->attributes['image_url'])) {
+            return $this->attributes['image_url'];
+        }
+        $imgs = $this->images;
+        if (is_array($imgs) && count($imgs) > 0 && !empty($imgs[0])) {
+            return $imgs[0];
+        }
         $variant = $this->relationLoaded('variants') ? $this->variants->first() : $this->variants()->first();
-        if ($variant && $variant->image_url) {
+        if ($variant && !empty($variant->image_url)) {
             return $variant->image_url;
         }
-        return null;
+        return '/images/logo.png';
     }
 
     public function getParsedOptionGroupsAttribute(): array
