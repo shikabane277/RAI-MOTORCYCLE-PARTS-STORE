@@ -189,18 +189,20 @@ class ProductController extends Controller
             'is_new_arrival'    => 'boolean',
         ]);
 
-        // Process Cover Image Upload
+        // Preserve existing Cover Image URL unless new cover photo uploaded
         if ($request->hasFile('cover_image_file')) {
             $coverFile = $request->file('cover_image_file');
             $coverFilename = 'cover_' . time() . '_' . rand(100, 999) . '.' . $coverFile->getClientOriginalExtension();
             $coverFile->move(public_path('uploads/products'), $coverFilename);
             $validated['image_url'] = '/uploads/products/' . $coverFilename;
+        } else {
+            $validated['image_url'] = $product->primary_image_url ?: $product->image_url;
         }
 
-        // Process Additional Gallery Photo Uploads
+        // Preserve existing Additional Gallery Photos
         $uploadedImages = $product->images ?? [];
-        if (!empty($validated['image_url'])) {
-            $uploadedImages[] = $validated['image_url'];
+        if (!empty($validated['image_url']) && !in_array($validated['image_url'], $uploadedImages)) {
+            array_unshift($uploadedImages, $validated['image_url']);
         }
 
         if ($request->hasFile('image_files')) {
@@ -227,15 +229,15 @@ class ProductController extends Controller
         if (empty($validated['base_price']) && $request->has('variants') && is_array($request->variants)) {
             $prices = array_column($request->variants, 'price');
             $validPrices = array_filter($prices, fn($p) => is_numeric($p) && $p > 0);
-            $validated['base_price'] = !empty($validPrices) ? min($validPrices) : $product->base_price;
+            $validated['base_price'] = !empty($validPrices) ? min($validPrices) : ($product->base_price ?: 0);
         }
 
         $product->update($validated);
 
-        // Process Variants Update
+        // Process Variants Update safely without wiping existing images or details
         if ($request->has('variants') && is_array($request->variants) && count($request->variants) > 0) {
-            // Delete old variants and create updated variants list
-            $product->variants()->delete();
+            $existingVariants = $product->variants->keyBy('variant_name');
+            $activeVariantNames = [];
 
             foreach ($request->variants as $idx => $vData) {
                 $t1 = trim($vData['tier1_option'] ?? '');
@@ -253,7 +255,12 @@ class ProductController extends Controller
                 if (empty($vName) && empty($vData['price'])) continue;
                 if (empty($vName)) $vName = 'Standard';
 
-                $vImg = $vData['image_url'] ?? null;
+                $activeVariantNames[] = $vName;
+                $existingVar = $existingVariants->get($vName);
+
+                // Preserve existing variant image if no new file uploaded
+                $vImg = !empty($vData['existing_image']) ? $vData['existing_image'] : ($existingVar?->image_url);
+
                 if ($request->hasFile("variants.{$idx}.image_file")) {
                     $vFile = $request->file("variants.{$idx}.image_file");
                     $vFilename = 'var_' . time() . '_' . $idx . '.' . $vFile->getClientOriginalExtension();
@@ -261,24 +268,33 @@ class ProductController extends Controller
                     $vImg = '/uploads/products/' . $vFilename;
                 }
 
-                if (empty($vImg) && !empty($uploadedImages)) {
-                    $vImg = $uploadedImages[0];
+                if (empty($vImg)) {
+                    $vImg = $product->primary_image_url ?: ($uploadedImages[0] ?? null);
                 }
 
-                $vSku = 'RAI-' . strtoupper(Str::slug(substr($product->name, 0, 8))) . '-' . strtoupper(Str::slug(substr($vName, 0, 6))) . '-' . rand(10, 99);
+                $vSku = $existingVar?->variant_sku ?: ('RAI-' . strtoupper(Str::slug(substr($product->name, 0, 8))) . '-' . strtoupper(Str::slug(substr($vName, 0, 6))) . '-' . rand(10, 99));
 
-                ProductVariant::create([
-                    'product_id'          => $product->id,
-                    'variant_name'        => $vName,
-                    'variant_sku'         => $vSku,
-                    'price'               => !empty($vData['price']) ? $vData['price'] : $product->base_price,
-                    'sale_price'          => !empty($vData['sale_price']) ? $vData['sale_price'] : null,
-                    'stock_qty'           => (int) ($vData['stock_qty'] ?? 0),
-                    'low_stock_threshold' => 5,
-                    'image_url'           => $vImg,
-                    'images'              => !empty($uploadedImages) ? $uploadedImages : null,
-                    'is_active'           => true,
-                ]);
+                ProductVariant::updateOrCreate(
+                    [
+                        'product_id'   => $product->id,
+                        'variant_name' => $vName,
+                    ],
+                    [
+                        'variant_sku'         => $vSku,
+                        'price'               => !empty($vData['price']) ? $vData['price'] : ($product->base_price ?: 0),
+                        'sale_price'          => !empty($vData['sale_price']) ? $vData['sale_price'] : null,
+                        'stock_qty'           => (int) ($vData['stock_qty'] ?? 0),
+                        'low_stock_threshold' => 5,
+                        'image_url'           => $vImg,
+                        'images'              => !empty($uploadedImages) ? $uploadedImages : null,
+                        'is_active'           => true,
+                    ]
+                );
+            }
+
+            // Safely delete only variants that were explicitly removed by admin
+            if (!empty($activeVariantNames)) {
+                $product->variants()->whereNotIn('variant_name', $activeVariantNames)->delete();
             }
         }
 

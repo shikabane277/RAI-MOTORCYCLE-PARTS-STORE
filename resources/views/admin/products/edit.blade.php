@@ -539,6 +539,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="variant-img-preview" id="v-preview-${rowId}" style="width:38px;height:38px;border-radius:6px;overflow:hidden;border:1px solid var(--mb-border);background:var(--mb-surface);display:flex;align-items:center;justify-content:center;">
                         ${image ? `<img src="${image}" style="width:100%;height:100%;object-fit:cover;">` : '<i class="bi bi-image text-muted fs-6"></i>'}
                     </div>
+                    <input type="hidden" name="variants[${rowId}][existing_image]" value="${image || ''}">
                     <label class="btn btn-outline-gold btn-xs py-0 px-1" style="font-size:.65rem;cursor:pointer;">
                         <i class="bi bi-upload"></i> Photo
                         <input type="file" name="variants[${rowId}][image_file]" accept="image/*" class="d-none variant-file-input" data-target="v-preview-${rowId}">
