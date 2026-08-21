@@ -45,8 +45,8 @@
     background: rgba(245, 108, 108, 0.08) !important;
   }
   .thumb-card-box {
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
     border-radius: 8px;
     overflow: hidden;
     position: relative;
@@ -73,6 +73,12 @@
     font-size: 0.72rem;
     padding: 2px 6px;
     border-radius: 4px;
+  }
+  .option-pill-row {
+    background: var(--mb-card);
+    border: 1px solid var(--mb-border);
+    border-radius: 6px;
+    padding: 6px 12px;
   }
 </style>
 
@@ -146,7 +152,7 @@
                 </div>
             </div>
 
-            {{-- ── 2. Product Images (Cover & Gallery Separated) ── --}}
+            {{-- ── 2. Product Images ──────────────────────────── --}}
             <div class="shopee-section-card" id="section-media">
                 <div class="shopee-section-title">
                     <i class="bi bi-images text-gold"></i> 2. Product Images
@@ -180,7 +186,7 @@
                         </div>
 
                         <div class="d-flex flex-wrap gap-3 align-items-center mb-2">
-                            <label for="image_files_input" class="shopee-upload-card" style="width:100px;height:100px;border:2px dashed #f56c6c;border-radius:8px;background:var(--mb-surface);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;text-align:center;padding:8px;">
+                            <label for="image_files_input" class="shopee-upload-card" style="width:90px;height:90px;border:2px dashed #f56c6c;border-radius:8px;background:var(--mb-surface);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;text-align:center;padding:8px;">
                                 <i class="bi bi-plus-circle-fill text-danger fs-3 mb-1"></i>
                                 <span style="font-size:.75rem;color:#f56c6c;font-weight:600;" id="image-counter-text">Add Gallery<br>Photos (0/8)</span>
                             </label>
@@ -192,28 +198,36 @@
                 </div>
             </div>
 
-            {{-- ── 3. Separated Tier 1 & Optional Tier 2 Variants ── --}}
+            {{-- ── 3. Separated Tier 1 & Tier 2 Sub-Option Builder ── --}}
             <div class="shopee-section-card" id="section-variations">
                 <div class="shopee-section-title">
-                    <i class="bi bi-diagram-3-fill text-gold"></i> 3. Sales &amp; Custom Variants
+                    <i class="bi bi-diagram-3-fill text-gold"></i> 3. Sales &amp; Custom Product Variants
                 </div>
 
-                {{-- Tier 1 Main Variation Configuration --}}
+                {{-- Tier 1 Options Container --}}
                 <div class="p-3 mb-3" style="background:var(--mb-surface);border:1px solid var(--mb-border);border-radius:10px;">
-                    <div class="mb-2">
+                    <div class="mb-3">
                         <label class="form-label font-bold text-gold">Tier 1 Main Group Name *</label>
                         <input type="text" name="tier1_name" id="tier1_name" class="form-control form-control-sm" placeholder="e.g. Size / Specification or Model" value="Size / Specification">
                     </div>
+
+                    <label class="form-label font-bold small">Tier 1 Option Values *</label>
+                    <div id="tier1-values-container" class="d-flex flex-column gap-2 mb-2">
+                        {{-- Populated dynamically --}}
+                    </div>
+                    <button type="button" class="btn btn-outline-gold btn-sm" id="btn-add-tier1-val">
+                        <i class="bi bi-plus-circle me-1"></i> + Add Tier 1 Option Value
+                    </button>
                 </div>
 
-                {{-- Tier 2 Sub-Variation Configuration (Optional) --}}
+                {{-- Tier 2 Sub-Options Container (Optional) --}}
                 <div class="p-3 mb-4" style="background:var(--mb-surface);border:1px solid var(--mb-border);border-radius:10px;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 style="font-family:'Rajdhani',sans-serif;color:var(--mb-gold);font-weight:700;" class="mb-0">
                                 <i class="bi bi-diagram-2-fill me-1"></i> Tier 2 Sub-Variation (Optional)
                             </h6>
-                            <span style="font-size:.78rem;color:var(--mb-muted);">Enable if you want to add sub-options like Color, Finish, or Material under each Tier 1 item.</span>
+                            <span style="font-size:.78rem;color:var(--mb-muted);">Enable to connect sub-options (e.g. 3 or more colors) to all Tier 1 options.</span>
                         </div>
                         <div class="form-check form-switch mb-0">
                             <input class="form-check-input" type="checkbox" id="enable-tier2-toggle" style="cursor:pointer;">
@@ -222,19 +236,26 @@
                     </div>
 
                     <div id="tier2-config-wrapper" style="display:none;" class="mt-3 pt-2 border-top border-secondary">
-                        <label class="form-label font-bold text-gold small">Tier 2 Sub-Group Name</label>
-                        <input type="text" name="tier2_name" id="tier2_name" class="form-control form-control-sm" placeholder="e.g. Color or Finish" value="Color">
+                        <div class="mb-3">
+                            <label class="form-label font-bold text-gold small">Tier 2 Sub-Group Name</label>
+                            <input type="text" name="tier2_name" id="tier2_name" class="form-control form-control-sm" placeholder="e.g. Color or Finish" value="Color">
+                        </div>
+
+                        <label class="form-label font-bold small">Tier 2 Sub-Option Values</label>
+                        <div id="tier2-values-container" class="d-flex flex-column gap-2 mb-2">
+                            {{-- Populated dynamically --}}
+                        </div>
+                        <button type="button" class="btn btn-outline-gold btn-sm" id="btn-add-tier2-val">
+                            <i class="bi bi-plus-circle me-1"></i> + Add Tier 2 Sub-Option Value
+                        </button>
                     </div>
                 </div>
 
-                {{-- Variants Table --}}
+                {{-- Combinations Matrix Table --}}
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 style="font-family:'Rajdhani',sans-serif;color:var(--mb-heading);font-weight:700;" class="mb-0">
-                        Variant Rows List
+                        Connected Combination Rows &amp; Stock Pricing List
                     </h6>
-                    <button type="button" class="btn btn-gold btn-sm" id="btn-add-variant-row">
-                        <i class="bi bi-plus-lg me-1"></i> + Add Variant Row
-                    </button>
                 </div>
 
                 <div class="table-responsive">
@@ -242,15 +263,15 @@
                         <thead>
                             <tr>
                                 <th style="width:90px;" class="text-center">Photo</th>
-                                <th style="min-width:180px;">Tier 1 Option *</th>
-                                <th style="min-width:180px;display:none;" class="tier2-col-header">Tier 2 Sub-Option (Optional)</th>
+                                <th style="min-width:160px;">Tier 1 Option *</th>
+                                <th style="min-width:160px;display:none;" class="tier2-matrix-col">Tier 2 Sub-Option</th>
                                 <th style="width:130px;">Price (₱) *</th>
                                 <th style="width:110px;">Stock Qty *</th>
                                 <th style="width:50px;" class="text-center">Action</th>
                             </tr>
                         </thead>
-                        <tbody id="variant-manual-rows">
-                            {{-- Clean empty row initialized dynamically --}}
+                        <tbody id="variant-matrix-rows">
+                            {{-- Populated dynamically by matrix generator --}}
                         </tbody>
                     </table>
                 </div>
@@ -326,35 +347,151 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    let variantRowCounter = 0;
-    const tbody = document.getElementById('variant-manual-rows');
-    const btnAddVariant = document.getElementById('btn-add-variant-row');
+    // Dynamic Tier 1 & Tier 2 Options State
+    const tier1Container = document.getElementById('tier1-values-container');
+    const tier2Container = document.getElementById('tier2-values-container');
+    const matrixTbody = document.getElementById('variant-matrix-rows');
+    const btnAddTier1Val = document.getElementById('btn-add-tier1-val');
+    const btnAddTier2Val = document.getElementById('btn-add-tier2-val');
     const tier2Toggle = document.getElementById('enable-tier2-toggle');
     const tier2ConfigWrapper = document.getElementById('tier2-config-wrapper');
 
-    // Toggle Tier 2 Sub-Option Column Visibility
-    function updateTier2Visibility() {
-        const isEnabled = tier2Toggle && tier2Toggle.checked;
-        if (tier2ConfigWrapper) {
-            tier2ConfigWrapper.style.display = isEnabled ? 'block' : 'none';
-        }
-        document.querySelectorAll('.tier2-col-header').forEach(el => {
-            el.style.display = isEnabled ? '' : 'none';
-        });
-        document.querySelectorAll('.tier2-col-cell').forEach(el => {
-            el.style.display = isEnabled ? '' : 'none';
-        });
+    let matrixRowCounter = 0;
+
+    // Helper to add Tier 1 Option input box
+    function addTier1ValInput(val = '') {
+        const div = document.createElement('div');
+        div.className = 'd-flex align-items-center gap-2 option-pill-row';
+        div.innerHTML = `
+            <i class="bi bi-tag text-gold"></i>
+            <input type="text" class="form-control form-control-sm tier1-input-val font-bold text-gold" value="${val}" placeholder="e.g. 5x25/CNC/4pcs or iPhone 12" required>
+            <button type="button" class="btn btn-sm btn-link text-danger p-0 btn-remove-t1-val" style="text-decoration:none;"><i class="bi bi-x-circle fs-6"></i></button>
+        `;
+        tier1Container.appendChild(div);
+        rebuildCombinationMatrix();
     }
 
+    // Helper to add Tier 2 Option input box
+    function addTier2ValInput(val = '') {
+        const div = document.createElement('div');
+        div.className = 'd-flex align-items-center gap-2 option-pill-row';
+        div.innerHTML = `
+            <i class="bi bi-palette text-gold"></i>
+            <input type="text" class="form-control form-control-sm tier2-input-val" value="${val}" placeholder="e.g. Gold, Titanium, or Black">
+            <button type="button" class="btn btn-sm btn-link text-danger p-0 btn-remove-t2-val" style="text-decoration:none;"><i class="bi bi-x-circle fs-6"></i></button>
+        `;
+        tier2Container.appendChild(div);
+        rebuildCombinationMatrix();
+    }
+
+    // Initialize default inputs
+    addTier1ValInput('');
+    addTier2ValInput('');
+
+    if (btnAddTier1Val) {
+        btnAddTier1Val.addEventListener('click', () => addTier1ValInput(''));
+    }
+
+    if (btnAddTier2Val) {
+        btnAddTier2Val.addEventListener('click', () => addTier2ValInput(''));
+    }
+
+    // Toggle Tier 2 Sub-Option Column Visibility & Matrix update
     if (tier2Toggle) {
-        tier2Toggle.addEventListener('change', updateTier2Visibility);
+        tier2Toggle.addEventListener('change', function() {
+            const isEnabled = this.checked;
+            tier2ConfigWrapper.style.display = isEnabled ? 'block' : 'none';
+            document.querySelectorAll('.tier2-matrix-col').forEach(el => {
+                el.style.display = isEnabled ? '' : 'none';
+            });
+            rebuildCombinationMatrix();
+        });
     }
 
-    function createVariantRow(t1 = '', t2 = '', price = '', stock = '50') {
+    // Remove Tier 1 input
+    tier1Container.addEventListener('click', function(e) {
+        if (e.target.closest('.btn-remove-t1-val')) {
+            const row = e.target.closest('.option-pill-row');
+            if (tier1Container.querySelectorAll('.option-pill-row').length > 1) {
+                row.remove();
+                rebuildCombinationMatrix();
+            } else {
+                alert('At least one Tier 1 option value is required.');
+            }
+        }
+    });
+
+    // Remove Tier 2 input
+    tier2Container.addEventListener('click', function(e) {
+        if (e.target.closest('.btn-remove-t2-val')) {
+            const row = e.target.closest('.option-pill-row');
+            if (tier2Container.querySelectorAll('.option-pill-row').length > 1) {
+                row.remove();
+                rebuildCombinationMatrix();
+            } else {
+                alert('At least one Tier 2 sub-option value is required when Tier 2 is enabled.');
+            }
+        }
+    });
+
+    // Rebuild Combination Matrix Table
+    function rebuildCombinationMatrix() {
+        const isTier2Enabled = tier2Toggle && tier2Toggle.checked;
+        const t1Vals = Array.from(tier1Container.querySelectorAll('.tier1-input-val'))
+                            .map(input => input.value.trim())
+                            .filter(Boolean);
+        const t2Vals = Array.from(tier2Container.querySelectorAll('.tier2-input-val'))
+                            .map(input => input.value.trim())
+                            .filter(Boolean);
+
+        // Keep existing prices/stocks if already entered
+        const existingData = {};
+        matrixTbody.querySelectorAll('.manual-variant-row').forEach(tr => {
+            const t1 = tr.dataset.t1;
+            const t2 = tr.dataset.t2 || '';
+            const key = `${t1}|||${t2}`;
+            const pInput = tr.querySelector('.input-price');
+            const sInput = tr.querySelector('.input-stock');
+            if (pInput || sInput) {
+                existingData[key] = {
+                    price: pInput ? pInput.value : '',
+                    stock: sInput ? sInput.value : '50'
+                };
+            }
+        });
+
+        matrixTbody.innerHTML = '';
+        matrixRowCounter = 0;
+
+        document.querySelectorAll('.tier2-matrix-col').forEach(el => {
+            el.style.display = isTier2Enabled ? '' : 'none';
+        });
+
+        if (t1Vals.length === 0) return;
+
+        if (isTier2Enabled && t2Vals.length > 0) {
+            t1Vals.forEach(v1 => {
+                t2Vals.forEach(v2 => {
+                    const key = `${v1}|||${v2}`;
+                    const saved = existingData[key] || { price: '', stock: '50' };
+                    createMatrixRow(v1, v2, saved.price, saved.stock, true);
+                });
+            });
+        } else {
+            t1Vals.forEach(v1 => {
+                const key = `${v1}|||`;
+                const saved = existingData[key] || { price: '', stock: '50' };
+                createMatrixRow(v1, '', saved.price, saved.stock, false);
+            });
+        }
+    }
+
+    function createMatrixRow(t1, t2, price, stock, isTier2Enabled) {
         const tr = document.createElement('tr');
         tr.className = 'manual-variant-row';
-        const rowId = variantRowCounter++;
-        const isTier2Enabled = tier2Toggle && tier2Toggle.checked;
+        tr.dataset.t1 = t1;
+        tr.dataset.t2 = t2;
+        const rowId = matrixRowCounter++;
 
         tr.innerHTML = `
             <td class="text-center align-middle">
@@ -369,10 +506,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </td>
             <td class="align-middle">
-                <input type="text" name="variants[${rowId}][tier1_option]" class="form-control form-control-sm font-bold text-gold" value="${t1}" placeholder="e.g. 5x25/CNC/4pcs or iPhone 12" required>
+                <input type="text" name="variants[${rowId}][tier1_option]" class="form-control form-control-sm font-bold text-gold" value="${t1}" readonly style="background:var(--mb-surface);">
             </td>
-            <td class="align-middle tier2-col-cell" style="${isTier2Enabled ? '' : 'display:none;'}">
-                <input type="text" name="variants[${rowId}][tier2_option]" class="form-control form-control-sm" value="${t2}" placeholder="e.g. Gold or Blue">
+            <td class="align-middle tier2-matrix-col" style="${isTier2Enabled ? '' : 'display:none;'}">
+                <input type="text" name="variants[${rowId}][tier2_option]" class="form-control form-control-sm" value="${t2}" readonly style="background:var(--mb-surface);">
             </td>
             <td class="align-middle">
                 <input type="number" step="0.01" name="variants[${rowId}][price]" class="form-control form-control-sm input-price" value="${price}" placeholder="250.00" required>
@@ -384,33 +521,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 <button type="button" class="btn btn-sm btn-link text-danger btn-remove-row" style="text-decoration:none;"><i class="bi bi-trash fs-5"></i></button>
             </td>
         `;
-        tbody.appendChild(tr);
+        matrixTbody.appendChild(tr);
     }
 
-    // Start with 1 clean empty row (NO PRESETS)
-    createVariantRow('', '', '', '50');
+    // Rebuild matrix when option labels change
+    tier1Container.addEventListener('input', rebuildCombinationMatrix);
+    tier2Container.addEventListener('input', rebuildCombinationMatrix);
 
-    // Add single manual variant row
-    if (btnAddVariant) {
-        btnAddVariant.addEventListener('click', function() {
-            createVariantRow('', '', '', '50');
-        });
-    }
-
-    // Remove variant row
-    tbody.addEventListener('click', function(e) {
+    // Remove matrix row manually
+    matrixTbody.addEventListener('click', function(e) {
         if (e.target.closest('.btn-remove-row')) {
             const row = e.target.closest('.manual-variant-row');
-            if (tbody.querySelectorAll('.manual-variant-row').length > 1) {
+            if (matrixTbody.querySelectorAll('.manual-variant-row').length > 1) {
                 row.remove();
             } else {
-                alert('At least one variant is required.');
+                alert('At least one combination is required.');
             }
         }
     });
 
-    // Image preview for variant rows when uploading
-    tbody.addEventListener('change', function(e) {
+    // Image preview for matrix rows when uploading
+    matrixTbody.addEventListener('change', function(e) {
         if (e.target.classList.contains('variant-file-input')) {
             const targetId = e.target.dataset.target;
             const previewBox = document.getElementById(targetId);
@@ -462,10 +593,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
-            // Re-assign accumulated DataTransfer files array back to file input
             galleryInput.files = accumulatedFiles.files;
-
-            // Render thumbnails
             renderGalleryThumbnails();
         });
 
@@ -493,7 +621,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // Remove single gallery image on click
         thumbnailsWrapper.addEventListener('click', function(e) {
             if (e.target.classList.contains('btn-remove-gallery-img')) {
                 const removeIdx = parseInt(e.target.dataset.index, 10);
