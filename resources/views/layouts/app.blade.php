@@ -176,10 +176,10 @@
             <div class="col-6 col-lg-2">
                 <div class="footer-heading">Customer Care</div>
                 <ul class="footer-links">
-                    <li><a href="{{ route('pages.shipping') }}">Shipping Policy</a></li>
-                    <li><a href="{{ route('pages.returns') }}">Returns &amp; Warranty</a></li>
-                    <li><a href="{{ route('pages.faq') }}">FAQ</a></li>
-                    <li><a href="{{ route('pages.contact') }}">Contact Us</a></li>
+                    <li><a href="{{ route('shipping') }}">Shipping Policy</a></li>
+                    <li><a href="{{ route('returns') }}">Returns &amp; Warranty</a></li>
+                    <li><a href="{{ route('faq') }}">FAQ</a></li>
+                    <li><a href="{{ route('contact') }}">Contact Us</a></li>
                 </ul>
             </div>
             <div class="col-lg-4">
