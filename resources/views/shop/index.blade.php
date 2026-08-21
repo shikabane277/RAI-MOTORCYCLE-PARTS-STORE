@@ -13,8 +13,8 @@
     </nav>
 
     <div class="row g-4">
-        {{-- ── Filter Sidebar ─────────────────────────────── --}}
-        <div class="col-lg-3">
+        {{-- ── Desktop Filter Sidebar ─────────────────────────────── --}}
+        <div class="col-lg-3 d-none d-lg-block">
             <div class="dark-card p-3 sticky-top" style="top:80px;">
                 <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--mb-heading);margin-bottom:1rem;">
                     <i class="bi bi-funnel me-2 text-gold"></i>Filters
@@ -100,15 +100,20 @@
                     <div style="color:var(--mb-muted);font-size:.85rem;">{{ $products->total() }} products</div>
                 </div>
                 <div class="d-flex gap-2 align-items-center">
-                    <label style="color:var(--mb-muted);font-size:.85rem;">Sort:</label>
-                    <select name="sort" form="filter-form" onchange="document.getElementById('filter-form').submit();"
-                            class="form-select form-select-sm" style="width:auto;">
-                        <option value="" {{ !request('sort') ? 'selected' : '' }}>Featured</option>
-                        <option value="price_asc" {{ request('sort') === 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
-                        <option value="price_desc" {{ request('sort') === 'price_desc' ? 'selected' : '' }}>Price: High to Low</option>
-                        <option value="newest" {{ request('sort') === 'newest' ? 'selected' : '' }}>Newest</option>
-                        <option value="best" {{ request('sort') === 'best' ? 'selected' : '' }}>Best Sellers</option>
-                    </select>
+                    <button type="button" class="btn btn-outline-gold btn-sm d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#mobileFilterDrawer">
+                        <i class="bi bi-funnel me-1"></i> Filter &amp; Sort
+                    </button>
+                    <div class="d-none d-lg-flex align-items-center gap-2">
+                        <label style="color:var(--mb-muted);font-size:.85rem;">Sort:</label>
+                        <select name="sort" form="filter-form" onchange="document.getElementById('filter-form').submit();"
+                                class="form-select form-select-sm" style="width:auto;">
+                            <option value="" {{ !request('sort') ? 'selected' : '' }}>Featured</option>
+                            <option value="price_asc" {{ request('sort') === 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
+                            <option value="price_desc" {{ request('sort') === 'price_desc' ? 'selected' : '' }}>Price: High to Low</option>
+                            <option value="newest" {{ request('sort') === 'newest' ? 'selected' : '' }}>Newest</option>
+                            <option value="best" {{ request('sort') === 'best' ? 'selected' : '' }}>Best Sellers</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -131,6 +136,55 @@
             </div>
             @endif
         </div>
+    </div>
+</div>
+
+{{-- ── Mobile Filter Offcanvas Drawer ── --}}
+<div class="offcanvas offcanvas-start offcanvas-dark" tabindex="-1" id="mobileFilterDrawer" aria-labelledby="mobileFilterDrawerLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title text-gold font-bold" id="mobileFilterDrawerLabel"><i class="bi bi-funnel me-2"></i>Filter Products</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form method="GET" action="{{ isset($category) ? route('shop.category',$category->slug) : route('shop.index') }}">
+            {{-- Sort By --}}
+            <div class="mb-4">
+                <label class="form-label font-bold text-gold">Sort By</label>
+                <select name="sort" class="form-select form-select-sm">
+                    <option value="" {{ !request('sort') ? 'selected' : '' }}>Featured</option>
+                    <option value="price_asc" {{ request('sort') === 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
+                    <option value="price_desc" {{ request('sort') === 'price_desc' ? 'selected' : '' }}>Price: High to Low</option>
+                    <option value="newest" {{ request('sort') === 'newest' ? 'selected' : '' }}>Newest</option>
+                    <option value="best" {{ request('sort') === 'best' ? 'selected' : '' }}>Best Sellers</option>
+                </select>
+            </div>
+
+            {{-- Price Range --}}
+            <div class="mb-4">
+                <label class="form-label font-bold text-gold">Price Range (&#x20B1;)</label>
+                <div class="d-flex gap-2">
+                    <input type="number" name="min_price" class="form-control form-control-sm" placeholder="Min" value="{{ request('min_price') }}">
+                    <input type="number" name="max_price" class="form-control form-control-sm" placeholder="Max" value="{{ request('max_price') }}">
+                </div>
+            </div>
+
+            @if(isset($materials) && $materials->isNotEmpty())
+            <div class="mb-4">
+                <label class="form-label font-bold text-gold">Material</label>
+                @foreach($materials as $mat)
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="material" value="{{ $mat->name }}" id="m_mat_{{ $mat->id }}" {{ request('material') === $mat->name ? 'checked' : '' }}>
+                    <label class="form-check-label" for="m_mat_{{ $mat->id }}" style="color:var(--mb-text);font-size:.9rem;">{{ $mat->name }}</label>
+                </div>
+                @endforeach
+            </div>
+            @endif
+
+            <div class="d-grid gap-2 mt-4">
+                <button type="submit" class="btn btn-gold py-2 font-bold">Apply Filters</button>
+                <a href="{{ isset($category) ? route('shop.category',$category->slug) : route('shop.index') }}" class="btn btn-dark-surface py-2 text-center text-muted">Clear Filters</a>
+            </div>
+        </form>
     </div>
 </div>
 @endsection

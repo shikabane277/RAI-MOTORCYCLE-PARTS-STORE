@@ -20,10 +20,10 @@
             <div class="d-flex flex-column gap-3">
                 @foreach($cart->items as $item)
                 @php $variant = $item->variant; $product = $variant->product; @endphp
-                <div class="cart-item d-flex gap-3 align-items-start">
+                <div class="cart-item d-flex flex-wrap flex-sm-nowrap gap-3 align-items-start">
                     {{-- Image --}}
                     <a href="{{ route('product.show', $product->slug) }}"
-                       style="width:90px;height:90px;flex-shrink:0;background:var(--mb-surface);border-radius:var(--mb-radius-sm);overflow:hidden;display:flex;align-items:center;justify-content:center;">
+                       style="width:80px;height:80px;flex-shrink:0;background:var(--mb-surface);border-radius:var(--mb-radius-sm);overflow:hidden;display:flex;align-items:center;justify-content:center;">
                         @if($variant->image_url)
                             <img src="{{ $variant->image_url }}" alt="{{ $product->name }}" style="width:100%;height:100%;object-fit:cover;">
                         @else
@@ -31,19 +31,17 @@
                         @endif
                     </a>
                     {{-- Info --}}
-                    <div class="flex-grow-1">
+                    <div class="flex-grow-1" style="min-width:180px;">
                         <div class="product-brand">{{ $product->brand?->name ?? 'RAI' }}</div>
                         <a href="{{ route('product.show', $product->slug) }}" class="text-decoration-none">
                             <div style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:600;color:var(--mb-text);">{{ $product->name }}</div>
                         </a>
                         <div style="font-size:.8rem;color:var(--mb-muted);">
-                            {{ $variant->color }} &bull; {{ $variant->material }}
-                            @if($variant->thread_size) &bull; {{ $variant->thread_size }} @endif
-                            &bull; {{ $variant->pack_qty }}pc
+                            {{ $variant->variant_name ?: $variant->color }}
                         </div>
                         <div style="font-size:.75rem;color:var(--mb-muted);">SKU: {{ $variant->variant_sku }}</div>
                         {{-- Qty + remove (mobile) --}}
-                        <div class="d-flex align-items-center gap-3 mt-2">
+                        <div class="d-flex align-items-center gap-3 mt-2 flex-wrap">
                             <form method="POST" action="{{ route('cart.update', $item->id) }}">
                                 @csrf @method('PATCH')
                                 <div class="qty-control">
@@ -62,7 +60,7 @@
                         </div>
                     </div>
                     {{-- Price --}}
-                    <div class="text-end" style="flex-shrink:0;">
+                    <div class="text-end ms-auto" style="flex-shrink:0;">
                         @if($variant->is_on_sale)
                             <div class="product-price">&#x20B1;{{ number_format($variant->sale_price * $item->qty, 2) }}</div>
                             <div style="font-size:.8rem;color:var(--mb-muted);text-decoration:line-through;">&#x20B1;{{ number_format($variant->price * $item->qty, 2) }}</div>

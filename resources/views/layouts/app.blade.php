@@ -98,10 +98,21 @@
                     <li class="nav-item"><a class="nav-link" href="{{ route('shop.index') }}?sort=sale">&#x1F525; Deals</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ route('shop.index') }}?new=1">&#x2728; New Arrivals</a></li>
                     @auth @if(auth()->user()->isStaff())
-                        <li class="nav-item"><a class="nav-link text-gold" href="{{ route('admin.dashboard') }}"><i class="bi bi-speedometer2 me-1"></i>Admin</a></li>
+                        <li class="nav-item"><a class="nav-link text-gold" href="{{ route('admin.dashboard') }}"><i class="bi bi-speedometer2 me-1"></i>Admin Panel</a></li>
                     @endif @endauth
                 </ul>
             </div>
+
+            {{-- Mobile Search Field Bar --}}
+            <form class="d-flex d-lg-none mt-2 px-1" action="{{ route('shop.index') }}" method="GET">
+                <div class="search-bar-wrap w-100">
+                    <input type="search" name="search" class="search-input-field"
+                           placeholder="Search bolts, levers, foot pegs..." value="{{ request('search') }}">
+                    <button class="search-btn" type="submit" aria-label="Search">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </form>
         </div>
     </nav>
 </header>
@@ -120,64 +131,68 @@
     </div>
     @endif
     @if($errors->any())
-    <div class="alert auto-dismiss" style="background:var(--mb-red-dim);border:1px solid rgba(229,57,53,0.3);color:var(--mb-red);border-radius:var(--mb-radius-sm);">
-        @foreach($errors->all() as $e)<div><i class="bi bi-x-circle me-1"></i>{{ $e }}</div>@endforeach
+    <div class="alert auto-dismiss d-flex flex-column gap-1" style="background:var(--mb-red-dim);border:1px solid rgba(229,57,53,0.3);color:var(--mb-red);border-radius:var(--mb-radius-sm);">
+        @foreach($errors->all() as $err)
+        <div><i class="bi bi-exclamation-triangle-fill me-1"></i> {{ $err }}</div>
+        @endforeach
     </div>
     @endif
 </div>
 @endif
 
-<main>@yield('content')</main>
+<main class="min-vh-100">
+    @yield('content')
+</main>
 
 {{-- ── Footer --}}
-<footer class="site-footer mt-5 pt-5 pb-4">
-    <div class="container-xl">
-        <div class="row g-4 mb-5">
-            <div class="col-lg-3 col-md-6">
-                <div class="footer-heading mb-3 d-flex align-items-center gap-2" style="font-size:1.2rem;">
-                    <img src="/images/logo.png" alt="RAI Logo" style="height:36px;width:36px;object-fit:cover;border-radius:50%;border:1px solid var(--mb-gold);">
-                    <span class="text-gold">RAI</span> MOTORCYCLE <span class="text-muted-custom" style="font-size:.7em;">PARTS</span>
+<footer class="site-footer mt-5">
+    <div class="container-xl py-5">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <a class="navbar-brand me-4 d-flex align-items-center gap-2 mb-3" href="{{ route('home') }}">
+                    <img src="/images/logo.png" alt="RAI MOTORCYCLE PARTS Logo" style="height:45px;width:45px;object-fit:cover;border-radius:50%;border:1px solid var(--mb-gold);">
+                    <span style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.3rem;">
+                        <span class="text-gold">RAI</span> <span class="brand-text-main">MOTORCYCLE</span> <span style="color:var(--mb-muted);font-size:.7em;">PARTS</span>
+                    </span>
+                </a>
+                <p style="color:var(--mb-muted);font-size:.9rem;line-height:1.7;">
+                    Your trusted source for premium CNC-machined titanium, stainless, and aluminum motorcycle bolts, hardware, and custom accessories in the Philippines.
+                </p>
+                <div class="d-flex gap-3 mt-3">
+                    <a href="#" class="btn btn-dark-surface btn-sm" style="border-radius:50px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="btn btn-dark-surface btn-sm" style="border-radius:50px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="btn btn-dark-surface btn-sm" style="border-radius:50px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;"><i class="bi bi-tiktok"></i></a>
                 </div>
-                <p style="color:var(--mb-muted);font-size:.87rem;line-height:1.7;">Precision CNC-machined parts for Filipino riders. Built tough, finished premium, delivered fast.</p>
-                <div class="d-flex gap-2 mt-3">
-                    <a href="#" class="social-icon"><i class="bi bi-facebook"></i></a>
-                    <a href="#" class="social-icon"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="social-icon"><i class="bi bi-tiktok"></i></a>
-                    <a href="#" class="social-icon" title="Shopee"><i class="bi bi-shop"></i></a>
+            </div>
+            <div class="col-6 col-lg-2">
+                <div class="footer-heading">Quick Links</div>
+                <ul class="footer-links">
+                    <li><a href="{{ route('shop.index') }}">Shop All</a></li>
+                    <li><a href="{{ route('shop.index') }}?sort=sale">Deals &amp; Sales</a></li>
+                    <li><a href="{{ route('shop.index') }}?new=1">New Arrivals</a></li>
+                    <li><a href="{{ route('order.track') }}">Track Order</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-lg-2">
+                <div class="footer-heading">Customer Care</div>
+                <ul class="footer-links">
+                    <li><a href="{{ route('pages.shipping') }}">Shipping Policy</a></li>
+                    <li><a href="{{ route('pages.returns') }}">Returns &amp; Warranty</a></li>
+                    <li><a href="{{ route('pages.faq') }}">FAQ</a></li>
+                    <li><a href="{{ route('pages.contact') }}">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-4">
+                <div class="footer-heading">Contact &amp; Payment</div>
+                <p style="color:var(--mb-muted);font-size:.85rem;" class="mb-2"><i class="bi bi-geo-alt-fill text-gold me-2"></i>Quezon City, Metro Manila, Philippines</p>
+                <p style="color:var(--mb-muted);font-size:.85rem;" class="mb-2"><i class="bi bi-envelope-fill text-gold me-2"></i>support@raimotorcycleparts.ph</p>
+                <p style="color:var(--mb-muted);font-size:.85rem;" class="mb-3"><i class="bi bi-telephone-fill text-gold me-2"></i>+63 917 123 4567 (Viber Available)</p>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge bg-dark border text-gold p-2">GCash</span>
+                    <span class="badge bg-dark border text-gold p-2">QR Ph</span>
+                    <span class="badge bg-dark border text-gold p-2">PayMongo</span>
+                    <span class="badge bg-dark border text-gold p-2">COD Available</span>
                 </div>
-            </div>
-            <div class="col-lg-2 col-md-6">
-                <div class="footer-heading">Shop</div>
-                <a href="{{ route('shop.index') }}" class="footer-link">All Products</a>
-                <a href="{{ route('shop.category','bolts-fasteners') }}" class="footer-link">Bolts &amp; Fasteners</a>
-                <a href="{{ route('shop.category','levers-grips') }}" class="footer-link">Levers &amp; Grips</a>
-                <a href="{{ route('shop.category','frame-sliders') }}" class="footer-link">Frame Sliders</a>
-            </div>
-            <div class="col-lg-2 col-md-6">
-                <div class="footer-heading">Support</div>
-                <a href="{{ route('faq') }}" class="footer-link">FAQs</a>
-                <a href="{{ route('shipping') }}" class="footer-link">Shipping &amp; Delivery</a>
-                <a href="{{ route('returns') }}" class="footer-link">Returns &amp; Warranty</a>
-                <a href="{{ route('order.track') }}" class="footer-link">Track Your Order</a>
-                <a href="{{ route('contact') }}" class="footer-link">Contact Us</a>
-            </div>
-            <div class="col-lg-2 col-md-6">
-                <div class="footer-heading">Company</div>
-                <a href="{{ route('about') }}" class="footer-link">About RAI</a>
-                <a href="{{ route('terms') }}" class="footer-link">Terms of Service</a>
-                <a href="{{ route('privacy') }}" class="footer-link">Privacy Policy</a>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="footer-heading">Payment Methods</div>
-                <div class="d-flex flex-wrap gap-2 mb-3">
-                    @foreach(['Google Pay','GCash','Maya','COD','Bank Transfer'] as $pm)
-                    <span style="background:var(--mb-surface);border:1px solid var(--mb-border);border-radius:6px;padding:.3rem .65rem;font-size:.75rem;color:var(--mb-muted);">{{ $pm }}</span>
-                    @endforeach
-                </div>
-                <div class="footer-heading mt-2">Also Available On</div>
-                <a href="#" class="footer-link d-flex align-items-center gap-1 mb-1"><i class="bi bi-shop text-gold"></i> Shopee</a>
-                <a href="#" class="footer-link d-flex align-items-center gap-1 mb-1"><i class="bi bi-box text-gold"></i> Lazada</a>
-                <a href="#" class="footer-link d-flex align-items-center gap-1"><i class="bi bi-tiktok text-gold"></i> TikTok Shop</a>
             </div>
         </div>
         <hr class="divider-gold">
@@ -187,6 +202,38 @@
         </div>
     </div>
 </footer>
+
+{{-- ── Sticky Mobile Bottom Navigation Bar (Shopee / Lazada UX) ── --}}
+<div class="mobile-bottom-nav">
+    <a href="{{ route('home') }}" class="mobile-nav-item {{ request()->routeIs('home') ? 'active' : '' }}">
+        <i class="bi bi-house-door"></i>
+        <span>Home</span>
+    </a>
+    <a href="{{ route('shop.index') }}" class="mobile-nav-item {{ request()->routeIs('shop.*') ? 'active' : '' }}">
+        <i class="bi bi-grid-fill"></i>
+        <span>Shop</span>
+    </a>
+    <a href="{{ route('cart.index') }}" class="mobile-nav-item {{ request()->routeIs('cart.*') ? 'active' : '' }}">
+        <i class="bi bi-bag"></i>
+        <span>Cart</span>
+        <span class="mobile-badge cart-badge" style="display:none;">0</span>
+    </a>
+    @auth
+        <a href="{{ route('account.wishlist') }}" class="mobile-nav-item {{ request()->routeIs('account.wishlist') ? 'active' : '' }}">
+            <i class="bi bi-heart"></i>
+            <span>Wishlist</span>
+        </a>
+        <a href="{{ route('account.dashboard') }}" class="mobile-nav-item {{ request()->routeIs('account.dashboard') ? 'active' : '' }}">
+            <i class="bi bi-person"></i>
+            <span>Account</span>
+        </a>
+    @else
+        <a href="{{ route('login') }}" class="mobile-nav-item {{ request()->routeIs('login') ? 'active' : '' }}">
+            <i class="bi bi-person-lock"></i>
+            <span>Login</span>
+        </a>
+    @endauth
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {

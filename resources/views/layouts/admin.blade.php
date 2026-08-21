@@ -169,6 +169,15 @@ document.addEventListener('DOMContentLoaded', () => {
             updateIcons(active);
         });
     }
+
+    // Mobile Admin Sidebar Toggle
+    const sidebar = document.querySelector('.admin-sidebar');
+    const toggleBtn = document.getElementById('admin-sidebar-toggle');
+    if (toggleBtn && sidebar) {
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('show');
+        });
+    }
 });
 </script>
 @stack('scripts')

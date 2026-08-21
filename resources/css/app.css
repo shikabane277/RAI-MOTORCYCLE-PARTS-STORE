@@ -1432,3 +1432,197 @@ html:not([data-theme="dark"]) .bg-dark:not(.btn) {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   FULL MOBILE RESPONSIVENESS & UX SYSTEM
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── 1. Mobile Safe Area & Spacing ──────────────────────── */
+body {
+  padding-bottom: 0;
+}
+
+@media (max-width: 991.98px) {
+  body {
+    padding-bottom: max(68px, calc(60px + env(safe-area-inset-bottom)));
+  }
+}
+
+/* ── 2. Sticky Mobile Bottom Navigation Bar ─────────────── */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1040;
+  background: rgba(18, 18, 20, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--mb-border);
+  padding-top: 6px;
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.35);
+}
+
+@media (max-width: 991.98px) {
+  .mobile-bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--mb-muted);
+  text-decoration: none;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.mobile-nav-item i {
+  font-size: 1.25rem;
+  margin-bottom: 2px;
+  transition: transform 0.2s ease;
+}
+
+.mobile-nav-item:hover,
+.mobile-nav-item.active {
+  color: var(--mb-gold) !important;
+}
+
+.mobile-nav-item.active i {
+  transform: translateY(-2px);
+}
+
+.mobile-nav-item .mobile-badge {
+  position: absolute;
+  top: 2px;
+  right: 12px;
+  background: var(--mb-red);
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  border-radius: 50px;
+  padding: 2px 5px;
+  min-width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* ── 3. Sticky Mobile Product Action Bar ─────────────────── */
+.mobile-product-action-bar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1045;
+  background: var(--mb-surface);
+  border-top: 1px solid var(--mb-border);
+  padding: 10px 16px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 767.98px) {
+  .mobile-product-action-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+}
+
+/* ── 4. Mobile Offcanvas & Filter Drawer ─────────────────── */
+.offcanvas-dark {
+  background-color: var(--mb-surface) !important;
+  color: var(--mb-text) !important;
+}
+
+.offcanvas-dark .offcanvas-header {
+  border-bottom: 1px solid var(--mb-border);
+}
+
+.offcanvas-dark .btn-close {
+  filter: invert(1);
+}
+
+.mobile-filter-bar {
+  position: sticky;
+  top: 60px;
+  z-index: 990;
+  background: var(--mb-card);
+  border-bottom: 1px solid var(--mb-border);
+  padding: 8px 12px;
+}
+
+/* ── 5. Responsive Admin Table & Floating Save Bar ──────── */
+.admin-sticky-save-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 1030;
+  background: var(--mb-surface);
+  border-top: 2px solid var(--mb-gold);
+  padding: 12px 20px;
+  box-shadow: 0 -4px 15px rgba(0,0,0,0.5);
+  margin-left: -1rem;
+  margin-right: -1rem;
+  margin-bottom: -1rem;
+  border-bottom-left-radius: var(--mb-radius);
+  border-bottom-right-radius: var(--mb-radius);
+}
+
+@media (max-width: 991.98px) {
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: -280px;
+    z-index: 1060;
+    width: 280px;
+    background: var(--mb-surface);
+    transition: left 0.3s ease;
+    box-shadow: none;
+  }
+  .admin-sidebar.show {
+    left: 0;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.6);
+  }
+  .admin-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+}
+
+/* ── 6. Mobile Touch Optimization ────────────────────────── */
+@media (max-width: 575.98px) {
+  .btn-lg {
+    padding: 0.8rem 1.2rem !important;
+    font-size: 0.95rem !important;
+  }
+  .shopee-option-btn {
+    padding: 8px 12px !important;
+    font-size: 0.85rem !important;
+  }
+  .thumb-img {
+    width: 54px !important;
+    height: 54px !important;
+  }
+  .shopee-option-label {
+    width: 90px !important;
+    font-size: 0.82rem !important;
+  }
+}
+
+

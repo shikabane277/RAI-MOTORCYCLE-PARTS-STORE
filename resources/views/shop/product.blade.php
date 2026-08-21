@@ -243,10 +243,21 @@
                 </div>
 
                 <div class="mb-4">
-                    <button type="submit" class="btn btn-gold btn-lg w-100 py-3 font-bold text-uppercase" id="btn-add-to-cart" {{ $firstVariant?->stock_qty <= 0 ? 'disabled' : '' }} style="letter-spacing:1px;font-size:1.05rem;">
+                    <button type="submit" class="btn btn-gold btn-lg w-100 py-3 font-bold text-uppercase d-none d-md-block" id="btn-add-to-cart" {{ $firstVariant?->stock_qty <= 0 ? 'disabled' : '' }} style="letter-spacing:1px;font-size:1.05rem;">
                         <i class="bi bi-cart-plus me-2"></i> Add To Cart
                     </button>
                     <div class="text-danger small mt-2 d-none" id="var-error-msg">Please select product variation first</div>
+                </div>
+
+                {{-- ── Sticky Mobile Product Bottom Bar ── --}}
+                <div class="mobile-product-action-bar">
+                    <div>
+                        <div class="text-muted small" style="font-size:.72rem;">Total Price</div>
+                        <div class="mobile-price-val font-bold text-gold fs-5">&#x20B1;{{ number_format($firstVariant?->price ?? $product->base_price, 2) }}</div>
+                    </div>
+                    <button type="submit" class="btn btn-gold py-2 px-4 font-bold flex-grow-1" id="btn-add-to-cart-mobile" {{ $firstVariant?->stock_qty <= 0 ? 'disabled' : '' }}>
+                        <i class="bi bi-cart-plus me-1"></i> Add To Cart
+                    </button>
                 </div>
             </form>
 
@@ -479,21 +490,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Live Available Pieces Counter right next to Quantity [+] button
                 const stockNumEl = document.getElementById('stock-qty-num');
                 const submitBtn = document.getElementById('btn-add-to-cart');
+                const submitBtnMobile = document.getElementById('btn-add-to-cart-mobile');
+                const mobilePriceEl = document.querySelector('.mobile-price-val');
                 const stock = matchedVariant.stock;
 
                 if (stockNumEl) {
                     stockNumEl.textContent = stock;
                 }
 
-                if (submitBtn) {
-                    if (stock > 0) {
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="bi bi-cart-plus me-2"></i> Add To Cart';
-                    } else {
-                        submitBtn.disabled = true;
-                        submitBtn.innerHTML = 'Out of Stock';
-                    }
+                if (mobilePriceEl) {
+                    const activePrice = matchedVariant.sale_price && matchedVariant.sale_price < matchedVariant.price ? matchedVariant.sale_price : matchedVariant.price;
+                    mobilePriceEl.textContent = `₱${activePrice.toLocaleString('en-PH', {minimumFractionDigits:2})}`;
                 }
+
+                [submitBtn, submitBtnMobile].forEach(btn => {
+                    if (!btn) return;
+                    if (stock > 0) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="bi bi-cart-plus me-1"></i> Add To Cart';
+                    } else {
+                        btn.disabled = true;
+                        btn.innerHTML = 'Out of Stock';
+                    }
+                });
             }
         });
     });
