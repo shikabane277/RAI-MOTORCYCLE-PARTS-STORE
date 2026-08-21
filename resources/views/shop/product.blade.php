@@ -94,45 +94,105 @@
             <p style="color:var(--mb-muted);font-size:.93rem;line-height:1.7;margin-bottom:1.5rem;">{{ $product->short_description }}</p>
             @endif
 
+            <style>
+              .shopee-option-row {
+                display: flex;
+                align-items: flex-start;
+                margin-bottom: 1.25rem;
+              }
+              .shopee-option-label {
+                width: 120px;
+                flex-shrink: 0;
+                color: var(--mb-muted);
+                font-size: 0.9rem;
+                font-weight: 500;
+                padding-top: 6px;
+              }
+              .shopee-option-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                flex-grow: 1;
+              }
+              .shopee-option-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 6px 14px;
+                border: 1px solid var(--mb-border);
+                border-radius: 4px;
+                background: var(--mb-card);
+                color: var(--mb-text);
+                font-size: 0.9rem;
+                font-weight: 500;
+                cursor: pointer;
+                position: relative;
+                overflow: hidden;
+                transition: all 0.15s ease;
+                user-select: none;
+              }
+              .shopee-option-btn:hover {
+                border-color: var(--mb-gold);
+                color: var(--mb-gold);
+              }
+              .shopee-option-btn.active {
+                border-color: #f53d2d !important;
+                color: #f53d2d !important;
+                background: rgba(245, 61, 45, 0.08) !important;
+                font-weight: 700;
+              }
+              .shopee-option-btn.active::after {
+                content: '✓';
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                background: #f53d2d;
+                color: #fff;
+                font-size: 9px;
+                width: 14px;
+                height: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-top-left-radius: 4px;
+                font-weight: 900;
+              }
+              .shopee-option-btn.disabled-out-of-stock {
+                opacity: 0.45;
+                background: var(--mb-surface) !important;
+                cursor: not-allowed !important;
+                border-style: dashed !important;
+              }
+            </style>
+
             {{-- Data-Driven Dynamic Multi-Group Option Selector System --}}
             @php
                 $optionGroups = $product->parsed_option_groups;
             @endphp
 
             @if(count($optionGroups) > 0)
-                <div class="d-flex flex-column gap-3 mb-4" id="dynamic-option-groups-container">
+                <div class="mb-4" id="dynamic-option-groups-container">
                     @foreach($optionGroups as $gIdx => $group)
-                    <div class="option-group-wrapper">
-                        <label class="form-label font-bold text-uppercase mb-2" style="letter-spacing:1px;font-size:.85rem;color:var(--mb-heading);">
-                            {{ $group['name'] }}: 
-                            <span id="group-selected-val-{{ $gIdx }}" class="text-gold fw-bold ms-1">
-                                {{ $group['values'][0]['label'] ?? '' }}
-                            </span>
-                        </label>
-
-                        <div class="d-flex flex-wrap gap-2 group-values-container" data-group-index="{{ $gIdx }}" data-group-name="{{ e($group['name']) }}">
+                    <div class="shopee-option-row">
+                        <div class="shopee-option-label">{{ $group['name'] }}</div>
+                        <div class="shopee-option-buttons group-values-container" data-group-index="{{ $gIdx }}" data-group-name="{{ e($group['name']) }}">
                             @foreach($group['values'] as $vIdx => $val)
                             @php
                                 $vLabel = $val['label'];
                                 $vImg   = $val['image'] ?? null;
                                 $isDis  = $val['disabled'] ?? false;
                             @endphp
-                            <div class="dynamic-option-btn {{ $vIdx === 0 && !$isDis ? 'active' : '' }} {{ $isDis ? 'disabled-out-of-stock' : '' }}"
+                            <div class="shopee-option-btn {{ $vIdx === 0 && !$isDis ? 'active' : '' }} {{ $isDis ? 'disabled-out-of-stock' : '' }}"
                                  data-group-index="{{ $gIdx }}"
-                                 data-value="{{ e($vLabel) }}"
-                                 style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid {{ $vIdx === 0 && !$isDis ? 'var(--mb-gold)' : 'var(--mb-border)' }};border-radius:6px;background:{{ $vIdx === 0 && !$isDis ? 'var(--mb-gold-dim)' : 'var(--mb-card)' }};cursor:{{ $isDis ? 'not-allowed' : 'pointer' }};transition:all 0.2s ease;{{ $isDis ? 'opacity:0.45;background:var(--mb-surface);' : '' }}">
+                                 data-value="{{ e($vLabel) }}">
                                 
                                 @if(!empty($vImg))
-                                    <img src="{{ $vImg }}" alt="{{ $vLabel }}" style="width:28px;height:28px;object-fit:cover;border-radius:4px;border:1px solid var(--mb-border);">
+                                    <img src="{{ $vImg }}" alt="{{ $vLabel }}" style="width:24px;height:24px;object-fit:cover;border-radius:3px;">
                                 @endif
                                 
-                                <span style="font-family:'Rajdhani',sans-serif;font-size:0.95rem;font-weight:600;color:var(--mb-text);{{ $isDis ? 'text-decoration:line-through;' : '' }}">
+                                <span style="{{ $isDis ? 'text-decoration:line-through;' : '' }}">
                                     {{ $vLabel }}
                                 </span>
-
-                                @if($isDis)
-                                    <span class="badge bg-secondary ms-1" style="font-size:0.65rem;">UNAVAILABLE</span>
-                                @endif
                             </div>
                             @endforeach
                         </div>
@@ -141,43 +201,32 @@
                 </div>
             @endif
 
-            {{-- Customer Live Stock Available Counter --}}
-            <div class="stock-status mb-4 p-3" style="background:var(--mb-surface);border:1px solid var(--mb-border);border-radius:8px;">
-                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                    <span style="color:var(--mb-muted);font-size:.88rem;"><i class="bi bi-box-seam text-gold me-1"></i> Available Inventory Stock:</span>
-                    <div id="stock-badge-container">
-                        @if($firstVariant)
-                            @if($firstVariant->stock_qty > 10)
-                                <span class="badge bg-success" style="font-size:.85rem;padding:6px 12px;">
-                                    <i class="bi bi-check-circle me-1"></i> In Stock ({{ $firstVariant->stock_qty }} units available)
-                                </span>
-                            @elseif($firstVariant->stock_qty > 0)
-                                <span class="badge bg-warning text-dark" style="font-size:.85rem;padding:6px 12px;">
-                                    <i class="bi bi-exclamation-triangle me-1"></i> Low Stock (Only {{ $firstVariant->stock_qty }} left!)
-                                </span>
-                            @else
-                                <span class="badge bg-danger" style="font-size:.85rem;padding:6px 12px;">
-                                    <i class="bi bi-x-circle me-1"></i> Out of Stock (0 items)
-                                </span>
-                            @endif
-                        @endif
-                    </div>
-                </div>
-            </div>
-
-            {{-- Add to Cart form --}}
+            {{-- Add to Cart form with Exact Shopee Quantity & Stock Row --}}
             <form action="{{ route('cart.add') }}" method="POST" class="ajax-add-to-cart">
                 @csrf
                 <input type="hidden" name="variant_id" id="selected-variant-id" value="{{ $firstVariant?->id }}">
-                <div class="d-flex align-items-center gap-3 mb-4">
-                    <div class="qty-control d-flex align-items-center">
-                        <button type="button" class="qty-btn" data-action="minus">-</button>
-                        <input type="number" name="qty" class="qty-input" value="1" min="1" max="99">
-                        <button type="button" class="qty-btn" data-action="plus">+</button>
+                
+                {{-- Quantity Row matching Reference Screenshot --}}
+                <div class="shopee-option-row align-items-center mb-4">
+                    <div class="shopee-option-label">Quantity</div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="qty-control d-flex align-items-center" style="border:1px solid var(--mb-border);border-radius:4px;overflow:hidden;">
+                            <button type="button" class="qty-btn px-3 py-1" data-action="minus" style="background:var(--mb-surface);border:none;color:var(--mb-text);">-</button>
+                            <input type="number" name="qty" class="qty-input text-center" value="1" min="1" max="99" style="width:45px;border:none;background:transparent;color:var(--mb-heading);font-weight:600;">
+                            <button type="button" class="qty-btn px-3 py-1" data-action="plus" style="background:var(--mb-surface);border:none;color:var(--mb-text);">+</button>
+                        </div>
+                        
+                        <span id="stock-pieces-available" style="color:var(--mb-muted);font-size:.9rem;">
+                            <strong id="stock-qty-num" class="text-white">{{ $firstVariant?->stock_qty ?? 0 }}</strong> pieces available
+                        </span>
                     </div>
-                    <button type="submit" class="btn btn-gold btn-lg flex-grow-1" id="btn-add-to-cart" {{ $firstVariant?->stock_qty <= 0 ? 'disabled' : '' }}>
-                        <i class="bi bi-cart-plus me-1"></i> Add To Cart
+                </div>
+
+                <div class="mb-4">
+                    <button type="submit" class="btn btn-gold btn-lg w-100 py-3 font-bold text-uppercase" id="btn-add-to-cart" {{ $firstVariant?->stock_qty <= 0 ? 'disabled' : '' }} style="letter-spacing:1px;font-size:1.05rem;">
+                        <i class="bi bi-cart-plus me-2"></i> Add To Cart
                     </button>
+                    <div class="text-danger small mt-2 d-none" id="var-error-msg">Please select product variation first</div>
                 </div>
             </form>
 
@@ -323,7 +372,8 @@ document.addEventListener('DOMContentLoaded', function() {
     })); ?>;
 
     // Handle Dynamic Option Button Click across unlimited groups
-    document.querySelectorAll('.dynamic-option-btn').forEach(btn => {
+    // Handle Dynamic Option Button Click across unlimited groups
+    document.querySelectorAll('.shopee-option-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             if (btn.classList.contains('disabled-out-of-stock')) return;
 
@@ -333,26 +383,18 @@ document.addEventListener('DOMContentLoaded', function() {
             // Deselect other buttons in the same group
             const container = btn.closest('.group-values-container');
             if (container) {
-                container.querySelectorAll('.dynamic-option-btn').forEach(b => {
+                container.querySelectorAll('.shopee-option-btn').forEach(b => {
                     b.classList.remove('active');
-                    b.style.borderColor = 'var(--mb-border)';
-                    b.style.background = 'var(--mb-card)';
                 });
             }
 
-            // Highlight selected button
+            // Highlight selected button with red/gold tick
             btn.classList.add('active');
-            btn.style.borderColor = 'var(--mb-gold)';
-            btn.style.background = 'var(--mb-gold-dim)';
-
-            // Update group selected label text
-            const labelEl = document.getElementById(`group-selected-val-${groupIdx}`);
-            if (labelEl) labelEl.textContent = val;
 
             // Collect selections across all option groups
             const selectedVals = [];
             document.querySelectorAll('.group-values-container').forEach(cnt => {
-                const activeBtn = cnt.querySelector('.dynamic-option-btn.active');
+                const activeBtn = cnt.querySelector('.shopee-option-btn.active');
                 if (activeBtn) selectedVals.push(activeBtn.dataset.value);
             });
 
@@ -398,21 +440,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
 
-                // Stock Badge Display
-                const stockContainer = document.getElementById('stock-badge-container');
+                // Live Available Pieces Counter right next to Quantity [+] button
+                const stockNumEl = document.getElementById('stock-qty-num');
                 const submitBtn = document.getElementById('btn-add-to-cart');
                 const stock = matchedVariant.stock;
 
-                if (stockContainer) {
-                    if (stock > 10) {
-                        stockContainer.innerHTML = `<span class="badge bg-success" style="font-size:.85rem;padding:6px 12px;"><i class="bi bi-check-circle me-1"></i> In Stock (${stock} units available)</span>`;
-                        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="bi bi-cart-plus me-1"></i> Add To Cart'; }
-                    } else if (stock > 0) {
-                        stockContainer.innerHTML = `<span class="badge bg-warning text-dark" style="font-size:.85rem;padding:6px 12px;"><i class="bi bi-exclamation-triangle me-1"></i> Low Stock (Only ${stock} left!)</span>`;
-                        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="bi bi-cart-plus me-1"></i> Add To Cart'; }
+                if (stockNumEl) {
+                    stockNumEl.textContent = stock;
+                }
+
+                if (submitBtn) {
+                    if (stock > 0) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="bi bi-cart-plus me-2"></i> Add To Cart';
                     } else {
-                        stockContainer.innerHTML = `<span class="badge bg-danger" style="font-size:.85rem;padding:6px 12px;"><i class="bi bi-x-circle me-1"></i> Out of Stock (0 items)</span>`;
-                        if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = 'Out of Stock'; }
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = 'Out of Stock';
                     }
                 }
             }
