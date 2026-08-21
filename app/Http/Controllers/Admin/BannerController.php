@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use App\Models\Product;
+use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
 
 class BannerController extends Controller
@@ -17,7 +18,7 @@ class BannerController extends Controller
 
     public function create()
     {
-        $products = Product::where('is_active', true)->orderBy('name')->get();
+        $products = Product::active()->orderBy('name')->get();
         return view('admin.banners.create', compact('products'));
     }
 
@@ -37,10 +38,7 @@ class BannerController extends Controller
         ]);
 
         if ($request->hasFile('image_file')) {
-            $file = $request->file('image_file');
-            $filename = 'banner_' . time() . '_' . rand(1000, 9999) . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/banners'), $filename);
-            $validated['image_url'] = '/uploads/banners/' . $filename;
+            $validated['image_url'] = CloudinaryService::upload($request->file('image_file'), 'banners');
         }
 
         if (empty($validated['image_url'])) {
@@ -56,7 +54,7 @@ class BannerController extends Controller
 
     public function edit(Banner $banner)
     {
-        $products = Product::where('is_active', true)->orderBy('name')->get();
+        $products = Product::active()->orderBy('name')->get();
         return view('admin.banners.edit', compact('banner', 'products'));
     }
 
@@ -76,10 +74,7 @@ class BannerController extends Controller
         ]);
 
         if ($request->hasFile('image_file')) {
-            $file = $request->file('image_file');
-            $filename = 'banner_' . time() . '_' . rand(1000, 9999) . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/banners'), $filename);
-            $validated['image_url'] = '/uploads/banners/' . $filename;
+            $validated['image_url'] = CloudinaryService::upload($request->file('image_file'), 'banners');
         }
 
         if (empty($validated['image_url'])) {
