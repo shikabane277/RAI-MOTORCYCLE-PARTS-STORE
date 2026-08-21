@@ -22,12 +22,18 @@
         <div class="col-lg-6">
             <div class="dark-card p-3" style="border-radius:var(--mb-radius);">
                 @php
-                    $allImages = collect([$product->primary_image_url]);
-                    foreach ($product->variants as $v) {
-                        if ($v->image_url) $allImages->push($v->image_url);
-                        if (is_array($v->images)) {
-                            foreach ($v->images as $extraImg) $allImages->push($extraImg);
+                    $allImages = collect();
+                    // Primary/cover image first
+                    if ($product->image_url) $allImages->push($product->image_url);
+                    // Gallery images from product
+                    if (is_array($product->images)) {
+                        foreach ($product->images as $gi) {
+                            if ($gi && $gi !== $product->image_url) $allImages->push($gi);
                         }
+                    }
+                    // Variant-specific images
+                    foreach ($product->variants as $v) {
+                        if ($v->image_url && !$allImages->contains($v->image_url)) $allImages->push($v->image_url);
                     }
                     $allImages = $allImages->filter()->unique()->values();
                     $mainImg = $allImages->first() ?: '/images/logo.png';
@@ -45,9 +51,11 @@
 
                 {{-- Thumbnail strip for all uploaded product photos --}}
                 @if($allImages->count() > 1)
-                <div class="d-flex gap-2 mt-3 overflow-auto" style="padding-bottom:.5rem;">
+                <div class="d-flex gap-2 mt-3 overflow-auto" id="thumbnail-strip" style="padding-bottom:.5rem;">
                     @foreach($allImages as $idx => $imgUrl)
-                    <div class="thumb-img {{ $loop->first ? 'active' : '' }}" onclick="document.getElementById('main-image').src='{{ $imgUrl }}'; document.querySelectorAll('.thumb-img').forEach(t=>t.style.borderColor='var(--mb-border)'); this.style.borderColor='var(--mb-gold)';"
+                    <div class="thumb-img {{ $loop->first ? 'active' : '' }}"
+                         data-img="{{ $imgUrl }}"
+                         onclick="setMainImage('{{ $imgUrl }}', this)"
                          style="width:64px;height:64px;flex-shrink:0;border-radius:8px;overflow:hidden;border:2px solid {{ $loop->first ? 'var(--mb-gold)' : 'var(--mb-border)' }};cursor:pointer;background:var(--mb-surface);">
                         <img src="{{ $imgUrl }}" alt="Photo {{ $idx+1 }}" style="width:100%;height:100%;object-fit:cover;">
                     </div>
@@ -359,15 +367,29 @@
 </div>
 
 <script>
+    // Global helper: set main image and sync thumbnail highlight
+    function setMainImage(src, thumbEl) {
+        const mainImg = document.getElementById('main-image');
+        if (mainImg) mainImg.src = src;
+        document.querySelectorAll('#thumbnail-strip .thumb-img').forEach(t => {
+            t.style.borderColor = 'var(--mb-border)';
+            t.classList.remove('active');
+        });
+        if (thumbEl) {
+            thumbEl.style.borderColor = 'var(--mb-gold)';
+            thumbEl.classList.add('active');
+        }
+    }
+
 document.addEventListener('DOMContentLoaded', function() {
     const variantsData = <?php echo json_encode($product->variants->map(function($v) use ($product) {
         return [
             'id'         => $v->id,
-            'label'      => $v->label,
+            'label'      => $v->variant_name,
             'price'      => (float)$v->price,
             'sale_price' => $v->sale_price ? (float)$v->sale_price : null,
             'stock'      => (int)$v->stock_qty,
-            'image'      => $v->image_url ?: $product->primary_image_url,
+            'image'      => $v->image_url ?: $product->image_url,
         ];
     })); ?>;
 
@@ -418,10 +440,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 const hiddenInput = document.getElementById('selected-variant-id');
                 if (hiddenInput) hiddenInput.value = matchedVariant.id;
 
-                // Main Image
+                // Main Image + sync thumbnail strip highlight
                 if (matchedVariant.image) {
-                    const mainImg = document.getElementById('main-image');
-                    if (mainImg) mainImg.src = matchedVariant.image;
+                    const thumbs = document.querySelectorAll('#thumbnail-strip .thumb-img');
+                    let matchThumb = null;
+                    thumbs.forEach(t => { if (t.dataset.img === matchedVariant.image) matchThumb = t; });
+                    setMainImage(matchedVariant.image, matchThumb);
                 }
 
                 // Price Display

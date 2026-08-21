@@ -13,6 +13,7 @@ class Product extends Model
         'name', 'slug', 'brand_id', 'category_id', 'description', 'short_description',
         'base_price', 'weight_grams', 'status', 'is_featured', 'is_new_arrival', 'views',
         'meta_title', 'meta_description', 'option_config',
+        'image_url', 'images',
     ];
 
     protected $casts = [
@@ -20,6 +21,7 @@ class Product extends Model
         'is_new_arrival' => 'boolean',
         'base_price'     => 'decimal:2',
         'option_config'  => 'array',
+        'images'         => 'array',
     ];
 
     public function brand()
