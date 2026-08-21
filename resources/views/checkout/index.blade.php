@@ -22,11 +22,11 @@
     </div>
     @endif
 
-    <div class="row g-4">
-        {{-- ── Left: Form ─────────────────────────────────── --}}
-        <div class="col-lg-7">
-            <form method="POST" action="{{ route('checkout.store') }}" id="checkout-form">
-                @csrf
+    <form method="POST" action="{{ route('checkout.store') }}" id="checkout-form">
+        @csrf
+        <div class="row g-4">
+            {{-- ── Left: Form ─────────────────────────────────── --}}
+            <div class="col-lg-7">
 
                 {{-- Shipping Address --}}
                 <div class="dark-card p-4 mb-4">
@@ -255,8 +255,7 @@
                         @endforeach
                     </div>
                 </div>
-            </form>
-        </div>
+            </div>
 
         {{-- ── Right: Summary ──────────────────────────────── --}}
         <div class="col-lg-5">
@@ -313,6 +312,7 @@
             </div>
         </div>
     </div>
+</form>
 </div>
 
 <script>
