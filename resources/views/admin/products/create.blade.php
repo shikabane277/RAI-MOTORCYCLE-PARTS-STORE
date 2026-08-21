@@ -437,20 +437,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Rebuild Combination Matrix Table
     function rebuildCombinationMatrix() {
         const isTier2Enabled = tier2Toggle && tier2Toggle.checked;
-        let t1Vals = Array.from(tier1Container.querySelectorAll('.tier1-input-val'))
+        const t1Vals = Array.from(tier1Container.querySelectorAll('.tier1-input-val'))
                             .map(input => input.value.trim())
                             .filter(Boolean);
-        let t2Vals = Array.from(tier2Container.querySelectorAll('.tier2-input-val'))
+        const t2Vals = Array.from(tier2Container.querySelectorAll('.tier2-input-val'))
                             .map(input => input.value.trim())
                             .filter(Boolean);
-
-        if (t1Vals.length === 0) {
-            t1Vals = ['Standard'];
-        }
-
-        if (isTier2Enabled && t2Vals.length === 0) {
-            t2Vals = ['Standard'];
-        }
 
         // Keep existing prices/stocks if already entered
         const existingData = {};

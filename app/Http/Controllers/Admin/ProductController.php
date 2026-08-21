@@ -199,8 +199,12 @@ class ProductController extends Controller
             $validated['image_url'] = $product->primary_image_url ?: $product->image_url;
         }
 
-        // Preserve existing Additional Gallery Photos
+        // Preserve existing Additional Gallery Photos, minus any the admin removed
         $existingImages = is_array($product->images) ? $product->images : [];
+        $removedImages  = $request->input('remove_images', []);
+        if (!empty($removedImages)) {
+            $existingImages = array_values(array_filter($existingImages, fn($img) => !in_array($img, $removedImages)));
+        }
         $uploadedImages = $existingImages;
         if (!empty($validated['image_url']) && !in_array($validated['image_url'], $uploadedImages)) {
             array_unshift($uploadedImages, $validated['image_url']);

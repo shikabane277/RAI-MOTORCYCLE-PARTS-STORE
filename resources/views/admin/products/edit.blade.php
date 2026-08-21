@@ -186,12 +186,15 @@
                         </div>
                     </div>
 
-                    {{-- 2B. Additional Product Gallery Images (Accumulating!) --}}
+                    {{-- 2B. Additional Product Gallery Images (Removable!) --}}
                     <div class="col-md-8">
                         <label class="form-label font-bold">Additional Gallery Images</label>
                         <div style="font-size:.78rem;color:var(--mb-muted);" class="mb-2">
-                            Add detail photos. Selecting new photos accumulates/appends cleanly!
+                            Add or remove detail photos. Click <strong>×</strong> to remove.
                         </div>
+
+                        {{-- Hidden inputs tracking which existing images to REMOVE --}}
+                        <div id="removed-images-container"></div>
 
                         <div class="d-flex flex-wrap gap-3 align-items-center mb-2">
                             <label for="image_files_input" class="shopee-upload-card" style="width:90px;height:90px;border:2px dashed #f56c6c;border-radius:8px;background:var(--mb-surface);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;text-align:center;padding:8px;">
@@ -203,11 +206,14 @@
                             <div id="image-thumbnails-wrapper" class="d-flex flex-wrap gap-3">
                                 @if(is_array($product->images))
                                     @foreach($product->images as $gImg)
-                                        @if($gImg !== $product->primary_image_url)
-                                        <div class="thumb-card-box">
-                                            <img src="{{ $gImg }}" alt="Gallery Image">
-                                        </div>
-                                        @endif
+                                    <div class="thumb-card-box position-relative" style="width:90px;height:90px;border-radius:8px;overflow:hidden;border:1px solid var(--mb-border);">
+                                        <img src="{{ $gImg }}" alt="Gallery Image" style="width:100%;height:100%;object-fit:cover;">
+                                        <button type="button"
+                                            class="btn-remove-gallery-img"
+                                            data-img="{{ $gImg }}"
+                                            style="position:absolute;top:3px;right:3px;background:rgba(0,0,0,.65);border:none;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;line-height:1;"
+                                            title="Remove image">&times;</button>
+                                    </div>
                                     @endforeach
                                 @endif
                             </div>
@@ -471,20 +477,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function rebuildCombinationMatrix() {
         const isTier2Enabled = tier2Toggle && tier2Toggle.checked;
-        let t1Vals = Array.from(tier1Container.querySelectorAll('.tier1-input-val'))
+        const t1Vals = Array.from(tier1Container.querySelectorAll('.tier1-input-val'))
                             .map(input => input.value.trim())
                             .filter(Boolean);
-        let t2Vals = Array.from(tier2Container.querySelectorAll('.tier2-input-val'))
+        const t2Vals = Array.from(tier2Container.querySelectorAll('.tier2-input-val'))
                             .map(input => input.value.trim())
                             .filter(Boolean);
-
-        if (t1Vals.length === 0) {
-            t1Vals = ['Standard'];
-        }
-
-        if (isTier2Enabled && t2Vals.length === 0) {
-            t2Vals = ['Standard'];
-        }
 
         const existingData = {};
         // Map pre-loaded variants
@@ -621,7 +619,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const galleryInput = document.getElementById('image_files_input');
     const thumbnailsWrapper = document.getElementById('image-thumbnails-wrapper');
+    const removedImagesContainer = document.getElementById('removed-images-container');
     let accumulatedFiles = new DataTransfer();
+
+    // Handle X button on existing server-rendered gallery images
+    if (thumbnailsWrapper) {
+        thumbnailsWrapper.addEventListener('click', function(e) {
+            const btn = e.target.closest('.btn-remove-gallery-img');
+            if (!btn) return;
+            const imgUrl = btn.dataset.img;
+            const card = btn.closest('.thumb-card-box');
+            if (card) card.remove();
+            // Add hidden input so server knows to exclude this image
+            if (imgUrl && removedImagesContainer) {
+                const hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = 'remove_images[]';
+                hidden.value = imgUrl;
+                removedImagesContainer.appendChild(hidden);
+            }
+        });
+    }
 
     if (galleryInput && thumbnailsWrapper) {
         galleryInput.addEventListener('change', function(e) {
@@ -632,27 +650,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
             galleryInput.files = accumulatedFiles.files;
-            renderGalleryThumbnails();
+            renderNewGalleryThumbnails();
         });
 
-        function renderGalleryThumbnails() {
-            thumbnailsWrapper.innerHTML = '';
+        function renderNewGalleryThumbnails() {
+            // Only render newly-added files preview — do NOT overwrite server-rendered existing images
+            let newFilesWrapper = document.getElementById('new-files-wrapper');
+            if (!newFilesWrapper) {
+                newFilesWrapper = document.createElement('div');
+                newFilesWrapper.id = 'new-files-wrapper';
+                newFilesWrapper.className = 'd-flex flex-wrap gap-3';
+                thumbnailsWrapper.parentElement.appendChild(newFilesWrapper);
+            }
+            newFilesWrapper.innerHTML = '';
             const files = Array.from(accumulatedFiles.files);
             files.forEach((file, idx) => {
                 const reader = new FileReader();
                 reader.onload = function(evt) {
                     const box = document.createElement('div');
-                    box.className = 'thumb-card-box';
-                    box.style.position = 'relative';
+                    box.className = 'thumb-card-box position-relative';
+                    box.style.cssText = 'width:90px;height:90px;border-radius:8px;overflow:hidden;border:1px solid var(--mb-border);';
                     box.innerHTML = `
-                        <img src="${evt.target.result}" alt="Gallery ${idx+1}">
-                        <button type="button" class="btn btn-danger btn-xs py-0 px-1 btn-remove-gallery-img" data-index="${idx}" style="position:absolute;top:2px;right:2px;font-size:10px;line-height:1;border-radius:50%;">&times;</button>
+                        <img src="${evt.target.result}" alt="New ${idx+1}" style="width:100%;height:100%;object-fit:cover;">
+                        <button type="button" class="btn-remove-new-img" data-index="${idx}"
+                            style="position:absolute;top:3px;right:3px;background:rgba(0,0,0,.65);border:none;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;line-height:1;">&times;</button>
                     `;
-                    thumbnailsWrapper.appendChild(box);
+                    newFilesWrapper.appendChild(box);
                 };
                 reader.readAsDataURL(file);
             });
         }
+
+        // Remove newly-added file before upload
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.btn-remove-new-img');
+            if (!btn) return;
+            const idx = parseInt(btn.dataset.index);
+            const dt = new DataTransfer();
+            Array.from(accumulatedFiles.files).forEach((f, i) => { if (i !== idx) dt.items.add(f); });
+            accumulatedFiles = dt;
+            galleryInput.files = accumulatedFiles.files;
+            renderNewGalleryThumbnails();
+        });
     }
 });
 </script>
