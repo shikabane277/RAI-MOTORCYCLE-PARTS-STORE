@@ -83,9 +83,22 @@ class ProductController extends Controller
         // Check if customizable variants array was submitted
         if ($request->has('variants') && is_array($request->variants) && count($request->variants) > 0) {
             foreach ($request->variants as $idx => $vData) {
-                if (empty($vData['variant_name']) && empty($vData['price'])) continue;
+                $t1 = trim($vData['tier1_option'] ?? '');
+                $t2 = trim($vData['tier2_option'] ?? '');
+                $vName = $vData['variant_name'] ?? '';
 
-                $vImg = $vData['image_url'] ?? ($uploadedImages[$idx] ?? ($uploadedImages[0] ?? $imageUrl));
+                if (empty($vName)) {
+                    if (!empty($t1) && !empty($t2)) {
+                        $vName = "{$t1} - {$t2}";
+                    } elseif (!empty($t1)) {
+                        $vName = $t1;
+                    }
+                }
+
+                if (empty($vName) && empty($vData['price'])) continue;
+                if (empty($vName)) $vName = 'Standard';
+
+                $vImg = $vData['image_url'] ?? null;
                 if ($request->hasFile("variants.{$idx}.image_file")) {
                     $vFile = $request->file("variants.{$idx}.image_file");
                     $vFilename = 'var_' . time() . '_' . $idx . '.' . $vFile->getClientOriginalExtension();
@@ -93,13 +106,17 @@ class ProductController extends Controller
                     $vImg = '/uploads/products/' . $vFilename;
                 }
 
+                if (empty($vImg) && !empty($uploadedImages)) {
+                    $vImg = $uploadedImages[$idx] ?? $uploadedImages[0];
+                }
+
                 $vSku = !empty($vData['sku'])
                     ? strtoupper(trim($vData['sku']))
-                    : 'RAI-' . strtoupper(Str::slug(substr($product->name, 0, 8))) . '-' . strtoupper(Str::slug(substr($vData['variant_name'] ?? 'VAR', 0, 6))) . '-' . rand(10, 99);
+                    : 'RAI-' . strtoupper(Str::slug(substr($product->name, 0, 8))) . '-' . strtoupper(Str::slug(substr($vName, 0, 6))) . '-' . rand(10, 99);
 
                 ProductVariant::create([
                     'product_id'          => $product->id,
-                    'variant_name'        => $vData['variant_name'] ?? 'Standard',
+                    'variant_name'        => $vName,
                     'variant_sku'         => $vSku,
                     'price'               => !empty($vData['price']) ? $vData['price'] : $product->base_price,
                     'sale_price'          => !empty($vData['sale_price']) ? $vData['sale_price'] : null,

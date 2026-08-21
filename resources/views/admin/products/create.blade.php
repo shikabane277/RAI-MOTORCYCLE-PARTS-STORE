@@ -40,13 +40,6 @@
     background: var(--mb-gold-dim);
     color: var(--mb-gold);
   }
-  .batch-edit-bar {
-    background: var(--mb-surface);
-    border: 1px solid var(--mb-gold-border);
-    border-radius: 8px;
-    padding: 0.85rem 1.25rem;
-    margin-bottom: 1rem;
-  }
   .shopee-upload-card:hover {
     border-color: #f56c6c !important;
     background: rgba(245, 108, 108, 0.08) !important;
@@ -96,7 +89,7 @@
                 <nav class="d-flex flex-column gap-1">
                     <a href="#section-basic" class="shopee-nav-link active"><i class="bi bi-info-circle"></i> 1. Basic Information</a>
                     <a href="#section-media" class="shopee-nav-link"><i class="bi bi-images"></i> 2. Product Images</a>
-                    <a href="#section-variations" class="shopee-nav-link"><i class="bi bi-diagram-3"></i> 3. Connected Variants</a>
+                    <a href="#section-variations" class="shopee-nav-link"><i class="bi bi-diagram-3"></i> 3. Sales &amp; Custom Variants</a>
                     <a href="#section-shipping" class="shopee-nav-link"><i class="bi bi-truck"></i> 4. Shipping &amp; Logistics</a>
                     <a href="#section-others" class="shopee-nav-link"><i class="bi bi-gear"></i> 5. Settings</a>
                 </nav>
@@ -153,7 +146,7 @@
                 </div>
             </div>
 
-            {{-- ── 2. Product Images (Shopee 1:1 Upload Grid) ── --}}
+            {{-- ── 2. Product Images ──────────────────────────── --}}
             <div class="shopee-section-card" id="section-media">
                 <div class="shopee-section-title">
                     <i class="bi bi-images text-gold"></i> 2. Product Images
@@ -182,59 +175,65 @@
                 </div>
             </div>
 
-            {{-- ── 3. Connected Variants & Sub-Variants Builder ── --}}
+            {{-- ── 3. Separated Tier 1 & Optional Tier 2 Variants ── --}}
             <div class="shopee-section-card" id="section-variations">
-                <div class="shopee-section-title justify-content-between flex-wrap gap-2">
-                    <span><i class="bi bi-diagram-3-fill text-gold"></i> 3. Sales &amp; Custom Variants</span>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-outline-gold btn-sm" id="btn-add-tier2-suboption">
-                            <i class="bi bi-node-plus me-1"></i> + Add Tier 2 Sub-Option
-                        </button>
-                        <button type="button" class="btn btn-gold btn-sm" id="btn-add-manual-variant">
-                            <i class="bi bi-plus-lg me-1"></i> + Add Variant Row
-                        </button>
+                <div class="shopee-section-title">
+                    <i class="bi bi-diagram-3-fill text-gold"></i> 3. Sales &amp; Custom Variants
+                </div>
+
+                {{-- Tier 1 Main Variation Configuration --}}
+                <div class="p-3 mb-3" style="background:var(--mb-surface);border:1px solid var(--mb-border);border-radius:10px;">
+                    <div class="mb-2">
+                        <label class="form-label font-bold text-gold">Tier 1 Main Group Name *</label>
+                        <input type="text" name="tier1_name" id="tier1_name" class="form-control form-control-sm" placeholder="e.g. Size / Specification or Model" value="Size / Specification">
                     </div>
                 </div>
 
-                <p style="font-size:.85rem;color:var(--mb-muted);" class="mb-3">
-                    Add custom variant rows (e.g. <code>5x25/CNC/4pcs</code>) or use <strong>+ Add Tier 2 Sub-Option</strong> to connect sub-options (e.g. <code>5x25/CNC/4pcs - Gold</code>). Each row has its own dedicated photo file upload!
-                </p>
+                {{-- Tier 2 Sub-Variation Configuration (Optional) --}}
+                <div class="p-3 mb-4" style="background:var(--mb-surface);border:1px solid var(--mb-border);border-radius:10px;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 style="font-family:'Rajdhani',sans-serif;color:var(--mb-gold);font-weight:700;" class="mb-0">
+                                <i class="bi bi-diagram-2-fill me-1"></i> Tier 2 Sub-Variation (Optional)
+                            </h6>
+                            <span style="font-size:.78rem;color:var(--mb-muted);">Enable if you want to add sub-options like Color, Finish, or Material under each Tier 1 item.</span>
+                        </div>
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input" type="checkbox" id="enable-tier2-toggle" style="cursor:pointer;">
+                            <label class="form-check-label font-bold text-white small" for="enable-tier2-toggle">Enable Tier 2</label>
+                        </div>
+                    </div>
 
-                {{-- Shopee Batch Setting Tool --}}
-                <div class="batch-edit-bar mb-3">
-                    <div class="row g-2 align-items-center">
-                        <div class="col-md-3">
-                            <span class="fw-bold text-gold" style="font-size:.9rem;"><i class="bi bi-magic me-1"></i> Batch Apply To All:</span>
-                        </div>
-                        <div class="col-md-3">
-                            <input type="number" step="0.01" id="batch-price" class="form-control form-control-sm" placeholder="Price (₱) e.g. 250">
-                        </div>
-                        <div class="col-md-3">
-                            <input type="number" id="batch-stock" class="form-control form-control-sm" placeholder="Stock Qty e.g. 50">
-                        </div>
-                        <div class="col-md-3">
-                            <button type="button" class="btn btn-gold btn-sm w-100" id="btn-apply-batch">
-                                Apply To All Rows
-                            </button>
-                        </div>
+                    <div id="tier2-config-wrapper" style="display:none;" class="mt-3 pt-2 border-top border-secondary">
+                        <label class="form-label font-bold text-gold small">Tier 2 Sub-Group Name</label>
+                        <input type="text" name="tier2_name" id="tier2_name" class="form-control form-control-sm" placeholder="e.g. Color or Finish" value="Color">
                     </div>
                 </div>
 
-                {{-- Connected Variants Table with Photo Upload Column --}}
+                {{-- Variants Table --}}
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 style="font-family:'Rajdhani',sans-serif;color:var(--mb-heading);font-weight:700;" class="mb-0">
+                        Variant Rows List
+                    </h6>
+                    <button type="button" class="btn btn-gold btn-sm" id="btn-add-variant-row">
+                        <i class="bi bi-plus-lg me-1"></i> + Add Variant Row
+                    </button>
+                </div>
+
                 <div class="table-responsive">
-                    <table class="table table-dark-custom mb-0" id="variant-manual-table">
+                    <table class="table table-dark-custom mb-0">
                         <thead>
                             <tr>
-                                <th style="width:110px;" class="text-center">Variant Photo</th>
-                                <th style="min-width:220px;">Connected Variant &amp; Sub-Variant Label *</th>
+                                <th style="width:90px;" class="text-center">Photo</th>
+                                <th style="min-width:180px;">Tier 1 Option *</th>
+                                <th style="min-width:180px;display:none;" class="tier2-col-header">Tier 2 Sub-Option (Optional)</th>
                                 <th style="width:130px;">Price (₱) *</th>
                                 <th style="width:110px;">Stock Qty *</th>
-                                <th style="width:130px;">SKU (Optional)</th>
                                 <th style="width:50px;" class="text-center">Action</th>
                             </tr>
                         </thead>
                         <tbody id="variant-manual-rows">
-                            {{-- Initial Connected Sub-Variant Rows --}}
+                            {{-- Clean empty row initialized dynamically --}}
                         </tbody>
                     </table>
                 </div>
@@ -312,38 +311,57 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let variantRowCounter = 0;
     const tbody = document.getElementById('variant-manual-rows');
-    const btnAddVariant = document.getElementById('btn-add-manual-variant');
-    const btnGenerateConnected = document.getElementById('btn-generate-connected');
-    const btnApplyBatch = document.getElementById('btn-apply-batch');
+    const btnAddVariant = document.getElementById('btn-add-variant-row');
+    const tier2Toggle = document.getElementById('enable-tier2-toggle');
+    const tier2ConfigWrapper = document.getElementById('tier2-config-wrapper');
 
-    function createVariantRow(label = '', price = '250.00', stock = '50') {
+    // Toggle Tier 2 Sub-Option Column Visibility
+    function updateTier2Visibility() {
+        const isEnabled = tier2Toggle && tier2Toggle.checked;
+        if (tier2ConfigWrapper) {
+            tier2ConfigWrapper.style.display = isEnabled ? 'block' : 'none';
+        }
+        document.querySelectorAll('.tier2-col-header').forEach(el => {
+            el.style.display = isEnabled ? '' : 'none';
+        });
+        document.querySelectorAll('.tier2-col-cell').forEach(el => {
+            el.style.display = isEnabled ? '' : 'none';
+        });
+    }
+
+    if (tier2Toggle) {
+        tier2Toggle.addEventListener('change', updateTier2Visibility);
+    }
+
+    function createVariantRow(t1 = '', t2 = '', price = '', stock = '50') {
         const tr = document.createElement('tr');
         tr.className = 'manual-variant-row';
         const rowId = variantRowCounter++;
+        const isTier2Enabled = tier2Toggle && tier2Toggle.checked;
 
         tr.innerHTML = `
             <td class="text-center align-middle">
                 <div class="d-flex flex-column align-items-center gap-1">
-                    <div class="variant-img-preview" id="v-preview-${rowId}" style="width:42px;height:42px;border-radius:6px;overflow:hidden;border:1px solid var(--mb-border);background:var(--mb-surface);display:flex;align-items:center;justify-content:center;">
-                        <i class="bi bi-image text-muted fs-5"></i>
+                    <div class="variant-img-preview" id="v-preview-${rowId}" style="width:38px;height:38px;border-radius:6px;overflow:hidden;border:1px solid var(--mb-border);background:var(--mb-surface);display:flex;align-items:center;justify-content:center;">
+                        <i class="bi bi-image text-muted fs-6"></i>
                     </div>
-                    <label class="btn btn-outline-gold btn-xs py-0 px-1" style="font-size:.68rem;cursor:pointer;">
+                    <label class="btn btn-outline-gold btn-xs py-0 px-1" style="font-size:.65rem;cursor:pointer;">
                         <i class="bi bi-upload"></i> Photo
                         <input type="file" name="variants[${rowId}][image_file]" accept="image/*" class="d-none variant-file-input" data-target="v-preview-${rowId}">
                     </label>
                 </div>
             </td>
             <td class="align-middle">
-                <input type="text" name="variants[${rowId}][variant_name]" class="form-control form-control-sm font-bold text-gold" value="${label}" placeholder="e.g. 5x25/CNC/4pcs - Gold" required>
+                <input type="text" name="variants[${rowId}][tier1_option]" class="form-control form-control-sm font-bold text-gold" value="${t1}" placeholder="e.g. 5x25/CNC/4pcs or iPhone 12" required>
+            </td>
+            <td class="align-middle tier2-col-cell" style="${isTier2Enabled ? '' : 'display:none;'}">
+                <input type="text" name="variants[${rowId}][tier2_option]" class="form-control form-control-sm" value="${t2}" placeholder="e.g. Gold or Blue">
             </td>
             <td class="align-middle">
-                <input type="number" step="0.01" name="variants[${rowId}][price]" class="form-control form-control-sm input-price" value="${price}" required>
+                <input type="number" step="0.01" name="variants[${rowId}][price]" class="form-control form-control-sm input-price" value="${price}" placeholder="250.00" required>
             </td>
             <td class="align-middle">
                 <input type="number" name="variants[${rowId}][stock_qty]" class="form-control form-control-sm input-stock" value="${stock}" min="0" required>
-            </td>
-            <td class="align-middle">
-                <input type="text" name="variants[${rowId}][sku]" class="form-control form-control-sm" placeholder="Auto SKU">
             </td>
             <td class="text-center align-middle">
                 <button type="button" class="btn btn-sm btn-link text-danger btn-remove-row" style="text-decoration:none;"><i class="bi bi-trash fs-5"></i></button>
@@ -352,45 +370,13 @@ document.addEventListener('DOMContentLoaded', function() {
         tbody.appendChild(tr);
     }
 
-    // Start with 1 clean empty row (NO pre-populated presets)
-    createVariantRow('', '', '50');
+    // Start with 1 clean empty row (NO PRESETS)
+    createVariantRow('', '', '', '50');
 
     // Add single manual variant row
     if (btnAddVariant) {
         btnAddVariant.addEventListener('click', function() {
-            createVariantRow('', '', '50');
-        });
-    }
-
-    // Add Connected Tier 2 Sub-Option row
-    const btnAddTier2 = document.getElementById('btn-add-tier2-suboption');
-    if (btnAddTier2) {
-        btnAddTier2.addEventListener('click', function() {
-            const rows = tbody.querySelectorAll('.manual-variant-row');
-            let parentLabel = '';
-            if (rows.length > 0) {
-                const lastVal = rows[rows.length - 1].querySelector('input[name*="[variant_name]"]').value.trim();
-                if (lastVal) {
-                    parentLabel = lastVal.split(' - ')[0];
-                }
-            }
-            const defaultCombo = parentLabel ? `${parentLabel} - Sub Option` : 'Main Option - Sub Option';
-            createVariantRow(defaultCombo, '', '50');
-        });
-    }
-
-    // Batch Apply Tool
-    if (btnApplyBatch) {
-        btnApplyBatch.addEventListener('click', function() {
-            const bPrice = document.getElementById('batch-price').value;
-            const bStock = document.getElementById('batch-stock').value;
-
-            if (bPrice !== '') {
-                document.querySelectorAll('.input-price').forEach(input => input.value = bPrice);
-            }
-            if (bStock !== '') {
-                document.querySelectorAll('.input-stock').forEach(input => input.value = bStock);
-            }
+            createVariantRow('', '', '', '50');
         });
     }
 
