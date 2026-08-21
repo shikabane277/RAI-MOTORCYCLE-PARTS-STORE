@@ -364,7 +364,7 @@ document.addEventListener('DOMContentLoaded', function() {
         div.className = 'd-flex align-items-center gap-2 option-pill-row';
         div.innerHTML = `
             <i class="bi bi-tag text-gold"></i>
-            <input type="text" class="form-control form-control-sm tier1-input-val font-bold text-gold" value="${val}" placeholder="e.g. 5x25/CNC/4pcs or iPhone 12" required>
+            <input type="text" class="form-control form-control-sm tier1-input-val font-bold text-gold" value="${val}" required>
             <button type="button" class="btn btn-sm btn-link text-danger p-0 btn-remove-t1-val" style="text-decoration:none;"><i class="bi bi-x-circle fs-6"></i></button>
         `;
         tier1Container.appendChild(div);
@@ -377,7 +377,7 @@ document.addEventListener('DOMContentLoaded', function() {
         div.className = 'd-flex align-items-center gap-2 option-pill-row';
         div.innerHTML = `
             <i class="bi bi-palette text-gold"></i>
-            <input type="text" class="form-control form-control-sm tier2-input-val" value="${val}" placeholder="e.g. Gold, Titanium, or Black">
+            <input type="text" class="form-control form-control-sm tier2-input-val" value="${val}">
             <button type="button" class="btn btn-sm btn-link text-danger p-0 btn-remove-t2-val" style="text-decoration:none;"><i class="bi bi-x-circle fs-6"></i></button>
         `;
         tier2Container.appendChild(div);
