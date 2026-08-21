@@ -369,10 +369,11 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Existing variants pre-loaded from backend
     const initialVariants = <?php echo json_encode($product->variants->map(function($v) {
-        $parts = explode(' - ', $v->label);
+        $vName = $v->variant_name ?: 'Standard';
+        $parts = explode(' - ', $vName);
         return [
             'id' => $v->id,
-            't1' => $parts[0] ?? $v->label,
+            't1' => $parts[0] ?? $vName,
             't2' => $parts[1] ?? '',
             'price' => (float)$v->price,
             'stock' => (int)$v->stock_qty,

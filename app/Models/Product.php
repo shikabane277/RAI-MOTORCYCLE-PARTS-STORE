@@ -108,13 +108,27 @@ class Product extends Model
 
     public function getParsedOptionGroupsAttribute(): array
     {
-        if (!empty($this->option_config) && is_array($this->option_config)) {
-            return $this->option_config;
-        }
-
         $variants = $this->relationLoaded('variants') ? $this->variants : $this->variants()->where('is_active', true)->get();
         if ($variants->isEmpty()) {
-            return [];
+            return [
+                [
+                    'name'          => 'Size / Specification',
+                    'display_style' => 'swatch',
+                    'values'        => [],
+                ]
+            ];
+        }
+
+        $t1GroupTitle = 'Size / Specification';
+        $t2GroupTitle = 'Color';
+
+        if (!empty($this->option_config) && is_array($this->option_config)) {
+            if (isset($this->option_config[0]['name']) && !empty($this->option_config[0]['name'])) {
+                $t1GroupTitle = $this->option_config[0]['name'];
+            }
+            if (isset($this->option_config[1]['name']) && !empty($this->option_config[1]['name'])) {
+                $t2GroupTitle = $this->option_config[1]['name'];
+            }
         }
 
         $tier1Values = [];
@@ -122,7 +136,7 @@ class Product extends Model
         $hasMultiTier = false;
 
         foreach ($variants as $v) {
-            $label = $v->label;
+            $label = $v->variant_name ?: 'Standard';
             if (str_contains($label, ' - ')) {
                 $parts = explode(' - ', $label, 2);
                 $hasMultiTier = true;
@@ -150,7 +164,7 @@ class Product extends Model
         // Group 1
         $uniqueT1 = collect($tier1Values)->unique('label')->values()->all();
         $groups[] = [
-            'name'          => $hasMultiTier ? 'Size / Specification' : 'Option',
+            'name'          => $t1GroupTitle,
             'display_style' => 'swatch',
             'values'        => array_map(fn($item) => [
                 'id'       => \Illuminate\Support\Str::slug($item['label']),
@@ -160,11 +174,11 @@ class Product extends Model
             ], $uniqueT1),
         ];
 
-        // Group 2
-        if ($hasMultiTier) {
+        // Group 2 (if multi-tier present)
+        if ($hasMultiTier && !empty($tier2Values)) {
             $uniqueT2 = collect($tier2Values)->unique('label')->values()->all();
             $groups[] = [
-                'name'          => 'Color / Finish',
+                'name'          => $t2GroupTitle,
                 'display_style' => 'swatch',
                 'values'        => array_map(fn($item) => [
                     'id'       => \Illuminate\Support\Str::slug($item['label']),
