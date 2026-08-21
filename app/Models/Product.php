@@ -114,15 +114,15 @@ class Product extends Model
         if ($variants->isEmpty()) {
             return [
                 [
-                    'name'          => 'Size / Specification',
+                    'name'          => 'Specification',
                     'display_style' => 'swatch',
                     'values'        => [],
                 ]
             ];
         }
 
-        $t1GroupTitle = 'Size / Specification';
-        $t2GroupTitle = 'Color';
+        $t1GroupTitle = 'Specification';
+        $t2GroupTitle = 'Option';
 
         if (!empty($this->option_config) && is_array($this->option_config)) {
             if (isset($this->option_config[0]['name']) && !empty($this->option_config[0]['name'])) {
@@ -163,7 +163,7 @@ class Product extends Model
 
         $groups = [];
 
-        // Group 1
+        // Group 1 — always present
         $uniqueT1 = collect($tier1Values)->unique('label')->values()->all();
         $groups[] = [
             'name'          => $t1GroupTitle,
@@ -176,7 +176,7 @@ class Product extends Model
             ], $uniqueT1),
         ];
 
-        // Group 2 (if multi-tier present)
+        // Group 2 (only if multi-tier variants exist)
         if ($hasMultiTier && !empty($tier2Values)) {
             $uniqueT2 = collect($tier2Values)->unique('label')->values()->all();
             $groups[] = [

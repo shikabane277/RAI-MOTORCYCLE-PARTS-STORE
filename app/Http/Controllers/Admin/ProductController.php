@@ -200,7 +200,8 @@ class ProductController extends Controller
         }
 
         // Preserve existing Additional Gallery Photos
-        $uploadedImages = $product->images ?? [];
+        $existingImages = is_array($product->images) ? $product->images : [];
+        $uploadedImages = $existingImages;
         if (!empty($validated['image_url']) && !in_array($validated['image_url'], $uploadedImages)) {
             array_unshift($uploadedImages, $validated['image_url']);
         }
