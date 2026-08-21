@@ -182,14 +182,27 @@ class ProductController extends Controller
             'category_id'       => 'nullable|exists:categories,id',
             'description'       => 'nullable|string',
             'short_description' => 'nullable|string|max:500',
-            'base_price'        => 'required|numeric|min:0',
+            'base_price'        => 'nullable|numeric|min:0',
+            'weight_grams'      => 'nullable|integer',
             'status'            => 'required|in:active,draft,archived',
             'is_featured'       => 'boolean',
             'is_new_arrival'    => 'boolean',
         ]);
 
-        // Process multiple photo uploads
-        $uploadedImages = [];
+        // Process Cover Image Upload
+        if ($request->hasFile('cover_image_file')) {
+            $coverFile = $request->file('cover_image_file');
+            $coverFilename = 'cover_' . time() . '_' . rand(100, 999) . '.' . $coverFile->getClientOriginalExtension();
+            $coverFile->move(public_path('uploads/products'), $coverFilename);
+            $validated['image_url'] = '/uploads/products/' . $coverFilename;
+        }
+
+        // Process Additional Gallery Photo Uploads
+        $uploadedImages = $product->images ?? [];
+        if (!empty($validated['image_url'])) {
+            $uploadedImages[] = $validated['image_url'];
+        }
+
         if ($request->hasFile('image_files')) {
             foreach ($request->file('image_files') as $idx => $file) {
                 $filename = 'prod_' . time() . '_' . $idx . '_' . rand(100, 999) . '.' . $file->getClientOriginalExtension();
@@ -198,28 +211,78 @@ class ProductController extends Controller
             }
         }
 
-        $imageUrl = $request->input('image_url');
-        if (empty($imageUrl) && !empty($uploadedImages)) {
-            $imageUrl = $uploadedImages[0];
+        $validated['images'] = !empty($uploadedImages) ? array_values(array_unique($uploadedImages)) : null;
+
+        // Process Option Config
+        if ($request->filled('tier1_name')) {
+            $optionConfig = [
+                ['name' => $request->tier1_name, 'display_style' => 'swatch'],
+            ];
+            if ($request->filled('tier2_name') && $request->has('tier2_name')) {
+                $optionConfig[] = ['name' => $request->tier2_name, 'display_style' => 'swatch'];
+            }
+            $validated['option_config'] = $optionConfig;
+        }
+
+        if (empty($validated['base_price']) && $request->has('variants') && is_array($request->variants)) {
+            $prices = array_column($request->variants, 'price');
+            $validPrices = array_filter($prices, fn($p) => is_numeric($p) && $p > 0);
+            $validated['base_price'] = !empty($validPrices) ? min($validPrices) : $product->base_price;
         }
 
         $product->update($validated);
 
-        // Update primary variant image or images if new ones were uploaded
-        $primaryVariant = $product->variants()->first();
-        if ($primaryVariant) {
-            $updates = [];
-            if ($imageUrl) $updates['image_url'] = $imageUrl;
-            if (!empty($uploadedImages)) {
-                $existingImages = $primaryVariant->images ?? [];
-                $updates['images'] = array_values(array_merge($existingImages, $uploadedImages));
-            }
-            if (!empty($updates)) {
-                $primaryVariant->update($updates);
+        // Process Variants Update
+        if ($request->has('variants') && is_array($request->variants) && count($request->variants) > 0) {
+            // Delete old variants and create updated variants list
+            $product->variants()->delete();
+
+            foreach ($request->variants as $idx => $vData) {
+                $t1 = trim($vData['tier1_option'] ?? '');
+                $t2 = trim($vData['tier2_option'] ?? '');
+                $vName = $vData['variant_name'] ?? '';
+
+                if (empty($vName)) {
+                    if (!empty($t1) && !empty($t2)) {
+                        $vName = "{$t1} - {$t2}";
+                    } elseif (!empty($t1)) {
+                        $vName = $t1;
+                    }
+                }
+
+                if (empty($vName) && empty($vData['price'])) continue;
+                if (empty($vName)) $vName = 'Standard';
+
+                $vImg = $vData['image_url'] ?? null;
+                if ($request->hasFile("variants.{$idx}.image_file")) {
+                    $vFile = $request->file("variants.{$idx}.image_file");
+                    $vFilename = 'var_' . time() . '_' . $idx . '.' . $vFile->getClientOriginalExtension();
+                    $vFile->move(public_path('uploads/products'), $vFilename);
+                    $vImg = '/uploads/products/' . $vFilename;
+                }
+
+                if (empty($vImg) && !empty($uploadedImages)) {
+                    $vImg = $uploadedImages[0];
+                }
+
+                $vSku = 'RAI-' . strtoupper(Str::slug(substr($product->name, 0, 8))) . '-' . strtoupper(Str::slug(substr($vName, 0, 6))) . '-' . rand(10, 99);
+
+                ProductVariant::create([
+                    'product_id'          => $product->id,
+                    'variant_name'        => $vName,
+                    'variant_sku'         => $vSku,
+                    'price'               => !empty($vData['price']) ? $vData['price'] : $product->base_price,
+                    'sale_price'          => !empty($vData['sale_price']) ? $vData['sale_price'] : null,
+                    'stock_qty'           => (int) ($vData['stock_qty'] ?? 0),
+                    'low_stock_threshold' => 5,
+                    'image_url'           => $vImg,
+                    'images'              => !empty($uploadedImages) ? $uploadedImages : null,
+                    'is_active'           => true,
+                ]);
             }
         }
 
-        return back()->with('success', 'Product details updated successfully!');
+        return redirect()->route('admin.products.index')->with('success', "Product '{$product->name}' updated successfully!");
     }
 
     public function destroy(Product $product)
