@@ -304,8 +304,8 @@
                     <span class="product-price" style="font-size:1.4rem;" id="order-grand-total">&#x20B1;{{ number_format($cart->subtotal + $shippingFee - $discount, 2) }}</span>
                 </div>
 
-                <button type="button" id="btn-place-order" class="btn btn-gold w-100 py-2" onclick="handleCheckoutSubmit()">
-                    <i class="bi bi-lock me-1"></i>Place Order
+                <button type="submit" id="btn-place-order" class="btn btn-gold w-100 py-3 font-bold fs-6">
+                    <i class="bi bi-lock-fill me-1"></i>Place Order Now
                 </button>
                 <p class="text-center mt-2" style="font-size:.75rem;color:var(--mb-muted);">
                     <i class="bi bi-shield-check me-1"></i>Your info is secured and encrypted
@@ -632,21 +632,20 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (e) {
                 brgySelect.innerHTML = '<option value="">— Select Barangay —</option>';
             }
+    // ── Checkout Form Submit Feedback
+    const checkoutForm = document.getElementById('checkout-form');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', function(e) {
+            const btn = document.getElementById('btn-place-order');
+            if (btn) {
+                setTimeout(() => {
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Processing Order...';
+                }, 50);
+            }
         });
     }
 });
-
-function handleCheckoutSubmit() {
-    const form = document.getElementById('checkout-form');
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-    }
-    // Disable button to prevent double-clicks
-    const btn = document.getElementById('btn-place-order');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Processing...';
-}
 </script>
 @endsection
 
