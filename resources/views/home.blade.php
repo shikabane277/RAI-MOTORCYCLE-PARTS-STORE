@@ -69,7 +69,7 @@
                 <a href="{{ route('shop.category', $cat->slug) }}" class="cat-icon-card">
                     <span class="cat-icon">{{ $cat->icon }}</span>
                     <div class="cat-name">{{ $cat->name }}</div>
-                    <div style="font-size:.75rem;color:var(--mb-muted);margin-top:.25rem;">{{ $cat->products()->count() }} products</div>
+                    <div style="font-size:.75rem;color:var(--mb-muted);margin-top:.25rem;">{{ $cat->products_count ?? $cat->products()->count() }} products</div>
                 </a>
             </div>
             @endforeach
