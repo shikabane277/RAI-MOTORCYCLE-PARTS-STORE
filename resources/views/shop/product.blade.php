@@ -221,10 +221,11 @@
                 </div>
             @endif
 
-            {{-- Add to Cart form with Exact Shopee Quantity & Stock Row --}}
-            <form action="{{ route('cart.add') }}" method="POST" class="ajax-add-to-cart">
+            {{-- Add to Cart & Buy Now Form --}}
+            <form action="{{ route('cart.add') }}" method="POST" class="ajax-add-to-cart" id="product-purchase-form">
                 @csrf
                 <input type="hidden" name="variant_id" id="selected-variant-id" value="{{ $firstVariant?->id }}">
+                <input type="hidden" name="buy_now" id="buy-now-input" value="0">
                 
                 {{-- Quantity Row matching Reference Screenshot --}}
                 <div class="shopee-option-row align-items-center mb-4">
@@ -242,9 +243,12 @@
                     </div>
                 </div>
 
-                <div class="mb-4">
-                    <button type="submit" class="btn btn-gold btn-lg w-100 py-3 font-bold text-uppercase d-none d-md-block" id="btn-add-to-cart" {{ $firstVariant?->stock_qty <= 0 ? 'disabled' : '' }} style="letter-spacing:1px;font-size:1.05rem;">
+                <div class="d-none d-md-flex gap-3 mb-4">
+                    <button type="submit" onclick="document.getElementById('buy-now-input').value='0'" class="btn btn-outline-gold btn-lg flex-grow-1 py-3 font-bold text-uppercase" id="btn-add-to-cart" {{ $firstVariant?->stock_qty <= 0 ? 'disabled' : '' }} style="letter-spacing:1px;font-size:1.05rem;">
                         <i class="bi bi-cart-plus me-2"></i> Add To Cart
+                    </button>
+                    <button type="submit" onclick="document.getElementById('buy-now-input').value='1'" class="btn btn-gold btn-lg flex-grow-1 py-3 font-bold text-uppercase" id="btn-buy-now" {{ $firstVariant?->stock_qty <= 0 ? 'disabled' : '' }} style="letter-spacing:1px;font-size:1.05rem;">
+                        <i class="bi bi-lightning-fill me-2"></i> Buy Now
                     </button>
                     <div class="text-danger small mt-2 d-none" id="var-error-msg">Please select product variation first</div>
                 </div>
@@ -255,9 +259,14 @@
                         <div class="text-muted small" style="font-size:.72rem;">Total Price</div>
                         <div class="mobile-price-val font-bold text-gold fs-5">&#x20B1;{{ number_format($firstVariant?->price ?? $product->base_price, 2) }}</div>
                     </div>
-                    <button type="submit" class="btn btn-gold py-2 px-4 font-bold flex-grow-1" id="btn-add-to-cart-mobile" {{ $firstVariant?->stock_qty <= 0 ? 'disabled' : '' }}>
-                        <i class="bi bi-cart-plus me-1"></i> Add To Cart
-                    </button>
+                    <div class="d-flex gap-2 flex-grow-1">
+                        <button type="submit" onclick="document.getElementById('buy-now-input').value='0'" class="btn btn-outline-gold py-2 px-3 font-bold flex-grow-1" id="btn-add-to-cart-mobile" {{ $firstVariant?->stock_qty <= 0 ? 'disabled' : '' }}>
+                            <i class="bi bi-cart-plus me-1"></i> Cart
+                        </button>
+                        <button type="submit" onclick="document.getElementById('buy-now-input').value='1'" class="btn btn-gold py-2 px-3 font-bold flex-grow-1" id="btn-buy-now-mobile" {{ $firstVariant?->stock_qty <= 0 ? 'disabled' : '' }}>
+                            <i class="bi bi-lightning-fill me-1"></i> Buy Now
+                        </button>
+                    </div>
                 </div>
             </form>
 

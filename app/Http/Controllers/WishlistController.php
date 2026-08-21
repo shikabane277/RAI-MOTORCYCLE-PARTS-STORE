@@ -10,6 +10,13 @@ class WishlistController extends Controller
 {
     public function toggle(ProductVariant $variant)
     {
+        if (!auth()->check()) {
+            if (request()->ajax()) {
+                return response()->json(['redirect' => route('login'), 'message' => 'Please login to save items to your wishlist.']);
+            }
+            return redirect()->route('login')->with('info', 'Please login to save items to your wishlist.');
+        }
+
         $user = auth()->user();
         $existing = Wishlist::where('user_id', $user->id)
                             ->where('product_variant_id', $variant->id)

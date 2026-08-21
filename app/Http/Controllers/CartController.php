@@ -51,6 +51,29 @@ class CartController extends Controller
             return back()->withErrors(['variant_id' => 'This item is out of stock.']);
         }
 
+        $buyNow = $request->boolean('buy_now') || $request->input('action') === 'buy_now';
+
+        // Guest Check — If guest, save pending action & redirect to login
+        if (!auth()->check()) {
+            session([
+                'pending_cart_action' => [
+                    'variant_id' => (int) $variant->id,
+                    'qty'        => (int) $request->qty,
+                    'buy_now'    => $buyNow,
+                ]
+            ]);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'redirect'       => route('login'),
+                    'requires_login' => true,
+                    'message'        => 'Please login or register to complete your order.',
+                ]);
+            }
+
+            return redirect()->route('login')->with('info', 'Please login or create an account to continue your order.');
+        }
+
         $cart = $this->getOrCreateCart();
 
         $item = $cart->items()->where('product_variant_id', $variant->id)->first();
@@ -63,11 +86,49 @@ class CartController extends Controller
             ]);
         }
 
+        if ($buyNow) {
+            if ($request->ajax()) {
+                return response()->json(['redirect' => route('checkout.index')]);
+            }
+            return redirect()->route('checkout.index');
+        }
+
         if ($request->ajax()) {
             return response()->json(['cart_count' => $cart->item_count, 'message' => 'Added to cart!']);
         }
 
         return back()->with('success', '✅ Added to cart!');
+    }
+
+    public static function processPendingCartAction($user)
+    {
+        if (!session()->has('pending_cart_action')) {
+            return null;
+        }
+
+        $pending = session()->pull('pending_cart_action');
+        $variant = ProductVariant::find($pending['variant_id']);
+
+        if ($variant && $variant->is_in_stock) {
+            $cart = Cart::firstOrCreate(['user_id' => $user->id]);
+            $item = $cart->items()->where('product_variant_id', $variant->id)->first();
+            if ($item) {
+                $item->increment('qty', $pending['qty']);
+            } else {
+                $cart->items()->create([
+                    'product_variant_id' => $variant->id,
+                    'qty'                => $pending['qty'],
+                ]);
+            }
+
+            if (!empty($pending['buy_now'])) {
+                return redirect()->route('checkout.index')->with('success', '✅ Item added! Complete your checkout below.');
+            }
+
+            return redirect()->route('cart.index')->with('success', '✅ Item added to your cart!');
+        }
+
+        return null;
     }
 
     public function update(Request $request, CartItem $item)

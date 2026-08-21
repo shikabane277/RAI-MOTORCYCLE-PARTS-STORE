@@ -57,6 +57,14 @@ Route::get('/auth/{provider}/callback', [App\Http\Controllers\Auth\SocialAuthCon
 // Static pages
 Route::view('/about', 'pages.about')->name('about');
 Route::view('/contact', 'pages.contact')->name('contact');
+Route::post('/contact', function (Illuminate\Http\Request $request) {
+    $request->validate([
+        'name'    => 'required|string|max:200',
+        'email'   => 'required|email',
+        'message' => 'required|string|min:5',
+    ]);
+    return back()->with('success', 'Thank you, ' . e($request->name) . '! Your message has been received. Our team will get back to you shortly.');
+})->name('contact.send');
 Route::view('/faq', 'pages.faq')->name('faq');
 Route::view('/shipping', 'pages.shipping')->name('shipping');
 Route::view('/returns', 'pages.returns')->name('returns');

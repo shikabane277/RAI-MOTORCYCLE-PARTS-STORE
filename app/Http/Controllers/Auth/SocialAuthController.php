@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\CartController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -70,6 +71,10 @@ class SocialAuthController extends Controller
 
             Auth::login($user, true);
 
+            if ($redirect = CartController::processPendingCartAction($user)) {
+                return $redirect;
+            }
+
             return redirect()->intended(route('home'))->with('success', 'Logged in successfully with ' . ucfirst($provider) . '!');
         } catch (\Exception $e) {
             return redirect()->route('login')->with('error', 'Failed to authenticate via ' . ucfirst($provider) . ': ' . $e->getMessage());
@@ -99,6 +104,10 @@ class SocialAuthController extends Controller
         }
 
         Auth::login($user, true);
+
+        if ($redirect = CartController::processPendingCartAction($user)) {
+            return $redirect;
+        }
 
         return redirect()->route('home')->with('success', "Logged in with {$providerName} (Demo Account).");
     }

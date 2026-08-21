@@ -65,10 +65,10 @@ document.querySelectorAll('.product-swiper').forEach(el => {
 document.querySelectorAll('.ajax-add-to-cart').forEach(form => {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const btn = form.querySelector('[type="submit"]');
-        const originalHTML = btn.innerHTML;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Adding...';
-        btn.disabled = true;
+        const clickedBtn = e.submitter || form.querySelector('[type="submit"]');
+        const originalHTML = clickedBtn.innerHTML;
+        clickedBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Processing...';
+        clickedBtn.disabled = true;
 
         try {
             const res = await fetch('/cart/add', {
@@ -78,20 +78,27 @@ document.querySelectorAll('.ajax-add-to-cart').forEach(form => {
             });
             const data = await res.json();
 
-            // Update cart badge
-            document.querySelectorAll('.cart-badge').forEach(badge => {
-                badge.textContent = data.cart_count;
-                badge.classList.remove('d-none');
-            });
+            if (data.redirect) {
+                window.location.href = data.redirect;
+                return;
+            }
 
-            btn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Added!';
+            // Update cart badge
+            if (data.cart_count !== undefined) {
+                document.querySelectorAll('.cart-badge').forEach(badge => {
+                    badge.textContent = data.cart_count;
+                    badge.style.display = data.cart_count > 0 ? 'flex' : 'none';
+                });
+            }
+
+            clickedBtn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Done!';
             setTimeout(() => {
-                btn.innerHTML = originalHTML;
-                btn.disabled = false;
+                clickedBtn.innerHTML = originalHTML;
+                clickedBtn.disabled = false;
             }, 2000);
         } catch {
-            btn.innerHTML = originalHTML;
-            btn.disabled = false;
+            clickedBtn.innerHTML = originalHTML;
+            clickedBtn.disabled = false;
         }
     });
 });
