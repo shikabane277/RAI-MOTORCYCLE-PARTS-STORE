@@ -46,6 +46,23 @@ class CheckoutController extends Controller
 
     public function store(Request $request)
     {
+        // Resolve manual address entry if toggled
+        if ($request->filled('province_manual')) {
+            $request->merge(['province' => $request->province_manual]);
+        }
+        if ($request->filled('city_manual')) {
+            $request->merge(['city' => $request->city_manual]);
+        }
+        if ($request->filled('barangay_manual')) {
+            $request->merge(['barangay' => $request->barangay_manual]);
+        }
+        if ($request->filled('zip_code_manual')) {
+            $request->merge(['zip_code' => $request->zip_code_manual]);
+        }
+        if ($request->filled('region_manual')) {
+            $request->merge(['region' => $request->region_manual]);
+        }
+
         $request->validate([
             'recipient_name'  => 'required|string|max:100',
             'phone'           => 'required|string|max:20',

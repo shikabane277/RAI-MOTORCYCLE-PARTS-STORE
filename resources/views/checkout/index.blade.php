@@ -71,34 +71,67 @@
                                 <input type="text" name="phone" class="form-control" placeholder="09XX XXX XXXX" value="{{ old('phone', auth()->user()?->phone) }}" required>
                             </div>
                             <div class="col-12">
-                                <label class="form-label">Street / House No. / Building *</label>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="form-label mb-0">Street / House No. / Building *</label>
+                                    <button type="button" class="btn btn-link text-gold p-0 text-decoration-none fw-bold" id="btn-toggle-manual-addr" style="font-size:.82rem;">
+                                        <i class="bi bi-pencil-square me-1"></i><span id="manual-toggle-label">Type Address Manually</span>
+                                    </button>
+                                </div>
                                 <input type="text" name="line1" class="form-control" value="{{ old('line1') }}" placeholder="123 Rizal St, Unit 2B" required>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Province / Region *</label>
-                                <select name="province" id="ph-province" class="form-select" required>
-                                    <option value="">— Select Province / Region —</option>
-                                </select>
+
+                            {{-- Dropdown Container --}}
+                            <div id="address-dropdown-wrapper" class="row g-3 col-12 m-0 p-0">
+                                <div class="col-md-6">
+                                    <label class="form-label">Province / Region *</label>
+                                    <select name="province" id="ph-province" class="form-select" required>
+                                        <option value="">— Loading Provinces &amp; Regions... —</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">City / Municipality *</label>
+                                    <select name="city" id="ph-city" class="form-select" required disabled>
+                                        <option value="">— Select City / Municipality —</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Barangay *</label>
+                                    <select name="barangay" id="ph-barangay" class="form-select" required disabled>
+                                        <option value="">— Select Barangay —</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">ZIP Code</label>
+                                    <input type="text" name="zip_code" id="ph-zip" class="form-control" value="{{ old('zip_code') }}" placeholder="e.g. 1100" style="font-weight:700;color:var(--mb-gold);">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Region</label>
+                                    <input type="text" name="region" id="ph-region" class="form-control" value="{{ old('region', 'Luzon') }}" placeholder="NCR / Region" readonly style="background:var(--mb-surface);">
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">City / Municipality *</label>
-                                <select name="city" id="ph-city" class="form-select" required disabled>
-                                    <option value="">— Select City / Municipality —</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Barangay *</label>
-                                <select name="barangay" id="ph-barangay" class="form-select" required disabled>
-                                    <option value="">— Select Barangay —</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">ZIP Code</label>
-                                <input type="text" name="zip_code" id="ph-zip" class="form-control" value="{{ old('zip_code') }}" placeholder="Auto-generated" readonly style="background:var(--mb-surface);font-weight:700;color:var(--mb-gold);">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Region</label>
-                                <input type="text" name="region" id="ph-region" class="form-control" value="{{ old('region', 'Luzon') }}" placeholder="NCR / Region" readonly style="background:var(--mb-surface);">
+
+                            {{-- Manual Text Input Wrapper (Initially Hidden) --}}
+                            <div id="address-manual-wrapper" class="row g-3 col-12 m-0 p-0 d-none">
+                                <div class="col-md-6">
+                                    <label class="form-label">Province / Region *</label>
+                                    <input type="text" name="province_manual" id="ph-province-manual" class="form-control" placeholder="e.g. Metro Manila / Cavite / Cebu" value="{{ old('province') }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">City / Municipality *</label>
+                                    <input type="text" name="city_manual" id="ph-city-manual" class="form-control" placeholder="e.g. Quezon City / Bacoor / Cebu City" value="{{ old('city') }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Barangay *</label>
+                                    <input type="text" name="barangay_manual" id="ph-barangay-manual" class="form-control" placeholder="e.g. Barangay Commonwealth / Brgy. 101" value="{{ old('barangay') }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">ZIP Code</label>
+                                    <input type="text" name="zip_code_manual" id="ph-zip-manual" class="form-control" placeholder="e.g. 1100" value="{{ old('zip_code') }}" style="font-weight:700;color:var(--mb-gold);">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Region / Island</label>
+                                    <input type="text" name="region_manual" id="ph-region-manual" class="form-control" placeholder="Luzon / Visayas / Mindanao" value="{{ old('region', 'Luzon') }}">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -394,34 +427,128 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // ── Philippine Address Cascading Select System
+    // ── Address Mode Toggle (Dropdown vs Manual Text Input)
+    const btnToggleManual = document.getElementById('btn-toggle-manual-addr');
+    const manualToggleLabel = document.getElementById('manual-toggle-label');
+    const dropdownWrapper = document.getElementById('address-dropdown-wrapper');
+    const manualWrapper = document.getElementById('address-manual-wrapper');
+    
+    const dropdownInputs = [
+        document.getElementById('ph-province'),
+        document.getElementById('ph-city'),
+        document.getElementById('ph-barangay')
+    ];
+    const manualInputs = [
+        document.getElementById('ph-province-manual'),
+        document.getElementById('ph-city-manual'),
+        document.getElementById('ph-barangay-manual')
+    ];
+
+    let isManualMode = false;
+
+    if (btnToggleManual) {
+        btnToggleManual.addEventListener('click', function() {
+            isManualMode = !isManualMode;
+            if (isManualMode) {
+                dropdownWrapper.classList.add('d-none');
+                manualWrapper.classList.remove('d-none');
+                manualToggleLabel.textContent = 'Select From List';
+
+                dropdownInputs.forEach(el => { if (el) el.removeAttribute('required'); });
+                manualInputs.forEach(el => { if (el) el.setAttribute('required', 'required'); });
+            } else {
+                dropdownWrapper.classList.remove('d-none');
+                manualWrapper.classList.add('d-none');
+                manualToggleLabel.textContent = 'Type Address Manually';
+
+                manualInputs.forEach(el => { if (el) el.removeAttribute('required'); });
+                dropdownInputs.forEach(el => { if (el) el.setAttribute('required', 'required'); });
+            }
+        });
+    }
+
+    // ── Live PSGC API Cascading Selector Engine
     const provSelect = document.getElementById('ph-province');
     const citySelect = document.getElementById('ph-city');
     const brgySelect = document.getElementById('ph-barangay');
-    const zipInput  = document.getElementById('ph-zip');
-    const regInput  = document.getElementById('ph-region');
+    const zipInput   = document.getElementById('ph-zip');
+    const regInput   = document.getElementById('ph-region');
 
-    if (provSelect && citySelect && brgySelect) {
-        // Populate Provinces
+    let psgcRegions = [];
+    let psgcProvinces = [];
+
+    async function initPSGC() {
+        if (!provSelect) return;
+
+        try {
+            // Load Regions & Provinces in parallel
+            const [regRes, provRes] = await Promise.all([
+                fetch('https://psgc.gitlab.io/api/regions.json'),
+                fetch('https://psgc.gitlab.io/api/provinces.json')
+            ]);
+            psgcRegions = await regRes.json();
+            psgcProvinces = await provRes.json();
+
+            provSelect.innerHTML = '<option value="">— Select Province / Region —</option>';
+            
+            // Add Metro Manila (NCR) at top
+            const ncrOpt = document.createElement('option');
+            ncrOpt.value = 'NCR (Metro Manila)';
+            ncrOpt.dataset.type = 'region';
+            ncrOpt.dataset.code = '130000000';
+            ncrOpt.textContent = '⭐ Metro Manila (NCR)';
+            provSelect.appendChild(ncrOpt);
+
+            // Sort and append all 81 provinces
+            psgcProvinces.sort((a, b) => a.name.localeCompare(b.name)).forEach(prov => {
+                const opt = document.createElement('option');
+                opt.value = prov.name;
+                opt.dataset.type = 'province';
+                opt.dataset.code = prov.code;
+                opt.textContent = prov.name;
+                provSelect.appendChild(opt);
+            });
+        } catch (e) {
+            console.warn('PSGC API load issue, using fallback address dataset', e);
+            populateFallbackProvinces();
+        }
+    }
+
+    function populateFallbackProvinces() {
+        if (!provSelect) return;
+        provSelect.innerHTML = '<option value="">— Select Province / Region —</option>';
         Object.keys(phAddressData).forEach(prov => {
             const opt = document.createElement('option');
             opt.value = prov;
             opt.textContent = prov;
             provSelect.appendChild(opt);
         });
+    }
 
-        // On Province Change
-        provSelect.addEventListener('change', function() {
+    if (provSelect) {
+        initPSGC();
+
+        provSelect.addEventListener('change', async function() {
+            const selectedOpt = this.options[this.selectedIndex];
+            const code = selectedOpt?.dataset?.code;
+            const type = selectedOpt?.dataset?.type;
             const provName = this.value;
-            citySelect.innerHTML = '<option value="">— Select City / Municipality —</option>';
+
+            citySelect.innerHTML = '<option value="">Loading Cities / Municipalities...</option>';
             brgySelect.innerHTML = '<option value="">— Select Barangay —</option>';
             citySelect.disabled = true;
             brgySelect.disabled = true;
-            zipInput.value = '';
 
-            if (provName && phAddressData[provName]) {
+            if (!provName) {
+                citySelect.innerHTML = '<option value="">— Select City / Municipality —</option>';
+                return;
+            }
+
+            // Standard fallback if custom PSGC code not available
+            if (!code && phAddressData[provName]) {
                 regInput.value = phAddressData[provName].region;
                 const citiesObj = phAddressData[provName].cities;
+                citySelect.innerHTML = '<option value="">— Select City / Municipality —</option>';
                 Object.keys(citiesObj).forEach(city => {
                     const opt = document.createElement('option');
                     opt.value = city;
@@ -429,21 +556,56 @@ document.addEventListener('DOMContentLoaded', function() {
                     citySelect.appendChild(opt);
                 });
                 citySelect.disabled = false;
+                return;
+            }
+
+            try {
+                const endpoint = type === 'region' 
+                    ? `https://psgc.gitlab.io/api/regions/${code}/cities-municipalities.json`
+                    : `https://psgc.gitlab.io/api/provinces/${code}/cities-municipalities.json`;
+                
+                const res = await fetch(endpoint);
+                const cities = await res.json();
+                cities.sort((a, b) => a.name.localeCompare(b.name));
+
+                citySelect.innerHTML = '<option value="">— Select City / Municipality —</option>';
+                cities.forEach(city => {
+                    const opt = document.createElement('option');
+                    opt.value = city.name;
+                    opt.dataset.code = city.code;
+                    opt.textContent = city.name;
+                    citySelect.appendChild(opt);
+                });
+                citySelect.disabled = false;
+                if (type === 'region') {
+                    regInput.value = 'NCR (Metro Manila)';
+                } else {
+                    regInput.value = provName;
+                }
+            } catch (e) {
+                citySelect.innerHTML = '<option value="">— Select City / Municipality —</option>';
             }
         });
 
-        // On City Change
-        citySelect.addEventListener('change', function() {
-            const provName = provSelect.value;
+        citySelect.addEventListener('change', async function() {
+            const selectedOpt = this.options[this.selectedIndex];
+            const code = selectedOpt?.dataset?.code;
             const cityName = this.value;
-            brgySelect.innerHTML = '<option value="">— Select Barangay —</option>';
-            brgySelect.disabled = true;
-            zipInput.value = '';
+            const provName = provSelect.value;
 
-            if (provName && cityName && phAddressData[provName] && phAddressData[provName].cities[cityName]) {
+            brgySelect.innerHTML = '<option value="">Loading Barangays...</option>';
+            brgySelect.disabled = true;
+
+            if (!cityName) {
+                brgySelect.innerHTML = '<option value="">— Select Barangay —</option>';
+                return;
+            }
+
+            // Check static fallback data if code not present
+            if (!code && phAddressData[provName] && phAddressData[provName].cities[cityName]) {
                 const cityInfo = phAddressData[provName].cities[cityName];
                 zipInput.value = cityInfo.zip || '';
-
+                brgySelect.innerHTML = '<option value="">— Select Barangay —</option>';
                 cityInfo.barangays.forEach(brgy => {
                     const opt = document.createElement('option');
                     opt.value = brgy;
@@ -451,6 +613,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     brgySelect.appendChild(opt);
                 });
                 brgySelect.disabled = false;
+                return;
+            }
+
+            try {
+                const res = await fetch(`https://psgc.gitlab.io/api/cities-municipalities/${code}/barangays.json`);
+                const barangays = await res.json();
+                barangays.sort((a, b) => a.name.localeCompare(b.name));
+
+                brgySelect.innerHTML = '<option value="">— Select Barangay —</option>';
+                barangays.forEach(brgy => {
+                    const opt = document.createElement('option');
+                    opt.value = brgy.name;
+                    opt.textContent = brgy.name;
+                    brgySelect.appendChild(opt);
+                });
+                brgySelect.disabled = false;
+            } catch (e) {
+                brgySelect.innerHTML = '<option value="">— Select Barangay —</option>';
             }
         });
     }
