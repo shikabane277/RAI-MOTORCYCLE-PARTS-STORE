@@ -42,9 +42,9 @@
 
                     {{-- Discount Value --}}
                     <div class="col-md-6">
-                        <label class="form-label font-bold  ">Discount Value *</label>
-                        <input type="number" step="0.01" min="0.01" name="value" class="form-control @error('value') is-invalid @enderror" 
-                               value="{{ old('value', $coupon->value) }}" required>
+                        <label class="form-label font-bold">Discount Value</label>
+                        <input type="number" step="0.01" min="0" name="value" class="form-control @error('value') is-invalid @enderror" 
+                               value="{{ old('value', $coupon->value) }}">
                         @error('value')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                 </div>

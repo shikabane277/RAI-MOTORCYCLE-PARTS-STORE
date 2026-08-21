@@ -33,6 +33,10 @@ class CouponController extends Controller
             'is_active' => $request->boolean('is_active', true),
         ]);
 
+        if ($request->type === 'free_shipping' && ($request->value === null || $request->value === '')) {
+            $request->merge(['value' => 0]);
+        }
+
         $validated = $request->validate([
             'code'        => 'required|string|max:50|unique:coupons,code',
             'type'        => 'required|in:percentage,fixed,free_shipping',
@@ -43,6 +47,10 @@ class CouponController extends Controller
             'expires_at'  => 'nullable|date|after_or_equal:starts_at',
             'is_active'   => 'boolean',
         ]);
+
+        if (!isset($validated['value']) || $validated['value'] === null) {
+            $validated['value'] = 0;
+        }
 
         Coupon::create($validated);
 
@@ -61,6 +69,10 @@ class CouponController extends Controller
             'is_active' => $request->boolean('is_active'),
         ]);
 
+        if ($request->type === 'free_shipping' && ($request->value === null || $request->value === '')) {
+            $request->merge(['value' => 0]);
+        }
+
         $validated = $request->validate([
             'code'        => 'required|string|max:50|unique:coupons,code,' . $coupon->id,
             'type'        => 'required|in:percentage,fixed,free_shipping',
@@ -71,6 +83,10 @@ class CouponController extends Controller
             'expires_at'  => 'nullable|date|after_or_equal:starts_at',
             'is_active'   => 'boolean',
         ]);
+
+        if (!isset($validated['value']) || $validated['value'] === null) {
+            $validated['value'] = 0;
+        }
 
         $coupon->update($validated);
 
