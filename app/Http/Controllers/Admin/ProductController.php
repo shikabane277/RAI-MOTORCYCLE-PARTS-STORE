@@ -57,8 +57,20 @@ class ProductController extends Controller
         $skuInput = $validated['sku'] ?? null;
         unset($validated['initial_stock'], $validated['sku']);
 
-        // Process multiple photo uploads
+        // 1. Process Dedicated Main Cover Image Upload
+        if ($request->hasFile('cover_image_file')) {
+            $coverFile = $request->file('cover_image_file');
+            $coverFilename = 'cover_' . time() . '_' . rand(100, 999) . '.' . $coverFile->getClientOriginalExtension();
+            $coverFile->move(public_path('uploads/products'), $coverFilename);
+            $validated['image_url'] = '/uploads/products/' . $coverFilename;
+        }
+
+        // 2. Process Additional Gallery Photo Uploads
         $uploadedImages = [];
+        if (!empty($validated['image_url'])) {
+            $uploadedImages[] = $validated['image_url'];
+        }
+
         if ($request->hasFile('image_files')) {
             foreach ($request->file('image_files') as $idx => $file) {
                 $filename = 'prod_' . time() . '_' . $idx . '_' . rand(100, 999) . '.' . $file->getClientOriginalExtension();
@@ -67,10 +79,11 @@ class ProductController extends Controller
             }
         }
 
-        $imageUrl = $request->input('image_url');
-        if (empty($imageUrl) && !empty($uploadedImages)) {
-            $imageUrl = $uploadedImages[0];
+        if (empty($validated['image_url']) && !empty($uploadedImages)) {
+            $validated['image_url'] = $uploadedImages[0];
         }
+
+        $validated['images'] = !empty($uploadedImages) ? array_values(array_unique($uploadedImages)) : null;
 
         if (empty($validated['base_price']) && $request->has('variants') && is_array($request->variants)) {
             $prices = array_column($request->variants, 'price');

@@ -146,31 +146,48 @@
                 </div>
             </div>
 
-            {{-- ── 2. Product Images ──────────────────────────── --}}
+            {{-- ── 2. Product Images (Cover & Gallery Separated) ── --}}
             <div class="shopee-section-card" id="section-media">
                 <div class="shopee-section-title">
                     <i class="bi bi-images text-gold"></i> 2. Product Images
                 </div>
                 
-                <div class="mb-2">
-                    <label class="form-label font-bold mb-1">Product Gallery Images</label>
-                    <div style="font-size:.85rem;color:var(--mb-muted);" class="mb-3">
-                        <span class="text-danger fw-bold">*</span> 1:1 Image (Square aspect ratio recommended)
+                <div class="row g-4 mb-2">
+                    {{-- 2A. Separated Main Cover Image Upload Box --}}
+                    <div class="col-md-4">
+                        <label class="form-label font-bold text-gold">Main Cover Image *</label>
+                        <div style="font-size:.78rem;color:var(--mb-muted);" class="mb-2">
+                            Primary 1:1 image displayed on store listings &amp; search.
+                        </div>
+
+                        <div class="d-flex flex-column align-items-center justify-content-center p-3 text-center" style="border:2px dashed var(--mb-gold);border-radius:10px;background:var(--mb-surface);min-height:130px;position:relative;" id="cover-dropzone">
+                            <div id="cover-preview-box" class="w-100 d-flex flex-column align-items-center">
+                                <i class="bi bi-image-fill text-gold fs-2 mb-1"></i>
+                                <span style="font-size:.8rem;color:var(--mb-heading);font-weight:600;">Main Cover Image</span>
+                            </div>
+                            <label for="cover_image_file" class="btn btn-gold btn-xs mt-2 py-1 px-3" style="cursor:pointer;font-size:.75rem;">
+                                <i class="bi bi-upload me-1"></i> Choose Cover Photo
+                                <input type="file" name="cover_image_file" id="cover_image_file" class="d-none" accept="image/*">
+                            </label>
+                        </div>
                     </div>
 
-                    {{-- Shopee Upload Grid --}}
-                    <div class="d-flex flex-wrap gap-3 align-items-center mb-2">
-                        <label for="image_files_input" class="shopee-upload-card" style="width:100px;height:100px;border:2px dashed #f56c6c;border-radius:8px;background:var(--mb-surface);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;text-align:center;padding:8px;">
-                            <i class="bi bi-image-fill text-danger fs-3 mb-1"></i>
-                            <span style="font-size:.78rem;color:#f56c6c;font-weight:600;" id="image-counter-text">Add Image<br>(0/9)</span>
-                        </label>
+                    {{-- 2B. Additional Product Gallery Images (Accumulating!) --}}
+                    <div class="col-md-8">
+                        <label class="form-label font-bold">Additional Gallery Images</label>
+                        <div style="font-size:.78rem;color:var(--mb-muted);" class="mb-2">
+                            Add detail photos. Selecting new photos accumulates/appends cleanly!
+                        </div>
 
-                        <input type="file" name="image_files[]" id="image_files_input" class="d-none" multiple accept="image/*">
-                        <div id="image-thumbnails-wrapper" class="d-flex flex-wrap gap-3"></div>
-                    </div>
+                        <div class="d-flex flex-wrap gap-3 align-items-center mb-2">
+                            <label for="image_files_input" class="shopee-upload-card" style="width:100px;height:100px;border:2px dashed #f56c6c;border-radius:8px;background:var(--mb-surface);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;text-align:center;padding:8px;">
+                                <i class="bi bi-plus-circle-fill text-danger fs-3 mb-1"></i>
+                                <span style="font-size:.75rem;color:#f56c6c;font-weight:600;" id="image-counter-text">Add Gallery<br>Photos (0/8)</span>
+                            </label>
 
-                    <div class="text-danger mt-2" style="font-size:.78rem;" id="image-warning-text">
-                        Image is missing, please make sure at least this product has one cover image.
+                            <input type="file" name="image_files[]" id="image_files_input" class="d-none" multiple accept="image/*">
+                            <div id="image-thumbnails-wrapper" class="d-flex flex-wrap gap-3"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -407,38 +424,87 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Main Shopee Gallery Image Upload Dropzone Handler
-    const fileInput = document.getElementById('image_files_input');
+    // Dedicated Main Cover Image Handler
+    const coverInput = document.getElementById('cover_image_file');
+    const coverPreviewBox = document.getElementById('cover-preview-box');
+
+    if (coverInput && coverPreviewBox) {
+        coverInput.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    coverPreviewBox.innerHTML = `
+                        <div class="thumb-card-box mx-auto mb-1" style="width:85px;height:85px;">
+                            <img src="${evt.target.result}" alt="Cover Image">
+                            <span class="badge-cover">MAIN COVER</span>
+                        </div>
+                    `;
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+    }
+
+    // Accumulating Gallery Image Upload Dropzone Handler using DataTransfer
+    const galleryInput = document.getElementById('image_files_input');
     const thumbnailsWrapper = document.getElementById('image-thumbnails-wrapper');
     const counterText = document.getElementById('image-counter-text');
-    const warningText = document.getElementById('image-warning-text');
+    let accumulatedFiles = new DataTransfer();
 
-    if (fileInput) {
-        fileInput.addEventListener('change', function(e) {
-            const selectedFiles = Array.from(e.target.files).slice(0, 9);
+    if (galleryInput && thumbnailsWrapper) {
+        galleryInput.addEventListener('change', function(e) {
+            const newlySelected = Array.from(e.target.files);
+
+            // Accumulate up to 8 gallery photos without wiping existing photos
+            newlySelected.forEach(file => {
+                if (accumulatedFiles.items.length < 8) {
+                    accumulatedFiles.items.add(file);
+                }
+            });
+
+            // Re-assign accumulated DataTransfer files array back to file input
+            galleryInput.files = accumulatedFiles.files;
+
+            // Render thumbnails
+            renderGalleryThumbnails();
+        });
+
+        function renderGalleryThumbnails() {
             thumbnailsWrapper.innerHTML = '';
+            const files = Array.from(accumulatedFiles.files);
 
-            if (selectedFiles.length > 0) {
-                warningText.style.display = 'none';
-                counterText.innerHTML = `Add Image<br>(${selectedFiles.length}/9)`;
-            } else {
-                warningText.style.display = 'block';
-                counterText.innerHTML = `Add Image<br>(0/9)`;
+            if (counterText) {
+                counterText.innerHTML = `Add Gallery<br>Photos (${files.length}/8)`;
             }
 
-            selectedFiles.forEach((file, idx) => {
+            files.forEach((file, idx) => {
                 const reader = new FileReader();
                 reader.onload = function(evt) {
                     const box = document.createElement('div');
                     box.className = 'thumb-card-box';
+                    box.style.position = 'relative';
                     box.innerHTML = `
-                        <img src="${evt.target.result}" alt="Photo ${idx+1}">
-                        ${idx === 0 ? '<span class="badge-cover">COVER</span>' : ''}
+                        <img src="${evt.target.result}" alt="Gallery ${idx+1}">
+                        <button type="button" class="btn btn-danger btn-xs py-0 px-1 btn-remove-gallery-img" data-index="${idx}" style="position:absolute;top:2px;right:2px;font-size:10px;line-height:1;border-radius:50%;">&times;</button>
                     `;
                     thumbnailsWrapper.appendChild(box);
                 };
                 reader.readAsDataURL(file);
             });
+        }
+
+        // Remove single gallery image on click
+        thumbnailsWrapper.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn-remove-gallery-img')) {
+                const removeIdx = parseInt(e.target.dataset.index, 10);
+                const newDt = new DataTransfer();
+                Array.from(accumulatedFiles.files).forEach((file, i) => {
+                    if (i !== removeIdx) newDt.items.add(file);
+                });
+                accumulatedFiles = newDt;
+                galleryInput.files = accumulatedFiles.files;
+                renderGalleryThumbnails();
+            }
         });
     }
 });
