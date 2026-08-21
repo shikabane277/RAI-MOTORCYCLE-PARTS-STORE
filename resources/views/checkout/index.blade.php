@@ -467,56 +467,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ── Live PSGC API Cascading Selector Engine
+    // ── Address Selection Engine (Instant Local Dictionary + PSGC API Fallback)
     const provSelect = document.getElementById('ph-province');
     const citySelect = document.getElementById('ph-city');
     const brgySelect = document.getElementById('ph-barangay');
     const zipInput   = document.getElementById('ph-zip');
     const regInput   = document.getElementById('ph-region');
 
-    let psgcRegions = [];
-    let psgcProvinces = [];
-
-    async function initPSGC() {
-        if (!provSelect) return;
-
-        try {
-            // Load Regions & Provinces in parallel
-            const [regRes, provRes] = await Promise.all([
-                fetch('https://psgc.gitlab.io/api/regions.json'),
-                fetch('https://psgc.gitlab.io/api/provinces.json')
-            ]);
-            psgcRegions = await regRes.json();
-            psgcProvinces = await provRes.json();
-
-            provSelect.innerHTML = '<option value="">— Select Province / Region —</option>';
-            
-            // Add Metro Manila (NCR) at top
-            const ncrOpt = document.createElement('option');
-            ncrOpt.value = 'NCR (Metro Manila)';
-            ncrOpt.dataset.type = 'region';
-            ncrOpt.dataset.code = '130000000';
-            ncrOpt.textContent = '⭐ Metro Manila (NCR)';
-            provSelect.appendChild(ncrOpt);
-
-            // Sort and append all 81 provinces
-            psgcProvinces.sort((a, b) => a.name.localeCompare(b.name)).forEach(prov => {
-                const opt = document.createElement('option');
-                opt.value = prov.name;
-                opt.dataset.type = 'province';
-                opt.dataset.code = prov.code;
-                opt.textContent = prov.name;
-                provSelect.appendChild(opt);
-            });
-        } catch (e) {
-            console.warn('PSGC API load issue, using fallback address dataset', e);
-            populateFallbackProvinces();
-        }
-    }
-
-    function populateFallbackProvinces() {
+    function populateProvinces() {
         if (!provSelect) return;
         provSelect.innerHTML = '<option value="">— Select Province / Region —</option>';
+        
         Object.keys(phAddressData).forEach(prov => {
             const opt = document.createElement('option');
             opt.value = prov;
@@ -526,29 +487,47 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (provSelect) {
-        initPSGC();
+        // 1. Immediately populate from instant local dataset
+        populateProvinces();
 
+        // 2. Try fetching full PSGC provinces list in background to enrich list if online
+        fetch('https://psgc.gitlab.io/api/provinces.json')
+            .then(res => res.json())
+            .then(provinces => {
+                if (!Array.isArray(provinces) || provinces.length === 0) return;
+                
+                // Add NCR at top if not present
+                const existing = Array.from(provSelect.options).map(o => o.value);
+                provinces.forEach(p => {
+                    if (!existing.includes(p.name)) {
+                        const opt = document.createElement('option');
+                        opt.value = p.name;
+                        opt.dataset.code = p.code;
+                        opt.textContent = p.name;
+                        provSelect.appendChild(opt);
+                    }
+                });
+            })
+            .catch(err => console.log('PSGC background enrichment skipped, using instant dataset.'));
+
+        // On Province Change
         provSelect.addEventListener('change', async function() {
             const selectedOpt = this.options[this.selectedIndex];
             const code = selectedOpt?.dataset?.code;
-            const type = selectedOpt?.dataset?.type;
             const provName = this.value;
 
-            citySelect.innerHTML = '<option value="">Loading Cities / Municipalities...</option>';
+            citySelect.innerHTML = '<option value="">— Select City / Municipality —</option>';
             brgySelect.innerHTML = '<option value="">— Select Barangay —</option>';
             citySelect.disabled = true;
             brgySelect.disabled = true;
+            if (zipInput) zipInput.value = '';
 
-            if (!provName) {
-                citySelect.innerHTML = '<option value="">— Select City / Municipality —</option>';
-                return;
-            }
+            if (!provName) return;
 
-            // Standard fallback if custom PSGC code not available
-            if (!code && phAddressData[provName]) {
-                regInput.value = phAddressData[provName].region;
+            // Check instant local data first
+            if (phAddressData[provName]) {
+                if (regInput) regInput.value = phAddressData[provName].region || provName;
                 const citiesObj = phAddressData[provName].cities;
-                citySelect.innerHTML = '<option value="">— Select City / Municipality —</option>';
                 Object.keys(citiesObj).forEach(city => {
                     const opt = document.createElement('option');
                     opt.value = city;
@@ -559,53 +538,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            try {
-                const endpoint = type === 'region' 
-                    ? `https://psgc.gitlab.io/api/regions/${code}/cities-municipalities.json`
-                    : `https://psgc.gitlab.io/api/provinces/${code}/cities-municipalities.json`;
-                
-                const res = await fetch(endpoint);
-                const cities = await res.json();
-                cities.sort((a, b) => a.name.localeCompare(b.name));
+            // Fallback to PSGC API for additional provinces
+            if (code) {
+                try {
+                    citySelect.innerHTML = '<option value="">Loading Cities / Municipalities...</option>';
+                    const res = await fetch(`https://psgc.gitlab.io/api/provinces/${code}/cities-municipalities.json`);
+                    const cities = await res.json();
+                    cities.sort((a, b) => a.name.localeCompare(b.name));
 
-                citySelect.innerHTML = '<option value="">— Select City / Municipality —</option>';
-                cities.forEach(city => {
-                    const opt = document.createElement('option');
-                    opt.value = city.name;
-                    opt.dataset.code = city.code;
-                    opt.textContent = city.name;
-                    citySelect.appendChild(opt);
-                });
-                citySelect.disabled = false;
-                if (type === 'region') {
-                    regInput.value = 'NCR (Metro Manila)';
-                } else {
-                    regInput.value = provName;
+                    citySelect.innerHTML = '<option value="">— Select City / Municipality —</option>';
+                    cities.forEach(city => {
+                        const opt = document.createElement('option');
+                        opt.value = city.name;
+                        opt.dataset.code = city.code;
+                        opt.textContent = city.name;
+                        citySelect.appendChild(opt);
+                    });
+                    citySelect.disabled = false;
+                    if (regInput) regInput.value = provName;
+                } catch (e) {
+                    citySelect.innerHTML = '<option value="">— Select City / Municipality —</option>';
                 }
-            } catch (e) {
-                citySelect.innerHTML = '<option value="">— Select City / Municipality —</option>';
             }
         });
 
+        // On City Change
         citySelect.addEventListener('change', async function() {
             const selectedOpt = this.options[this.selectedIndex];
             const code = selectedOpt?.dataset?.code;
             const cityName = this.value;
             const provName = provSelect.value;
 
-            brgySelect.innerHTML = '<option value="">Loading Barangays...</option>';
+            brgySelect.innerHTML = '<option value="">— Select Barangay —</option>';
             brgySelect.disabled = true;
+            if (zipInput) zipInput.value = '';
 
-            if (!cityName) {
-                brgySelect.innerHTML = '<option value="">— Select Barangay —</option>';
-                return;
-            }
+            if (!cityName) return;
 
-            // Check static fallback data if code not present
-            if (!code && phAddressData[provName] && phAddressData[provName].cities[cityName]) {
+            // Check instant local data first
+            if (phAddressData[provName] && phAddressData[provName].cities[cityName]) {
                 const cityInfo = phAddressData[provName].cities[cityName];
-                zipInput.value = cityInfo.zip || '';
-                brgySelect.innerHTML = '<option value="">— Select Barangay —</option>';
+                if (zipInput) zipInput.value = cityInfo.zip || '';
+                
                 cityInfo.barangays.forEach(brgy => {
                     const opt = document.createElement('option');
                     opt.value = brgy;
@@ -616,22 +590,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            try {
-                const res = await fetch(`https://psgc.gitlab.io/api/cities-municipalities/${code}/barangays.json`);
-                const barangays = await res.json();
-                barangays.sort((a, b) => a.name.localeCompare(b.name));
+            // Fallback to PSGC API for barangays if code present
+            if (code) {
+                try {
+                    brgySelect.innerHTML = '<option value="">Loading Barangays...</option>';
+                    const res = await fetch(`https://psgc.gitlab.io/api/cities-municipalities/${code}/barangays.json`);
+                    const barangays = await res.json();
+                    barangays.sort((a, b) => a.name.localeCompare(b.name));
 
-                brgySelect.innerHTML = '<option value="">— Select Barangay —</option>';
-                barangays.forEach(brgy => {
-                    const opt = document.createElement('option');
-                    opt.value = brgy.name;
-                    opt.textContent = brgy.name;
-                    brgySelect.appendChild(opt);
-                });
-                brgySelect.disabled = false;
-            } catch (e) {
-                brgySelect.innerHTML = '<option value="">— Select Barangay —</option>';
+                    brgySelect.innerHTML = '<option value="">— Select Barangay —</option>';
+                    barangays.forEach(brgy => {
+                        const opt = document.createElement('option');
+                        opt.value = brgy.name;
+                        opt.textContent = brgy.name;
+                        brgySelect.appendChild(opt);
+                    });
+                    brgySelect.disabled = false;
+                } catch (e) {
+                    brgySelect.innerHTML = '<option value="">— Select Barangay —</option>';
+                }
             }
+        });
+    }
+
     // ── Checkout Form Submit Feedback
     const checkoutForm = document.getElementById('checkout-form');
     if (checkoutForm) {
