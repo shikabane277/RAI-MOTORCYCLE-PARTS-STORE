@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -59,10 +60,7 @@ class ProductController extends Controller
 
         // 1. Process Dedicated Main Cover Image Upload
         if ($request->hasFile('cover_image_file')) {
-            $coverFile = $request->file('cover_image_file');
-            $coverFilename = 'cover_' . time() . '_' . rand(100, 999) . '.' . $coverFile->getClientOriginalExtension();
-            $coverFile->move(public_path('uploads/products'), $coverFilename);
-            $validated['image_url'] = '/uploads/products/' . $coverFilename;
+            $validated['image_url'] = CloudinaryService::upload($request->file('cover_image_file'), 'products');
         }
 
         // 2. Process Additional Gallery Photo Uploads
@@ -72,10 +70,8 @@ class ProductController extends Controller
         }
 
         if ($request->hasFile('image_files')) {
-            foreach ($request->file('image_files') as $idx => $file) {
-                $filename = 'prod_' . time() . '_' . $idx . '_' . rand(100, 999) . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('uploads/products'), $filename);
-                $uploadedImages[] = '/uploads/products/' . $filename;
+            foreach ($request->file('image_files') as $file) {
+                $uploadedImages[] = CloudinaryService::upload($file, 'products');
             }
         }
 
@@ -113,10 +109,7 @@ class ProductController extends Controller
 
                 $vImg = $vData['image_url'] ?? null;
                 if ($request->hasFile("variants.{$idx}.image_file")) {
-                    $vFile = $request->file("variants.{$idx}.image_file");
-                    $vFilename = 'var_' . time() . '_' . $idx . '.' . $vFile->getClientOriginalExtension();
-                    $vFile->move(public_path('uploads/products'), $vFilename);
-                    $vImg = '/uploads/products/' . $vFilename;
+                    $vImg = CloudinaryService::upload($request->file("variants.{$idx}.image_file"), 'variants');
                 }
 
                 if (empty($vImg) && !empty($uploadedImages)) {
@@ -191,10 +184,7 @@ class ProductController extends Controller
 
         // Preserve existing Cover Image URL unless new cover photo uploaded
         if ($request->hasFile('cover_image_file')) {
-            $coverFile = $request->file('cover_image_file');
-            $coverFilename = 'cover_' . time() . '_' . rand(100, 999) . '.' . $coverFile->getClientOriginalExtension();
-            $coverFile->move(public_path('uploads/products'), $coverFilename);
-            $validated['image_url'] = '/uploads/products/' . $coverFilename;
+            $validated['image_url'] = CloudinaryService::upload($request->file('cover_image_file'), 'products');
         } else {
             $validated['image_url'] = $product->primary_image_url ?: $product->image_url;
         }
@@ -211,10 +201,8 @@ class ProductController extends Controller
         }
 
         if ($request->hasFile('image_files')) {
-            foreach ($request->file('image_files') as $idx => $file) {
-                $filename = 'prod_' . time() . '_' . $idx . '_' . rand(100, 999) . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('uploads/products'), $filename);
-                $uploadedImages[] = '/uploads/products/' . $filename;
+            foreach ($request->file('image_files') as $file) {
+                $uploadedImages[] = CloudinaryService::upload($file, 'products');
             }
         }
 
@@ -267,10 +255,7 @@ class ProductController extends Controller
                 $vImg = !empty($vData['existing_image']) ? $vData['existing_image'] : ($existingVar?->image_url);
 
                 if ($request->hasFile("variants.{$idx}.image_file")) {
-                    $vFile = $request->file("variants.{$idx}.image_file");
-                    $vFilename = 'var_' . time() . '_' . $idx . '.' . $vFile->getClientOriginalExtension();
-                    $vFile->move(public_path('uploads/products'), $vFilename);
-                    $vImg = '/uploads/products/' . $vFilename;
+                    $vImg = CloudinaryService::upload($request->file("variants.{$idx}.image_file"), 'variants');
                 }
 
                 if (empty($vImg)) {
