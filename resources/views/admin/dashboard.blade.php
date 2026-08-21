@@ -63,9 +63,17 @@
         <div class="dark-card p-4 h-100">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700;color:var(--mb-heading);margin:0;">Revenue — Last 7 Days</h2>
-                <span style="font-size:.8rem;color:var(--mb-muted);">Completed + Delivered orders</span>
+                <span style="font-size:.8rem;color:var(--mb-muted);">{{ $revenueChart->first()['date'] }} &ndash; {{ $revenueChart->last()['date'] }} &middot; Completed + Delivered</span>
             </div>
-            <canvas id="revenue-chart" style="max-height:220px;"></canvas>
+            @if($revenueTotal > 0)
+                <div style="height:240px;"><canvas id="revenue-chart"></canvas></div>
+            @else
+                <div class="d-flex flex-column align-items-center justify-content-center text-center" style="height:240px;">
+                    <i class="bi bi-bar-chart-line" style="font-size:2rem;color:var(--mb-muted);opacity:.45;"></i>
+                    <p style="font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--mb-heading);margin:.75rem 0 .25rem;">No revenue in this period</p>
+                    <p style="font-size:.82rem;color:var(--mb-muted);margin:0;">Completed and delivered orders will show up here.</p>
+                </div>
+            @endif
         </div>
     </div>
 
@@ -181,43 +189,93 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4/dist/chart.umd.min.js"></script>
 <script>
-const ctx = document.getElementById('revenue-chart').getContext('2d');
-new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: {!! json_encode($revenueChart->pluck('date')) !!},
-        datasets: [
-            {
-                label: 'Product Sales (₱)',
-                data: {!! json_encode($revenueChart->pluck('product_revenue')) !!},
-                backgroundColor: 'rgba(245, 166, 35, 0.85)',
-                borderColor: '#F5A623',
-                borderWidth: 1,
-                borderRadius: 4,
-            },
-            {
-                label: 'Shipping Fees (₱)',
-                data: {!! json_encode($revenueChart->pluck('shipping_revenue')) !!},
-                backgroundColor: 'rgba(0, 210, 255, 0.85)',
-                borderColor: '#00D2FF',
-                borderWidth: 1,
-                borderRadius: 4,
-            }
-        ]
-    },
-    options: {
-        responsive: true,
-        plugins: { 
-            legend: { 
-                display: true,
-                labels: { color: '#B3B3C1', font: { family: 'Rajdhani', size: 13 } }
-            } 
+(() => {
+    const canvas = document.getElementById('revenue-chart');
+
+    // Absent when the window has no revenue and the empty state rendered instead.
+    if (! canvas || typeof Chart === 'undefined') return;
+
+    const PESO   = '\u20B1';
+    const series = @json($revenueChart);
+
+    const money = (value, dp = 2) => PESO + Number(value || 0).toLocaleString('en-PH', {
+        minimumFractionDigits: dp,
+        maximumFractionDigits: dp,
+    });
+
+    new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: series.map(day => day.date),
+            datasets: [
+                {
+                    label: 'Product Sales',
+                    data: series.map(day => day.product_revenue),
+                    backgroundColor: 'rgba(245, 166, 35, 0.85)',
+                    borderColor: '#F5A623',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                },
+                {
+                    label: 'Shipping Fees',
+                    data: series.map(day => day.shipping_revenue),
+                    backgroundColor: 'rgba(0, 210, 255, 0.85)',
+                    borderColor: '#00D2FF',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                },
+            ],
         },
-        scales: {
-            x: { stacked: true, ticks: { color: '#7A7A8C' }, grid: { display: false } },
-            y: { stacked: true, ticks: { color: '#7A7A8C', callback: v => '₱'+v.toLocaleString() }, grid: { color: 'rgba(255,255,255,0.05)' } }
-        }
-    }
-});
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            // Index mode so hovering a day's column reports the whole stack,
+            // including days whose bars have no height to hit.
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#B3B3C1',
+                        font: { family: 'Rajdhani', size: 13 },
+                        usePointStyle: true,
+                        boxWidth: 8,
+                    },
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(18,18,26,0.95)',
+                    borderColor: 'rgba(255,255,255,0.12)',
+                    borderWidth: 1,
+                    padding: 10,
+                    titleFont: { family: 'Rajdhani', size: 13, weight: '700' },
+                    bodyFont: { size: 12 },
+                    callbacks: {
+                        title:  items => series[items[0].dataIndex].full_date,
+                        label:  item  => ' ' + item.dataset.label + ': ' + money(item.parsed.y),
+                        footer: items => {
+                            const day = series[items[0].dataIndex];
+                            return 'Total: ' + money(day.revenue)
+                                 + '  (' + day.orders + (day.orders === 1 ? ' order)' : ' orders)');
+                        },
+                    },
+                },
+            },
+            scales: {
+                x: {
+                    stacked: true,
+                    ticks: { color: '#7A7A8C' },
+                    grid: { display: false },
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    // Whole-peso gridlines, so a small range cannot repeat the
+                    // same rounded label on several lines.
+                    ticks: { color: '#7A7A8C', precision: 0, callback: value => money(value, 0) },
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                },
+            },
+        },
+    });
+})();
 </script>
 @endpush
